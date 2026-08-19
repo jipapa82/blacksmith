@@ -42,7 +42,7 @@ function openForge(){
     ? fallen.map(f=>`${f.old}는 돌아오지 못했다. ${f.eq}는 새 손에 넘어간다.`).join('<br>')
     : '용병들은 상처를 씻고 다시 선다.';
   ov.innerHTML=`
-    <div class="ov-eyebrow">웨이브 ${waveIdx+1} 방어 성공</div>
+    <div class="ov-eyebrow">웨이브 ${waveIdx+1} 섬멸 · ${waveT.toFixed(1)}초</div>
     <div class="ov-title">대장간</div>
     <div class="ov-sub">${fallenTxt}</div>
     <div class="purse"><span class="g">골드 <b id="ovGold">${G.gold}</b></span>

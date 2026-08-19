@@ -25,7 +25,7 @@ function showEnd(win){
 function reset(){
   running=false; phase='idle';
   const o=document.getElementById('ov'); if(o)o.remove();
-  waveIdx=0; waveT=0; mobs=[]; fxs=[]; nums=[];
+  waveIdx=0; waveT=0; waveSpawned=0; waveKills=0; curWave=null; mobs=[]; fxs=[]; nums=[];
   G.gold=0; G.mats=0; G.kills=0; G.goldMul=1; G.reroll=10; G.hireCost=200; G._boss=0;
   mercLetter=0;
   allies=loadout.map((k,i)=>mkAlly(k,i,i===0)); layoutAllies();

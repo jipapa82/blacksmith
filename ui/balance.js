@@ -17,7 +17,7 @@ function renderBal(){
 }
 const foeMulLbl=document.getElementById('foeMulLbl'),
       rateLbl=document.getElementById('rateLbl'),
-      durLbl=document.getElementById('durLbl');
+      sizeLbl=document.getElementById('sizeLbl');
 document.getElementById('foeMul').oninput=e=>{foeMul=+e.target.value;foeMulLbl.textContent=foeMul.toFixed(2)};
 document.getElementById('rate').oninput=e=>{rateMul=+e.target.value;rateLbl.textContent=rateMul.toFixed(2)};
-document.getElementById('dur').oninput=e=>{waveDur=+e.target.value;durLbl.textContent=e.target.value+'초'};
+document.getElementById('wsize').oninput=e=>{waveSize=+e.target.value;sizeLbl.textContent='×'+waveSize.toFixed(2)};

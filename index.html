@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>대장간 — 전투 프로토타입 v4</title>
+<title>대장간 — 전투 프로토타입 v5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 
 <header>
   <h1>대장간 <em>/</em> 전투 프로토타입</h1>
-  <span class="tagline">v4 — 버티고, 두드리고, 다시 나간다</span>
+  <span class="tagline">v5 — 남김없이 잡아야 끝난다</span>
   <div class="head-actions">
     <div class="seg" id="speedSeg">
       <button data-sp="0.5">0.5배</button>
@@ -49,10 +49,10 @@
           <input type="range" id="rate" min="0.4" max="2.5" step="0.05" value="1">
         </div>
         <div class="slider-row">
-          <label>웨이브 길이 <b id="durLbl">22초</b></label>
-          <input type="range" id="dur" min="10" max="45" step="2" value="22">
+          <label>웨이브 규모 <b id="sizeLbl">×1.00</b></label>
+          <input type="range" id="wsize" min="0.5" max="2" step="0.05" value="1">
         </div>
-        <p class="note">바꾸면 다음 출정부터 적용.</p>
+        <p class="note">새로 나오는 적부터 적용. 규모는 다음 웨이브부터.</p>
       </div>
     </div>
   </div>

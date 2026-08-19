@@ -1,7 +1,7 @@
 /* ===================== 피해 처리 ===================== */
 function killMob(m,src){
   burst(m.x,m.y,m.color);
-  G.kills++; killTxt.textContent=G.kills;
+  G.kills++; waveKills++; killTxt.textContent=G.kills;
   const g=Math.round(m.gold*G.goldMul);
   G.gold+=g; goldTxt.textContent=G.gold; num(m.x,m.y-4,'+'+g,'#D9B45C');
   if(Math.random()<.16||m.type==='boss'){G.mats+=m.type==='boss'?3:1;matTxt.textContent=G.mats;}

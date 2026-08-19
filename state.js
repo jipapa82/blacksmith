@@ -4,7 +4,8 @@ let loadout=['shield','wand'];
 let speed=1, running=false, phase='idle';
 let allies=[], mobs=[], fxs=[], nums=[];
 let waveIdx=0, waveT=0, spawnT=0, shake=0;
-let foeMul=1, rateMul=1, waveDur=22;
+let waveSpawned=0, waveKills=0, curWave=null;   // 섬멸형: 이번 웨이브의 스폰/처치 집계
+let foeMul=1, rateMul=1, waveSize=1;
 const G={gold:0, mats:0, kills:0, goldMul:1, reroll:10, hireCost:200};
 
 /* 캔버스와 전장 좌표 */
