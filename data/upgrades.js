@@ -3,18 +3,18 @@
    일반 = 원소 부여(빌드의 시작), 희귀 = 무기 행동, 전설 = 시너지("A 상태의 적에게 B").
    ok: 이 카드가 뜰 조건 / d: 설명 / f: 적용 */
 const UP=[
-  /* ===== 일반 — 원소 부여 ===== */
-  {id:'efire', n:'화염 부여', max:3, r:0, ok:()=>1,
-   d:a=>`적중 시 ${STATUS.burn.dur}초 화상 — 초당 공격력 ${Math.round(STATUS.burn.dpsPct*100*(a.elFire+1))}% 지속 피해`,
+  /* ===== 일반 — 원소 부여 (1무기 1원소: 처음 고른 부여가 그 무기의 원소를 정한다) ===== */
+  {id:'efire', n:'화염 부여', max:3, r:0, ok:a=>!elemOf(a)||elemOf(a)==='fire',
+   d:a=>`적중 시 ${STATUS.burn.dur}초 화상 — 초당 공격력 ${Math.round(STATUS.burn.dpsPct*100*(a.elFire+1))}% 지속 피해${elemOf(a)?'':'<br>이 무기의 원소가 불로 정해진다'}`,
    f:a=>a.elFire++},
-  {id:'epois', n:'맹독 부여', max:3, r:0, ok:()=>1,
-   d:a=>`적중 시 중독 1중첩 (최대 ${STATUS.pois.maxStacks}) — 중첩당 초당 공격력 ${Math.round(STATUS.pois.dpsPct*100*(a.elPois+1))}%`,
+  {id:'epois', n:'맹독 부여', max:3, r:0, ok:a=>!elemOf(a)||elemOf(a)==='pois',
+   d:a=>`적중 시 중독 1중첩 (최대 ${STATUS.pois.maxStacks}) — 중첩당 초당 공격력 ${Math.round(STATUS.pois.dpsPct*100*(a.elPois+1))}%${elemOf(a)?'':'<br>이 무기의 원소가 독으로 정해진다'}`,
    f:a=>a.elPois++},
-  {id:'ecold', n:'냉기 부여', max:3, r:0, ok:()=>1,
-   d:a=>`적중 시 ${STATUS.chill.dur}초 한기(이동 -${Math.round(STATUS.chill.slow*100)}%). 한기 중 ${STATUS.chill.hitsToFreeze}회 적중 시 ${(STATUS.chill.freezeBase+STATUS.chill.freezePerLv*(a.elCold+1)).toFixed(1)}초 빙결`,
+  {id:'ecold', n:'냉기 부여', max:3, r:0, ok:a=>!elemOf(a)||elemOf(a)==='cold',
+   d:a=>`적중 시 ${STATUS.chill.dur}초 한기(이동 -${Math.round(STATUS.chill.slow*100)}%). 한기 중 ${STATUS.chill.hitsToFreeze}회 적중 시 ${(STATUS.chill.freezeBase+STATUS.chill.freezePerLv*(a.elCold+1)).toFixed(1)}초 빙결${elemOf(a)?'':'<br>이 무기의 원소가 얼음으로 정해진다'}`,
    f:a=>a.elCold++},
-  {id:'eshock',n:'진동 부여', max:3, r:0, ok:()=>1,
-   d:a=>`적중 시 ${STATUS.shock.dur}초 공명 — 받는 피해 +${Math.round(STATUS.shock.ampPerLv*100*(a.elShock+1))}%`,
+  {id:'eshock',n:'진동 부여', max:3, r:0, ok:a=>!elemOf(a)||elemOf(a)==='shock',
+   d:a=>`적중 시 ${STATUS.shock.dur}초 공명 — 받는 피해 +${Math.round(STATUS.shock.ampPerLv*100*(a.elShock+1))}%${elemOf(a)?'':'<br>이 무기의 원소가 진동으로 정해진다'}`,
    f:a=>a.elShock++},
   {id:'leech', n:'피 먹는 홈',  max:4, r:0, ok:()=>1,
    d:a=>`처치할 때마다 체력 +2 (현재 ${a.leech})`, f:a=>a.leech+=2},

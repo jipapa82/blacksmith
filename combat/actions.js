@@ -18,7 +18,7 @@ function ultimate(a){
   shake=6;
 
   if(a.trait==='melee'){                       // 회전 베기 — 자기 주위
-    ring(a.x,a.y,120,'#E8963C',2);
+    ring(a.x,a.y,120,elemColor(a)||'#E8963C',2);
     live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<120).forEach(m=>hurtMob(m,atkOf(a)*2.2*P,a,true));
   }
   else if(a.trait==='cleave'){                 // 내려찍기 — 앞으로 3연타
@@ -26,14 +26,14 @@ function ultimate(a){
       const cx=a.x+90+i*70;
       setTimeout(()=>{
         if(!running)return;
-        ring(cx,a.y,90,'#E8963C',2);
+        ring(cx,a.y,90,elemColor(a)||'#E8963C',2);
         mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-a.y)<90)
             .forEach(m=>hurtMob(m,atkOf(a)*0.9*P,a,true));
       },i*90);
     }
   }
   else if(a.trait==='wall'){                   // 방패 밀치기 — 근처만
-    ring(a.x,a.y,135,'#8FBF6A',2.5);
+    ring(a.x,a.y,135,elemColor(a)||'#8FBF6A',2.5);
     live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<135).forEach(m=>{
       hurtMob(m,atkOf(a)*2.0*P,a,true);
       m.x+=80; m.stun=1.3;
@@ -45,8 +45,8 @@ function ultimate(a){
       const px=x0+Math.random()*(x1-x0), py=30+Math.random()*(H-60);
       setTimeout(()=>{
         if(!running)return;
-        beam(px,-10,px,py,'#6FC9CE',4);
-        ring(px,py,34,'#6FC9CE',1.6);
+        beam(px,-10,px,py,elemColor(a)||'#6FC9CE',4);
+        ring(px,py,34,elemColor(a)||'#6FC9CE',1.6);
         mobs.filter(m=>m.hp>0&&Math.hypot(m.x-px,m.y-py)<34)
             .forEach(m=>hurtMob(m,atkOf(a)*1.5*P,a,true));
       },i*55);
@@ -58,7 +58,7 @@ function ultimate(a){
       const cx=x0+i*135;
       setTimeout(()=>{
         if(!running)return;
-        ring(cx,MID_Y,115,'#9B8ACB',2.2);
+        ring(cx,MID_Y,115,elemColor(a)||'#9B8ACB',2.2);
         mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-MID_Y)<115)
             .forEach(m=>hurtMob(m,atkOf(a)*0.85*P,a,true));
       },i*100);
@@ -73,10 +73,10 @@ function allyAct(a){
                     .sort((p,q)=>Math.hypot(p.x-a.x,p.y-a.y)-Math.hypot(q.x-a.x,q.y-a.y));
   if(a.trait==='wall'||a.trait==='melee'){
     const t=near(a.range)[0]; if(!t)return;
-    a.lung=.14; slashFx(t.x,t.y,'#E8963C'); hurtMob(t,atkOf(a),a);
+    a.lung=.14; slashFx(t.x,t.y,elemColor(a)||'#E8963C'); hurtMob(t,atkOf(a),a);
   }else if(a.trait==='cleave'){
     const t=near(a.range+22); if(!t.length)return;
-    a.lung=.18; ring(a.x+32,a.y,a.cleaveR,'#E8963C',.55);
+    a.lung=.18; ring(a.x+32,a.y,a.cleaveR,elemColor(a)||'#E8963C',.55);
     live.filter(m=>Math.hypot(m.x-(a.x+30),m.y-a.y)<a.cleaveR).forEach(m=>hurtMob(m,atkOf(a),a));
   }else if(a.trait==='shoot'){
     const rows=[];
@@ -99,7 +99,7 @@ function allyAct(a){
                      .sort((p,q)=>p.x-q.x);
       const hits=line.slice(0, 1+a.pierce);
       const endX = hits.length ? hits[hits.length-1].x+14 : W;
-      beam(a.x+12,a.y,endX,y,'#6FC9CE',2.5);
+      beam(a.x+12,a.y,endX,y,elemColor(a)||'#6FC9CE',2.5);
       hits.forEach((m,i)=>hurtMob(m,atkOf(a)*rowMul*Math.pow(.62,i),a));
     });
   }else if(a.trait==='blast'){
@@ -110,7 +110,7 @@ function allyAct(a){
     a.lung=.16; shake=Math.min(7,2+bn*.45);
     let cx=bx, cy=by, mult=.72;
     for(let c=0;c<=a.chain;c++){
-      ring(cx,cy,a.blastR,'#9B8ACB',1);
+      ring(cx,cy,a.blastR,elemColor(a)||'#9B8ACB',1);
       const hit=mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-cy)<a.blastR);
       hit.forEach(m=>hurtMob(m,atkOf(a)*mult,a));
       if(c<a.chain){
@@ -118,7 +118,7 @@ function allyAct(a){
         if(!rest.length)break;
         rest.sort((p,q)=>Math.hypot(p.x-cx,p.y-cy)-Math.hypot(q.x-cx,q.y-cy));
         const nx=rest[0];
-        beam(cx,cy,nx.x,nx.y,'#9B8ACB',2);
+        beam(cx,cy,nx.x,nx.y,elemColor(a)||'#9B8ACB',2);
         cx=nx.x; cy=nx.y; mult*=.55;
       }
     }
