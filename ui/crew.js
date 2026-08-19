@@ -11,16 +11,17 @@ function renderCrew(){
   }
   allies.forEach((a,i)=>{
     const el=c.children[i]; if(!el)return;
-    const p=Math.max(0,a.hp/a.maxhp);
+    const mx=maxHpOf(a), p=Math.max(0,a.hp/mx);
     const bar=el.querySelector('.cw-hp i');
     bar.style.width=p*100+'%'; bar.classList.toggle('hot',p<=.3);
-    el.querySelector('.hpn').textContent=Math.max(0,Math.ceil(a.hp))+' / '+a.maxhp;
-    el.querySelector('.atkn').textContent='공 '+a.atk+' · 치명 '+Math.round(a.crit*100)+'%';
+    el.querySelector('.hpn').textContent=Math.max(0,Math.ceil(a.hp))+' / '+mx;
+    el.querySelector('.atkn').textContent='공 '+atkOf(a)+' · 치명 '+Math.round(critOf(a)*100)+'%';
     const m=el.querySelector('.cw-mods');
-    const list=Object.entries(a.lv).map(([id,lv])=>{
-      const u=UP.find(x=>x.id===id); return u?`${u.n} ${lv}`:null;
+    const list=Object.entries(a.lv).map(([id,cl])=>{
+      const u=UP.find(x=>x.id===id); return u?`${u.n} ${cl}`:null;
     }).filter(Boolean);
-    if(a.crit>.05) list.unshift('치명 '+Math.round(a.crit*100)+'%');
+    a.sock.forEach(s=>{ if(s) list.unshift(`${GEMS[s.type].name} ${GRADE_TXT[s.grade-1]}`); });
+    if(critOf(a)>.05) list.unshift('치명 '+Math.round(critOf(a)*100)+'%');
     const key=list.join('|');
     if(m.dataset.key!==key){ m.dataset.key=key;
       m.innerHTML=list.map(x=>`<span class="mod">${x}</span>`).join(''); }

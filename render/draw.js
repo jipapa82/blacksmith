@@ -50,9 +50,11 @@ function draw(dt){
     if(a.hp>0){
       ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=2;
       ctx.beginPath();ctx.arc(a.x+ox,a.y,a.r+9,-1.57,-1.57+6.283*Math.min(1,a.charge));ctx.stroke();
-      const up=Math.min(1,a.ultT/a.ultCd);
-      ctx.strokeStyle=up>=1?'#E8963C':'rgba(232,150,60,.45)';ctx.lineWidth=3;
-      ctx.beginPath();ctx.arc(a.x+ox,a.y,a.r+15,-1.57,-1.57+6.283*up);ctx.stroke();
+      if(a.ultOn){                        // 필살기 링은 해금된 무기에만 (DESIGN 4.5)
+        const up=Math.min(1,a.ultT/a.ultCd);
+        ctx.strokeStyle=up>=1?'#E8963C':'rgba(232,150,60,.45)';ctx.lineWidth=3;
+        ctx.beginPath();ctx.arc(a.x+ox,a.y,a.r+15,-1.57,-1.57+6.283*up);ctx.stroke();
+      }
       ctx.fillStyle='#7E858F';ctx.font='11px "IBM Plex Sans KR"';ctx.textAlign='center';
       ctx.fillText(a.eq,a.x,a.y+a.r+26);
     }

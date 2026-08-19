@@ -7,10 +7,11 @@ const WAVE_TITLES=['척후','몰려드는 무리','옆을 파고든다','첫 번
 /* 웨이브가 오를수록 적 개체가 세지는 배수 */
 function waveScale(i){ return 1 + i*0.14; }
 
-/* 섬멸 목표 마릿수 (DESIGN 3.6) — 시간제 시절의 실측 마릿수 곡선(23/34/95/216/441)을 그대로 잇는다.
+/* 섬멸 목표 마릿수 (DESIGN 3.6) — 시간제 시절의 실측 곡선을 잇되,
+   레벨업이 전투 중으로 오면서 기준을 22→28로 올렸다 (웨이브를 길게, DESIGN 4.1).
    waveSize 슬라이더(웨이브 규모)가 전체를 늘리고 줄인다. */
 function waveCount(i){
-  return Math.round(22*waveSize*(1+i*0.045)/(0.95*Math.pow(0.917,i))*(1+Math.floor(i/4)*0.7));
+  return Math.round(28*waveSize*(1+i*0.045)/(0.95*Math.pow(0.917,i))*(1+Math.floor(i/4)*0.7));
 }
 
 function waveSpec(i){

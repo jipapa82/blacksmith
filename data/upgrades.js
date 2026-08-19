@@ -15,7 +15,7 @@ const UP=[
    d:a=>`치명타 확률 +7% (현재 ${Math.round(a.crit*100)}%)`, f:a=>a.crit+=.07},
   {id:'greed', n:'값나가는 세공',max:3, r:0, ok:()=>1,
    d:()=>'골드 획득 +20%', f:()=>G.goldMul+=.2},
-  {id:'ultcd', n:'가쁜 호흡',   max:4, r:0, ok:()=>1,
+  {id:'ultcd', n:'가쁜 호흡',   max:4, r:0, ok:a=>a.ultOn,
    d:a=>`필살기 대기 -12% (현재 ${a.ultCd.toFixed(1)}초)`, f:a=>a.ultCd*=.88},
 
   /* ===== 장비 전용 ===== */
@@ -43,7 +43,7 @@ const UP=[
   /* ===== 상위 ===== */
   {id:'cdmg',  n:'쪼개는 각인', max:4, r:2, ok:()=>1,
    d:a=>`치명타 피해 +30% (현재 ${Math.round(a.critD*100)}%)`, f:a=>a.critD+=.30},
-  {id:'ultpow',n:'필살의 각인', max:3, r:2, ok:()=>1,
+  {id:'ultpow',n:'필살의 각인', max:3, r:2, ok:a=>a.ultOn,
    d:a=>`필살기 피해 +25% (현재 ${Math.round(a.ultPow*100)}%)`, f:a=>a.ultPow+=.25},
   {id:'rune',  n:'파열의 룬',   max:3, r:2, ok:()=>1,
    d:()=>'적을 죽이면 작게 터진다', f:a=>a.deathBlast++},

@@ -19,16 +19,20 @@ function step(dt){
   }
   if(w.boss&&!G._boss&&waveSpawned>=w.count*.4){G._boss=1;mobs.push(mkMob('boss'));}
   allies.forEach(a=>{ if(a.hp<=0)return;
-    a.charge+=dt*a.aspd; if(a.charge>=1){a.charge=0;allyAct(a);}
-    a.ultT+=dt;
-    if(a.ultT>=a.ultCd){ if(ultimate(a)) a.ultT=0; }
+    a.charge+=dt*aspdOf(a); if(a.charge>=1){a.charge=0;allyAct(a);}
+    if(a.ultOn){                                 // 필살기는 노드로 해금 (DESIGN 4.5)
+      a.ultT+=dt;
+      if(a.ultT>=a.ultCd){ if(ultimate(a)) a.ultT=0; }
+    }
     a.hit=Math.max(0,a.hit-dt); a.lung=Math.max(0,a.lung-dt); });
   mobs.forEach(m=>{ if(m.hp>0){mobStep(m,dt);m.hit=Math.max(0,m.hit-dt);m.lung=Math.max(0,m.lung-dt);} });
   mobs=mobs.filter(m=>m.hp>0);
   aliveTxt.textContent=total-waveKills;          // 아직 등장하지 않은 적까지 센다
+  lvTxt.textContent=lv; xpFill.style.width=Math.min(100,xp/xpNeed(lv)*100)+'%';
   renderCrew();
   if(waveSpawned>=w.count&&mobs.length) statusTxt.textContent='잔당 정리';
   if(!liveAllies().length){running=false;showEnd(false);return;}
+  if(pendingLv>0){running=false;openLevelUp();return;}   // 레벨업: 잠깐 멈추고 3택 (DESIGN 4.1)
   if(waveSpawned>=w.count&&!mobs.length){running=false;openForge();}
 }
 

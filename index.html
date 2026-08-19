@@ -21,6 +21,7 @@
       <button data-sp="1" class="on">1배</button>
       <button data-sp="2">2배</button>
     </div>
+    <button id="metaBtn">대장간</button>
     <button id="startBtn" class="primary">출정</button>
   </div>
 </header>
@@ -65,14 +66,17 @@
         <div class="hud-title" id="waveTitle">출정 대기</div>
       </div>
       <div class="hud-right">
+        <div class="hud-stat">Lv <b id="lvTxt" style="color:var(--heat)">1</b></div>
         <div class="hud-stat g">골드 <b id="goldTxt" style="color:var(--gold)">0</b></div>
         <div class="hud-stat m">재료 <b id="matTxt" style="color:var(--quench)">0</b></div>
+        <div class="hud-stat">보석 <b id="gemTxt" style="color:var(--violet)">0</b></div>
         <div class="hud-stat">남은 적 <b id="aliveTxt" style="color:var(--blood)">0</b></div>
         <div class="hud-stat">처치 <b id="killTxt">0</b></div>
         <div class="hud-stat" id="statusTxt">준비</div>
       </div>
     </div>
     <div class="timebar"><i id="timeFill"></i></div>
+    <div class="xpbar"><i id="xpFill"></i></div>
     <div class="canvas-wrap"><canvas id="cv" width="880" height="400"></canvas></div>
     <div class="crew" id="crew"></div>
     <div class="legend">
@@ -91,8 +95,12 @@
 <script src="data/foes.js"></script>
 <script src="data/upgrades.js"></script>
 <script src="data/waves.js"></script>
+<script src="data/gems.js"></script>
+<script src="data/nodes.js"></script>
 <script src="state.js"></script>
+<script src="meta.js"></script>
 <script src="combat/units.js"></script>
+<script src="combat/loot.js"></script>
 <script src="combat/damage.js"></script>
 <script src="combat/actions.js"></script>
 <script src="combat/wave.js"></script>
@@ -102,6 +110,8 @@
 <script src="ui/balance.js"></script>
 <script src="ui/crew.js"></script>
 <script src="ui/forge.js"></script>
+<script src="ui/levelup.js"></script>
+<script src="ui/meta.js"></script>
 <script src="main.js"></script>
 </body>
 </html>
