@@ -14,5 +14,8 @@ const STATUS={
     mixer:.15,          // 원소 공진: 상태 2종 이상 적에게 피해 증가
     spreadBase:40, spreadPerLv:20,   // 불길 전파 반경
     resoPct:.60, resoR:70,           // 공명 파열: 폭발 피해·반경
+    harvestPct:.20,     // 추수: 필살기 피해, 상태이상 1종당
+    detBase:.5, detPerLv:.5,         // 기폭: 남은 지속 피해 회수 배율 (1단계 100%, 2단계 150%)
+    reapPct:.03,        // 갈무리: 상태이상 적 처치 시 필살기 게이지 회복
   },
 };

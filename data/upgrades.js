@@ -63,5 +63,18 @@ const UP=[
      return s.size>=2;},
    d:a=>`상태이상이 2종 이상 걸린 적에게 피해 +${Math.round(STATUS.syn.mixer*100*(a.syMixer+1))}%`,
    f:a=>a.syMixer++},
+
+  /* ===== 전설 — 회수: 농사 짓고 필살기로 거둔다 (필살기 해금 + 원소 보유 시에만) ===== */
+  {id:'detona', n:'기폭', max:2, r:2, ok:a=>a.ultOn&&allies.some(x=>x.elFire||x.elPois),
+   d:a=>`필살기가 화상·중독을 터뜨린다 — 남은 지속 피해의 ${Math.round((STATUS.syn.detBase+STATUS.syn.detPerLv*(a.syDeton+1))*100)}%를 즉시`,
+   f:a=>a.syDeton++},
+  {id:'harvest', n:'추수', max:2, r:2,
+   ok:a=>a.ultOn&&allies.some(x=>x.elFire||x.elPois||x.elCold||x.elShock),
+   d:a=>`필살기 피해가 대상의 상태이상 1종당 +${Math.round(STATUS.syn.harvestPct*100*(a.syHarvest+1))}%`,
+   f:a=>a.syHarvest++},
+  {id:'reap', n:'갈무리', max:2, r:2,
+   ok:a=>a.ultOn&&allies.some(x=>x.elFire||x.elPois||x.elCold||x.elShock),
+   d:a=>`상태이상 걸린 적을 처치하면 필살기 게이지 +${Math.round(STATUS.syn.reapPct*100*(a.syReap+1))}%`,
+   f:a=>a.syReap++},
 ];
 const RAR=['일반','희귀','전설'];

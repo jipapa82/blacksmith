@@ -85,6 +85,9 @@ canvas{display:block;width:100%;height:auto}
   display:flex;justify-content:space-between}
 .cw-mods{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px}
 .mod{font-size:9.5px;padding:1px 5px;border-radius:2px;background:#2E323B;color:var(--dim)}
+.ultbtn{width:100%;margin-top:6px;padding:3px 6px;font-size:10.5px}
+.ultbtn.ready{background:var(--heat);border-color:var(--heat);color:var(--forge);font-weight:500;
+  box-shadow:0 0 8px rgba(232,150,60,.4)}
 
 /* forge overlay */
 .overlay{position:absolute;inset:0;background:rgba(15,16,21,.96);z-index:20;

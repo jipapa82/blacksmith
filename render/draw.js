@@ -51,7 +51,7 @@ function draw(dt){
     if(m.freezeT>0){ctx.strokeStyle='rgba(154,217,232,.9)';ctx.lineWidth=2;
       ctx.beginPath();ctx.arc(m.x,m.y,m.r+3,0,6.283);ctx.stroke();}
   });
-  allies.forEach(a=>{
+  allies.forEach((a,i)=>{
     if(a.hp<=0)ctx.globalAlpha=.18;
     const ox=a.lung>0?7:0;
     shapePath(a.x+ox,a.y,a.r+2,a.shape);
@@ -60,10 +60,13 @@ function draw(dt){
     if(a.hp>0){
       ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=2;
       ctx.beginPath();ctx.arc(a.x+ox,a.y,a.r+9,-1.57,-1.57+6.283*Math.min(1,a.charge));ctx.stroke();
-      if(a.ultOn){                        // 필살기 링은 해금된 무기에만 (DESIGN 4.5)
+      if(a.ultOn){                        // 필살기: 게이지가 차면 키로 발동 (DESIGN 4.1.2)
         const up=Math.min(1,a.ultT/a.ultCd);
         ctx.strokeStyle=up>=1?'#E8963C':'rgba(232,150,60,.45)';ctx.lineWidth=3;
         ctx.beginPath();ctx.arc(a.x+ox,a.y,a.r+15,-1.57,-1.57+6.283*up);ctx.stroke();
+        ctx.fillStyle=up>=1?'#E8963C':'#565B64';
+        ctx.font='600 10px "IBM Plex Mono"';ctx.textAlign='center';
+        ctx.fillText(String(i+1),a.x+ox,a.y-a.r-20);   // 발동 키 번호
       }
       ctx.fillStyle='#7E858F';ctx.font='11px "IBM Plex Sans KR"';ctx.textAlign='center';
       ctx.fillText(a.eq,a.x,a.y+a.r+26);

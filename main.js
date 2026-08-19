@@ -52,6 +52,12 @@ function startRun(){ reset(); beginWave(); }
 /* ===== 헤더 조작 ===== */
 document.getElementById('startBtn').onclick=startRun;
 document.getElementById('metaBtn').onclick=openMeta;
+
+/* 필살기 발동: 키 1~5 (DESIGN 4.1.2) */
+document.addEventListener('keydown',e=>{
+  const n=+e.key;
+  if(n>=1&&n<=allies.length) fireUlt(n-1);
+});
 document.getElementById('speedSeg').onclick=e=>{
   if(e.target.tagName!=='BUTTON')return; speed=+e.target.dataset.sp;
   [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===e.target));

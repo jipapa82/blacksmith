@@ -10,6 +10,7 @@ function mkAlly(k,i,front){
     leech:0, deathBlast:0, crit:.05, critD:1.5,
     elFire:0, elPois:0, elCold:0, elShock:0,                       // 원소 부여 단계
     syShatter:0, syColdcut:0, syFirespread:0, syDotamp:0, syReso:0, syMixer:0,   // 시너지 단계
+    syDeton:0, syHarvest:0, syReap:0,                                            // 회수 시너지 (필살기)
     ultOn:mm.ultOn, ultCd:e.ultCd, ultT:e.ultCd*.5, ultPow:1,
     sock:Array(mm.slots).fill(null), gm:null,
     lv:{}, mods:[]};

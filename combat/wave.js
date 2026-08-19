@@ -20,10 +20,7 @@ function step(dt){
   if(w.boss&&!G._boss&&waveSpawned>=w.count*.4){G._boss=1;mobs.push(mkMob('boss'));}
   allies.forEach(a=>{ if(a.hp<=0)return;
     a.charge+=dt*aspdOf(a); if(a.charge>=1){a.charge=0;allyAct(a);}
-    if(a.ultOn){                                 // 필살기는 노드로 해금 (DESIGN 4.5)
-      a.ultT+=dt;
-      if(a.ultT>=a.ultCd){ if(ultimate(a)) a.ultT=0; }
-    }
+    if(a.ultOn) a.ultT=Math.min(a.ultCd,a.ultT+dt);   // 수동 발동: 게이지는 차서 기다린다 (4.1.2)
     a.hit=Math.max(0,a.hit-dt); a.lung=Math.max(0,a.lung-dt); });
   mobs.forEach(m=>{ if(m.hp<=0)return;
     statusTick(m,dt);                        // 화상·중독 틱, 한기·빙결·공명 시간 경과

@@ -1,6 +1,16 @@
 /* ===================== 행동: 필살기 / 기본 공격 / 적 이동 =====================
    규칙: 이펙트가 그려지는 그 좌표, 그 시점에만 판정한다. (DESIGN 7.2)
    setTimeout으로 연출을 나눴다면 피해 계산도 그 안에 넣는다. */
+
+/* 필살기 수동 발동 — 키 1~5와 부대 카드 버튼이 부른다 (DESIGN 4.1.2) */
+function fireUlt(i){
+  if(!running)return false;
+  const a=allies[i];
+  if(!a||a.hp<=0||!a.ultOn||a.ultT<a.ultCd)return false;
+  if(ultimate(a)){ a.ultT=0; return true; }
+  return false;
+}
+
 function ultimate(a){
   const live=mobs.filter(m=>m.hp>0);
   if(!live.length)return false;
@@ -9,7 +19,7 @@ function ultimate(a){
 
   if(a.trait==='melee'){                       // 회전 베기 — 자기 주위
     ring(a.x,a.y,120,'#E8963C',2);
-    live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<120).forEach(m=>hurtMob(m,atkOf(a)*2.2*P,a));
+    live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<120).forEach(m=>hurtMob(m,atkOf(a)*2.2*P,a,true));
   }
   else if(a.trait==='cleave'){                 // 내려찍기 — 앞으로 3연타
     for(let i=0;i<3;i++){
@@ -18,14 +28,14 @@ function ultimate(a){
         if(!running)return;
         ring(cx,a.y,90,'#E8963C',2);
         mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-a.y)<90)
-            .forEach(m=>hurtMob(m,atkOf(a)*0.9*P,a));
+            .forEach(m=>hurtMob(m,atkOf(a)*0.9*P,a,true));
       },i*90);
     }
   }
   else if(a.trait==='wall'){                   // 방패 밀치기 — 근처만
     ring(a.x,a.y,135,'#8FBF6A',2.5);
     live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<135).forEach(m=>{
-      hurtMob(m,atkOf(a)*2.0*P,a);
+      hurtMob(m,atkOf(a)*2.0*P,a,true);
       m.x+=80; m.stun=1.3;
     });
   }
@@ -38,7 +48,7 @@ function ultimate(a){
         beam(px,-10,px,py,'#6FC9CE',4);
         ring(px,py,34,'#6FC9CE',1.6);
         mobs.filter(m=>m.hp>0&&Math.hypot(m.x-px,m.y-py)<34)
-            .forEach(m=>hurtMob(m,atkOf(a)*1.5*P,a));
+            .forEach(m=>hurtMob(m,atkOf(a)*1.5*P,a,true));
       },i*55);
     }
   }
@@ -50,7 +60,7 @@ function ultimate(a){
         if(!running)return;
         ring(cx,MID_Y,115,'#9B8ACB',2.2);
         mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-MID_Y)<115)
-            .forEach(m=>hurtMob(m,atkOf(a)*0.85*P,a));
+            .forEach(m=>hurtMob(m,atkOf(a)*0.85*P,a,true));
       },i*100);
     }
   }
