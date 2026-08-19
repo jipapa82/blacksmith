@@ -26,12 +26,16 @@ function applyOnHit(src,m){
       pt:m.pois?m.pois.pt:0, src};
   }
   if(src.elCold){
-    m.chillT=STATUS.chill.dur; m.chillHits++;
+    m.chillT=STATUS.chill.dur;
     m.chillLv=Math.max(m.chillLv,src.elCold);              // 감속 세기는 건 무기의 단계
-    if(m.chillHits>=STATUS.chill.hitsToFreeze[src.elCold-1]&&m.freezeT<=0){
-      m.chillHits=0;
-      m.freezeT=STATUS.chill.freezeDur[src.elCold-1];
-      ring(m.x,m.y,m.r+10,'#9AD9E8',1.2);
+    if(m.freezeCd<=0){                                     // 재빙결 유예 중엔 카운트도 안 쌓인다
+      m.chillHits++;
+      if(m.chillHits>=STATUS.chill.hitsToFreeze[src.elCold-1]){
+        m.chillHits=0;
+        m.freezeT=STATUS.chill.freezeDur[src.elCold-1]*(m.type==='boss'?STATUS.chill.bossFreezeMul:1);
+        m.freezeCd=m.freezeT+STATUS.chill.immune;
+        ring(m.x,m.y,m.r+10,'#9AD9E8',1.2);
+      }
     }
   }
   if(src.elShock){
@@ -56,6 +60,7 @@ function dotDamage(m,d,c,src){
 /* 매 프레임 상태 갱신 — combat/wave.js의 mobs 루프에서 호출 */
 function statusTick(m,dt){
   if(m.freezeT>0) m.freezeT-=dt;
+  if(m.freezeCd>0) m.freezeCd-=dt;
   if(m.chillT>0){ m.chillT-=dt; if(m.chillT<=0){m.chillHits=0;m.chillLv=0;} }
   if(m.shockT>0){ m.shockT-=dt; if(m.shockT<=0)m.shockLv=0; }
   if(m.burn){

@@ -5,7 +5,8 @@ const STATUS={
   /* 단계별 배열 [1단계, 2단계, 3단계] — 단계가 오르면 여러 축이 같이 자란다 (4.1.1) */
   burn:  {dur:[4,5,6],  dpsPct:[.20,.40,.60]},                 // 화상: 굵은 단일 DoT
   pois:  {dur:6,  dpsPct:[.08,.16,.24], maxStacks:[5,6,8]},    // 중독: 쌓는 DoT
-  chill: {dur:3,  slow:[.20,.35,.50], hitsToFreeze:[5,4,3], freezeDur:[1.2,1.6,2.0]},
+  chill: {dur:3,  slow:[.20,.35,.50], hitsToFreeze:[5,4,3], freezeDur:[1.2,1.6,2.0],
+          immune:4, bossFreezeMul:.5},   // 재빙결 유예(초) — 무한 빙결 방지 / 대장은 절반만 언다
   shock: {dur:[3,4,5],  amp:[.08,.16,.24]},                    // 공명: 받는 피해 증폭
   tick:  .5,                                                   // DoT 판정 주기(초)
   syn:{                                                        // 시너지 카드 수치 (단계당)

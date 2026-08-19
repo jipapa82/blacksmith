@@ -18,48 +18,51 @@ function ultimate(a){
   shake=6;
 
   if(a.trait==='melee'){                       // 회전 베기 — 자기 주위
-    ring(a.x,a.y,120,elemColor(a)||'#E8963C',2);
-    live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<120).forEach(m=>hurtMob(m,atkOf(a)*2.2*P,a,true));
+    const R=120*a.ultR;
+    ring(a.x,a.y,R,elemColor(a)||'#E8963C',2);
+    live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<R).forEach(m=>hurtMob(m,atkOf(a)*2.2*P,a,true));
   }
   else if(a.trait==='cleave'){                 // 내려찍기 — 앞으로 3연타
+    const R=90*a.ultR;
     for(let i=0;i<3;i++){
       const cx=a.x+90+i*70;
       setTimeout(()=>{
         if(!running)return;
-        ring(cx,a.y,90,elemColor(a)||'#E8963C',2);
-        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-a.y)<90)
+        ring(cx,a.y,R,elemColor(a)||'#E8963C',2);
+        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-a.y)<R)
             .forEach(m=>hurtMob(m,atkOf(a)*0.9*P,a,true));
       },i*90);
     }
   }
   else if(a.trait==='wall'){                   // 방패 밀치기 — 근처만
-    ring(a.x,a.y,135,elemColor(a)||'#8FBF6A',2.5);
-    live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<135).forEach(m=>{
+    const R=135*a.ultR;
+    ring(a.x,a.y,R,elemColor(a)||'#8FBF6A',2.5);
+    live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<R).forEach(m=>{
       hurtMob(m,atkOf(a)*2.0*P,a,true);
       m.x+=80; m.stun=1.3;
     });
   }
   else if(a.trait==='shoot'){                  // 화살비 — 떨어지는 순간에 맞는다
-    const x0=a.x+130, x1=W-20;
+    const x0=a.x+130, x1=W-20, R=34*a.ultR;
     for(let i=0;i<14;i++){
       const px=x0+Math.random()*(x1-x0), py=30+Math.random()*(H-60);
       setTimeout(()=>{
         if(!running)return;
         beam(px,-10,px,py,elemColor(a)||'#6FC9CE',4);
-        ring(px,py,34,elemColor(a)||'#6FC9CE',1.6);
-        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-px,m.y-py)<34)
+        ring(px,py,R,elemColor(a)||'#6FC9CE',1.6);
+        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-px,m.y-py)<R)
             .forEach(m=>hurtMob(m,atkOf(a)*1.5*P,a,true));
       },i*55);
     }
   }
   else if(a.trait==='blast'){                  // 불바다 — 앞쪽 절반, 순차 폭발
-    const x0=a.x+120;
+    const x0=a.x+120, R=115*a.ultR;
     for(let i=0;i<4;i++){
       const cx=x0+i*135;
       setTimeout(()=>{
         if(!running)return;
-        ring(cx,MID_Y,115,elemColor(a)||'#9B8ACB',2.2);
-        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-MID_Y)<115)
+        ring(cx,MID_Y,R,elemColor(a)||'#9B8ACB',2.2);
+        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-MID_Y)<R)
             .forEach(m=>hurtMob(m,atkOf(a)*0.85*P,a,true));
       },i*100);
     }

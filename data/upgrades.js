@@ -38,6 +38,8 @@ const UP=[
    d:()=>'적을 막는 범위 +15%', f:a=>a.blockR*=1.15},
   {id:'reach', n:'긴 자루',     max:4, r:1, ok:a=>a.trait==='melee'||a.trait==='wall',
    d:()=>'사거리 +15%', f:a=>a.range*=1.15},
+  {id:'ultwide', n:'퍼지는 오의', max:3, r:1, ok:a=>a.ultOn,
+   d:a=>`필살기 범위 +15% (현재 +${Math.round((a.ultR-1)*100)}%)`, f:a=>a.ultR*=1.15},
 
   /* ===== 전설 — 시너지: "A 상태의 적에게 B" ===== */
   {id:'rune',  n:'파열의 룬',   max:3, r:2, ok:()=>1,

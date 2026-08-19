@@ -11,7 +11,7 @@ function mkAlly(k,i,front){
     elFire:0, elPois:0, elCold:0, elShock:0,                       // 원소 부여 단계
     syShatter:0, syColdcut:0, syFirespread:0, syDotamp:0, syReso:0, syMixer:0,   // 시너지 단계
     syDeton:0, syHarvest:0, syReap:0,                                            // 회수 시너지 (필살기)
-    ultOn:mm.ultOn, ultCd:e.ultCd, ultT:e.ultCd*.5, ultPow:1,
+    ultOn:mm.ultOn, ultCd:e.ultCd, ultT:e.ultCd*.5, ultPow:1, ultR:1,
     sock:Array(mm.slots).fill(null), gm:null,
     lv:{}, mods:[]};
   recalcGems(a); a.hp=maxHpOf(a);
@@ -35,7 +35,7 @@ function mkMob(type){
     def:Math.round(f.def*(1+waveIdx*.07)*foeMul),
     mv:f.mv*(1+waveIdx*.015),aspd:f.aspd,charge:Math.random()*.5,
     x:W-6+Math.random()*44,y:34+Math.random()*(H-68),hit:0,lung:0,stun:0,
-    burn:null,pois:null,chillT:0,chillHits:0,chillLv:0,freezeT:0,shockT:0,shockLv:0};
+    burn:null,pois:null,chillT:0,chillHits:0,chillLv:0,freezeT:0,freezeCd:0,shockT:0,shockLv:0};
 }
 
 /* ===== 보석 스탯 반영 (DESIGN 4.2) =====
