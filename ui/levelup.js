@@ -4,7 +4,8 @@ function lvOf(a,id){ return a.lv[id]||0; }
 function pickCards(){
   const out=[], used=new Set();
   const live=liveAllies();
-  for(let i=0;i<3;i++){
+  const n=allies.length+1;   // 용병 2명=3택, 한 명 늘 때마다 +1 (최대 5명=6택)
+  for(let i=0;i<n;i++){
     let tries=0, c=null, tgt=null;
     while(tries++<120){
       const r=Math.random(); const rar=r<.58?0:r<.88?1:2;
