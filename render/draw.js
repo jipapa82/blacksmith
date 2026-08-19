@@ -40,6 +40,16 @@ function draw(dt){
     if(m.hp<m.maxhp){const w=m.r*2.2;
       ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(m.x-w/2,m.y-m.r-7,w,3);
       ctx.fillStyle=m.color;ctx.fillRect(m.x-w/2,m.y-m.r-7,w*(m.hp/m.maxhp),3);}
+    /* 상태이상 표시: 체력 바 위 색점 + 빙결 테두리 (DESIGN 7.3 가독성) */
+    const sts=[];
+    if(m.burn)sts.push('#E8963C');
+    if(m.pois)sts.push('#8FBF6A');
+    if(m.chillT>0||m.freezeT>0)sts.push('#9AD9E8');
+    if(m.shockT>0)sts.push('#9B8ACB');
+    sts.forEach((c,i)=>{ctx.fillStyle=c;
+      ctx.fillRect(m.x-sts.length*3+i*6+1,m.y-m.r-13,4,4);});
+    if(m.freezeT>0){ctx.strokeStyle='rgba(154,217,232,.9)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(m.x,m.y,m.r+3,0,6.283);ctx.stroke();}
   });
   allies.forEach(a=>{
     if(a.hp<=0)ctx.globalAlpha=.18;

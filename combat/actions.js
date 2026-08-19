@@ -81,6 +81,8 @@ function allyAct(a){
     }
     if(!rows.length)return;
     a.lung=.1;
+    // 줄이 늘면 줄당 피해를 나눈다(총합 +20%씩), 관통은 한 명 뚫을 때마다 62%로 (DESIGN 7.1)
+    const rowMul = a.arrows>1 ? (1+.2*(a.arrows-1))/a.arrows : 1;
     rows.forEach(y=>{
       // 가까운 순으로 정렬해 관통 수만큼만 맞춘다
       const line=live.filter(m=>Math.abs(m.y-y)<a.pierceW&&m.x>a.x)
@@ -88,7 +90,7 @@ function allyAct(a){
       const hits=line.slice(0, 1+a.pierce);
       const endX = hits.length ? hits[hits.length-1].x+14 : W;
       beam(a.x+12,a.y,endX,y,'#6FC9CE',2.5);
-      hits.forEach(m=>hurtMob(m,atkOf(a),a));
+      hits.forEach((m,i)=>hurtMob(m,atkOf(a)*rowMul*Math.pow(.62,i),a));
     });
   }else if(a.trait==='blast'){
     let bx=0,by=0,bn=0;
@@ -119,10 +121,12 @@ function mobStep(m,dt){
   else if(m.behav==='leak'){ tgt=B||F; stopD=(tgt?tgt.r:16)+m.r+3; }
   else{ tgt=B||F; stopD=185; }
   if(!tgt)return;
+  if(m.freezeT>0) return;                                  // 빙결: 행동 불가
   if(m.stun>0){ m.stun-=dt; m.x=Math.min(W+20,m.x); return; }
   const dx=tgt.x-m.x, dy=tgt.y-m.y, dist=Math.hypot(dx,dy);
   if(dist>stopD){
-    const s=m.mv*dt/dist; m.x+=dx*s; m.y+=dy*s;
+    const slow=m.chillT>0?(1-STATUS.chill.slow):1;         // 한기: 감속
+    const s=m.mv*slow*dt/dist; m.x+=dx*s; m.y+=dy*s;
     if(m.behav==='wall'&&F&&m.x<F.x+8) m.x=F.x+8;
   }else{
     m.charge+=dt*m.aspd;

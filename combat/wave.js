@@ -25,7 +25,9 @@ function step(dt){
       if(a.ultT>=a.ultCd){ if(ultimate(a)) a.ultT=0; }
     }
     a.hit=Math.max(0,a.hit-dt); a.lung=Math.max(0,a.lung-dt); });
-  mobs.forEach(m=>{ if(m.hp>0){mobStep(m,dt);m.hit=Math.max(0,m.hit-dt);m.lung=Math.max(0,m.lung-dt);} });
+  mobs.forEach(m=>{ if(m.hp<=0)return;
+    statusTick(m,dt);                        // 화상·중독 틱, 한기·빙결·공명 시간 경과
+    if(m.hp>0){mobStep(m,dt);m.hit=Math.max(0,m.hit-dt);m.lung=Math.max(0,m.lung-dt);} });
   mobs=mobs.filter(m=>m.hp>0);
   aliveTxt.textContent=total-waveKills;          // 아직 등장하지 않은 적까지 센다
   lvTxt.textContent=lv; xpFill.style.width=Math.min(100,xp/xpNeed(lv)*100)+'%';
