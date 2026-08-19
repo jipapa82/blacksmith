@@ -4,9 +4,12 @@
 const META_KEY='blacksmith-meta-v1';
 const META=(()=>{ try{
     const j=JSON.parse(localStorage.getItem(META_KEY));
-    if(j&&typeof j.pts==='number'&&j.nodes) return j;
+    if(j&&typeof j.pts==='number'&&j.nodes){
+      if(j.autoUlt===undefined)j.autoUlt=true;   // 필살기 발동 방식 (4.1.2) — 기본 자동
+      return j;
+    }
   }catch(e){}
-  return {pts:0, nodes:{}}; })();
+  return {pts:0, nodes:{}, autoUlt:true}; })();
 function saveMeta(){ try{localStorage.setItem(META_KEY,JSON.stringify(META));}catch(e){} }
 
 function metaRank(k,id){ return (META.nodes[k]||{})[id]||0; }

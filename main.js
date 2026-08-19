@@ -53,7 +53,18 @@ function startRun(){ reset(); beginWave(); }
 document.getElementById('startBtn').onclick=startRun;
 document.getElementById('metaBtn').onclick=openMeta;
 
-/* 필살기 발동: 키 1~5 (DESIGN 4.1.2) */
+/* 필살기 발동 방식 토글 — 기본 자동, 저장됨 (DESIGN 4.1.2) */
+const ultSeg=document.getElementById('ultSeg');
+function syncUltSeg(){
+  [...ultSeg.children].forEach(b=>b.classList.toggle('on',(b.dataset.um==='auto')===META.autoUlt));
+}
+ultSeg.onclick=e=>{
+  if(e.target.tagName!=='BUTTON')return;
+  META.autoUlt=e.target.dataset.um==='auto'; saveMeta(); syncUltSeg();
+};
+syncUltSeg();
+
+/* 수동 모드: 키 1~5로 발동 */
 document.addEventListener('keydown',e=>{
   const n=+e.key;
   if(n>=1&&n<=allies.length) fireUlt(n-1);

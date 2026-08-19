@@ -64,9 +64,11 @@ function draw(dt){
         const up=Math.min(1,a.ultT/a.ultCd);
         ctx.strokeStyle=up>=1?'#E8963C':'rgba(232,150,60,.45)';ctx.lineWidth=3;
         ctx.beginPath();ctx.arc(a.x+ox,a.y,a.r+15,-1.57,-1.57+6.283*up);ctx.stroke();
-        ctx.fillStyle=up>=1?'#E8963C':'#565B64';
-        ctx.font='600 10px "IBM Plex Mono"';ctx.textAlign='center';
-        ctx.fillText(String(i+1),a.x+ox,a.y-a.r-20);   // 발동 키 번호
+        if(!META.autoUlt){                             // 수동 모드에만 발동 키 번호
+          ctx.fillStyle=up>=1?'#E8963C':'#565B64';
+          ctx.font='600 10px "IBM Plex Mono"';ctx.textAlign='center';
+          ctx.fillText(String(i+1),a.x+ox,a.y-a.r-20);
+        }
       }
       ctx.fillStyle='#7E858F';ctx.font='11px "IBM Plex Sans KR"';ctx.textAlign='center';
       ctx.fillText(a.eq,a.x,a.y+a.r+26);
