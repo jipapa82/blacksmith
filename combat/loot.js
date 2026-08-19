@@ -32,14 +32,14 @@ function invEntries(){
   }).sort((a,b)=>a.type===b.type?a.grade-b.grade:(a.type<b.type?-1:1));
 }
 
-/* 처치 시 드랍. 대장은 확정 2개(단계 보정), 잡졸은 확률. */
+/* 처치 시 드랍. 대장은 확정(단계 보정), 잡졸은 확률. 수치는 data/gems.js의 GEM_DROP. */
 function dropLoot(m){
   if(m.type==='boss'){
     gainGem(rollGemType(), 1+Math.ceil(waveIdx/5));
-    gainGem(rollGemType(), 1+Math.floor(waveIdx/8));
+    for(let i=1;i<GEM_DROP.bossGems;i++) gainGem(rollGemType(), 1+Math.floor(waveIdx/8));
     num(m.x,m.y-18,'보석!','#6FC9CE',1);
-  }else if(Math.random()<.10){
-    gainGem(rollGemType(), 1+(Math.random()<waveIdx*.02?1:0));
+  }else if(Math.random()<GEM_DROP.rate){
+    gainGem(rollGemType(), 1+(Math.random()<waveIdx*GEM_DROP.gradeUpPerWave?1:0));
     num(m.x,m.y-18,'보석','#6FC9CE');
   }
 }
