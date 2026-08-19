@@ -135,7 +135,7 @@ function mobStep(m,dt){
   if(m.stun>0){ m.stun-=dt; m.x=Math.min(W+20,m.x); return; }
   const dx=tgt.x-m.x, dy=tgt.y-m.y, dist=Math.hypot(dx,dy);
   if(dist>stopD){
-    const slow=m.chillT>0?(1-STATUS.chill.slow):1;         // 한기: 감속
+    const slow=(m.chillT>0&&m.chillLv)?(1-STATUS.chill.slow[m.chillLv-1]):1;   // 한기: 단계별 감속
     const s=m.mv*slow*dt/dist; m.x+=dx*s; m.y+=dy*s;
     if(m.behav==='wall'&&F&&m.x<F.x+8) m.x=F.x+8;
   }else{

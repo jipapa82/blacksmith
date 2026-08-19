@@ -35,7 +35,7 @@ function mkMob(type){
     def:Math.round(f.def*(1+waveIdx*.07)*foeMul),
     mv:f.mv*(1+waveIdx*.015),aspd:f.aspd,charge:Math.random()*.5,
     x:W-6+Math.random()*44,y:34+Math.random()*(H-68),hit:0,lung:0,stun:0,
-    burn:null,pois:null,chillT:0,chillHits:0,freezeT:0,shockT:0,shockLv:0};
+    burn:null,pois:null,chillT:0,chillHits:0,chillLv:0,freezeT:0,shockT:0,shockLv:0};
 }
 
 /* ===== 보석 스탯 반영 (DESIGN 4.2) =====

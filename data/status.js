@@ -2,10 +2,11 @@
    원소 4종 튜닝 값. 로직은 combat/status.js. (DESIGN 4.1.1)
    dpsPct: 부여 단계당, 건 무기의 공격력 대비 초당 비율. */
 const STATUS={
-  burn:  {dur:4,  dpsPct:.20},                                 // 화상: 굵은 단일 DoT
-  pois:  {dur:6,  dpsPct:.08, maxStacks:5},                    // 중독: 쌓는 DoT
-  chill: {dur:3,  slow:.35, hitsToFreeze:4, freezeBase:.8, freezePerLv:.4},
-  shock: {dur:3,  ampPerLv:.08},                               // 공명: 받는 피해 증폭
+  /* 단계별 배열 [1단계, 2단계, 3단계] — 단계가 오르면 여러 축이 같이 자란다 (4.1.1) */
+  burn:  {dur:[4,5,6],  dpsPct:[.20,.40,.60]},                 // 화상: 굵은 단일 DoT
+  pois:  {dur:6,  dpsPct:[.08,.16,.24], maxStacks:[5,6,8]},    // 중독: 쌓는 DoT
+  chill: {dur:3,  slow:[.20,.35,.50], hitsToFreeze:[5,4,3], freezeDur:[1.2,1.6,2.0]},
+  shock: {dur:[3,4,5],  amp:[.08,.16,.24]},                    // 공명: 받는 피해 증폭
   tick:  .5,                                                   // DoT 판정 주기(초)
   syn:{                                                        // 시너지 카드 수치 (단계당)
     shatterPct:.15,     // 서리 파쇄: 최대 체력 비례 추가 피해

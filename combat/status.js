@@ -16,24 +16,27 @@ function applyOnHit(src,m){
   if(m.hp<=0)return;
   const dotAmp=1+STATUS.syn.dotAmp*src.syDotamp;
   if(src.elFire){
-    m.burn={t:STATUS.burn.dur, dps:atkOf(src)*STATUS.burn.dpsPct*src.elFire*dotAmp,
+    m.burn={t:STATUS.burn.dur[src.elFire-1],
+      dps:atkOf(src)*STATUS.burn.dpsPct[src.elFire-1]*dotAmp,
       pt:m.burn?m.burn.pt:0, src};
   }
   if(src.elPois){
-    const n=Math.min(STATUS.pois.maxStacks,(m.pois?m.pois.n:0)+1);
-    m.pois={n, t:STATUS.pois.dur, dps:atkOf(src)*STATUS.pois.dpsPct*src.elPois*dotAmp,
+    const n=Math.min(STATUS.pois.maxStacks[src.elPois-1],(m.pois?m.pois.n:0)+1);
+    m.pois={n, t:STATUS.pois.dur, dps:atkOf(src)*STATUS.pois.dpsPct[src.elPois-1]*dotAmp,
       pt:m.pois?m.pois.pt:0, src};
   }
   if(src.elCold){
     m.chillT=STATUS.chill.dur; m.chillHits++;
-    if(m.chillHits>=STATUS.chill.hitsToFreeze&&m.freezeT<=0){
+    m.chillLv=Math.max(m.chillLv,src.elCold);              // 감속 세기는 건 무기의 단계
+    if(m.chillHits>=STATUS.chill.hitsToFreeze[src.elCold-1]&&m.freezeT<=0){
       m.chillHits=0;
-      m.freezeT=STATUS.chill.freezeBase+STATUS.chill.freezePerLv*src.elCold;
+      m.freezeT=STATUS.chill.freezeDur[src.elCold-1];
       ring(m.x,m.y,m.r+10,'#9AD9E8',1.2);
     }
   }
   if(src.elShock){
-    m.shockT=STATUS.shock.dur; m.shockLv=Math.max(m.shockLv,src.elShock);
+    m.shockT=STATUS.shock.dur[src.elShock-1];
+    m.shockLv=Math.max(m.shockLv,src.elShock);
   }
 }
 
@@ -53,7 +56,7 @@ function dotDamage(m,d,c,src){
 /* 매 프레임 상태 갱신 — combat/wave.js의 mobs 루프에서 호출 */
 function statusTick(m,dt){
   if(m.freezeT>0) m.freezeT-=dt;
-  if(m.chillT>0){ m.chillT-=dt; if(m.chillT<=0)m.chillHits=0; }
+  if(m.chillT>0){ m.chillT-=dt; if(m.chillT<=0){m.chillHits=0;m.chillLv=0;} }
   if(m.shockT>0){ m.shockT-=dt; if(m.shockT<=0)m.shockLv=0; }
   if(m.burn){
     m.burn.t-=dt; m.burn.pt+=dt;

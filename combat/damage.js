@@ -31,7 +31,7 @@ function hurtMob(m,dmg,src,isUlt){
   if(m.hp<=0)return;
   let crit=false;
   if(src && Math.random()<critOf(src)){ dmg*=src.critD; crit=true; }
-  if(m.shockT>0) dmg*=1+STATUS.shock.ampPerLv*m.shockLv;              // 공명: 받는 피해 증폭
+  if(m.shockT>0&&m.shockLv) dmg*=1+STATUS.shock.amp[m.shockLv-1];     // 공명: 받는 피해 증폭
   if(src){
     if(src.syColdcut&&(m.chillT>0||m.freezeT>0))
       dmg*=1+STATUS.syn.coldcut*src.syColdcut;                        // 한파의 날
