@@ -16,6 +16,15 @@ function restoreCrew(){
 
 let selGem=null;   // 인벤토리에서 고른 보석 키 ("종류:단계")
 
+/* 보석 스탯 표기 — 무색 2종은 이중 스탯 (DESIGN 4.2) */
+function gemStatText(g,gr){
+  const pct=s=>s==='leech'||s==='def'?false:true;   // 흡혈·방어만 정수, 나머지는 %
+  const f=(s,v)=>pct(s)?Math.round(v*100)+'%':v;
+  let t=`${g.desc} +${f(g.stat,g.v[gr-1])}`;
+  if(g.stat2) t+=` · ${g.desc2} +${f(g.stat2,g.v2[gr-1])}`;
+  return t;
+}
+
 function openForge(){
   phase='forge'; selGem=null;
   const fallen=restoreCrew();
@@ -56,7 +65,7 @@ function renderForgeBody(){
       ${a.sock.map((s,si)=>{
         if(s){const g=GEMS[s.type];
           return `<button class="slotbtn filled" data-ai="${ai}" data-si="${si}"
-            title="${g.name} ${GRADE_TXT[s.grade-1]} — ${g.desc}"
+            title="${g.name} ${GRADE_TXT[s.grade-1]} — ${gemStatText(g,s.grade)}"
             style="border-color:${g.color};color:${g.color}">${GRADE_TXT[s.grade-1]}</button>`;}
         return `<button class="slotbtn" data-ai="${ai}" data-si="${si}">+</button>`;
       }).join('')}
@@ -67,8 +76,7 @@ function renderForgeBody(){
       const g=GEMS[e.type];
       return `<span class="gemchip ${selGem===e.key?'sel':''}" data-key="${e.key}">
         <i class="dot2" style="background:${g.color}"></i>${g.name} ${GRADE_TXT[e.grade-1]}
-        <span class="cnt">${g.desc} +${g.kind==='mul'||g.stat==='crit'||g.stat==='dodge'
-          ?Math.round(g.v[e.grade-1]*100)+'%':g.v[e.grade-1]}</span>
+        <span class="cnt">${gemStatText(g,e.grade)}</span>
         ${g.elem?`<span class="cnt" style="color:${ELEM_INFO[g.elem][1]}">↔${ELEM_INFO[g.elem][0]}</span>`:''}
         <span class="cnt">×${e.count}</span>
         ${e.count>=2&&e.grade<GEM_MAX_GRADE?`<button data-merge="${e.key}">합성</button>`:''}

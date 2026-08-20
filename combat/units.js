@@ -44,12 +44,15 @@ function mkMob(type){
    장착된 보석의 합을 a.gm에 캐시해두고, 전투 계산은 아래 *Of() 접근자만 쓴다. */
 function recalcGems(a){
   const gm={atkMul:1,aspdMul:1,hpMul:1,defAdd:0,critAdd:0,dodgeAdd:0,
+    leechAdd:0,critDmgAdd:0,                     // 무색 보석의 2번째 스탯 (4.2)
     synFire:0,synPois:0,synCold:0,synShock:0};   // 보석×원소 시너지 합 (DESIGN 4.2)
   a.sock.forEach(s=>{ if(!s)return;
     const g=GEMS[s.type], v=g.v[s.grade-1];
     if(g.stat==='atk')gm.atkMul+=v; else if(g.stat==='aspd')gm.aspdMul+=v;
     else if(g.stat==='hp')gm.hpMul+=v; else if(g.stat==='crit')gm.critAdd+=v;
     else if(g.stat==='def')gm.defAdd+=v; else gm.dodgeAdd+=v;
+    if(g.stat2){ const v2=g.v2[s.grade-1];
+      if(g.stat2==='leech')gm.leechAdd+=v2; else if(g.stat2==='critD')gm.critDmgAdd+=v2; }
     if(g.elem){ const sv=g.syn[s.grade-1];
       if(g.elem==='fire')gm.synFire+=sv; else if(g.elem==='pois')gm.synPois+=sv;
       else if(g.elem==='cold')gm.synCold+=sv; else gm.synShock+=sv; } });

@@ -12,12 +12,15 @@ const GEMS={
             v:[.05,.08,.13,.21,.34], elem:'pois',  syn:[1,2,3,4,5]},            // 중독 중첩 상한 +
   sapphire:{name:'사파이어',  color:'#5A8FD9', stat:'hp',    kind:'mul', desc:'최대 체력',
             v:[.07,.12,.19,.30,.48], elem:'cold',  syn:[.10,.20,.30,.40,.50]},  // 빙결 지속 +
+  /* 무색 2종은 원소 시너지 대신 이중 스탯 (2026-08-21) — 토파즈+다이아 = 치명 빌드 */
   topaz:   {name:'토파즈',    color:'#E0C050', stat:'crit',  kind:'add', desc:'치명타 확률',
-            v:[.04,.07,.11,.17,.26], elem:null},                                // 무색 — 번개 추가 시 승격 후보
+            v:[.04,.07,.11,.17,.26], elem:null,                                 // 번개 추가 시 승격 후보
+            stat2:'leech', desc2:'처치 시 회복', v2:[1,2,3,5,8]},
   amethyst:{name:'자수정',    color:'#9B6FD0', stat:'def',   kind:'add', desc:'방어',
             v:[1,2,4,6,10],          elem:'shock', syn:[.02,.04,.06,.08,.10]},  // 공명 증폭 +
   diamond: {name:'다이아몬드',color:'#D8E4EA', stat:'dodge', kind:'add', desc:'회피',
-            v:[.03,.05,.08,.13,.20], elem:null},                                // 무색 — 범용
+            v:[.03,.05,.08,.13,.20], elem:null,                                 // 치명 피해의 유일한 공급처
+            stat2:'critD', desc2:'치명타 피해', v2:[.10,.18,.28,.42,.60]},
 };
 const GEM_MAX_GRADE=5;
 const GRADE_TXT=['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];

@@ -7,7 +7,8 @@ function killMob(m,src){
   gainXp(m.xp);
   dropLoot(m);
   if(src){
-    if(src.leech){src.hp=Math.min(maxHpOf(src),src.hp+src.leech);}
+    const lch=src.leech+(src.gm?src.gm.leechAdd:0);          // 피 먹는 홈 + 토파즈 흡혈
+    if(lch){src.hp=Math.min(maxHpOf(src),src.hp+lch);}
     if(src.syReap&&statusCount(m)>0)                     // 갈무리: 상태이상 적 처치 → 게이지 회복
       src.ultT=Math.min(src.ultCd,src.ultT+src.ultCd*STATUS.syn.reapPct*src.syReap);
     if(src.deathBlast){ ring(m.x,m.y,34,'#E8963C',.6);
@@ -30,7 +31,7 @@ function killMob(m,src){
 function hurtMob(m,dmg,src,isUlt){
   if(m.hp<=0)return;
   let crit=false;
-  if(src && Math.random()<critOf(src)){ dmg*=src.critD; crit=true; }
+  if(src && Math.random()<critOf(src)){ dmg*=src.critD+(src.gm?src.gm.critDmgAdd:0); crit=true; }  // 다이아: 치명 피해 +
   if(m.shockT>0&&m.shockAmp) dmg*=1+m.shockAmp;                       // 공명: 받는 피해 증폭 (자수정 포함)
   if(src){
     if(src.syColdcut&&(m.chillT>0||m.freezeT>0))
