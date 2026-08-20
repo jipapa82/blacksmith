@@ -70,8 +70,8 @@ const UP=[
    d:a=>`상태이상이 2종 이상 걸린 적에게 피해 +${Math.round(STATUS.syn.mixer*100*(a.syMixer+1))}%`,
    f:a=>a.syMixer++},
 
-  /* ===== 전설 — 회수: 농사 짓고 필살기로 거둔다 (필살기 해금 + 원소 보유 시에만) ===== */
-  {id:'detona', n:'기폭', max:2, r:2, ok:()=>allies.some(x=>x.elFire||x.elPois),
+  /* ===== 회수: 농사 짓고 필살기로 거둔다 (원소 보유 시에만) — 기폭은 황금 등급 ===== */
+  {id:'detona', n:'기폭', max:2, r:3, ok:()=>allies.some(x=>x.elFire||x.elPois),
    d:a=>`필살기가 화상·중독을 터뜨린다 — 남은 지속 피해의 ${Math.round((STATUS.syn.detBase+STATUS.syn.detPerLv*(a.syDeton+1))*100)}% × 걸린 상태이상 종류 수(최대 4)를 즉시`,
    f:a=>a.syDeton++},
   {id:'harvest', n:'추수', max:2, r:2,
@@ -83,4 +83,4 @@ const UP=[
    d:a=>`상태이상 걸린 적을 처치하면 필살기 게이지 +${Math.round(STATUS.syn.reapPct*100*(a.syReap+1))}%`,
    f:a=>a.syReap++},
 ];
-const RAR=['일반','희귀','전설'];
+const RAR=['일반','희귀','전설','황금'];   // 황금 = 빌드를 정의하는 카드 (3%)

@@ -111,6 +111,10 @@ canvas{display:block;width:100%;height:auto}
 .card.epic{border-color:var(--violet);
   box-shadow:0 0 0 1px rgba(155,138,203,.28),0 0 14px rgba(155,138,203,.2)}
 .card.epic .cname{color:var(--violet)}
+.card.gold{border-color:var(--gold);
+  box-shadow:0 0 0 1px rgba(217,180,92,.35),0 0 18px rgba(217,180,92,.28)}
+.card.gold .cname{color:var(--gold)}
+.card.gold .pip.on{background:var(--gold)}
 
 /* 무기 문양 아이콘 */
 .wicon{display:inline-flex;width:15px;height:15px;flex:none;vertical-align:-3px;margin-right:3px}

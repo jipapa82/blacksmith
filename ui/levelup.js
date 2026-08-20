@@ -7,7 +7,7 @@ function pickCards(){
   for(let i=0;i<4;i++){      // 4택 고정 (DESIGN 4.1) — N+1 규칙은 비교 피로로 폐기
     let tries=0, c=null, tgt=null;
     while(tries++<120){
-      const r=Math.random(); const rar=r<.58?0:r<.88?1:2;
+      const r=Math.random(); const rar=r<.58?0:r<.88?1:r<.97?2:3;   // 일반/희귀/전설/황금
       const cands=UP.filter(u=>u.r===rar&&!used.has(u.id));
       if(!cands.length)continue;
       const u=cands[Math.floor(Math.random()*cands.length)];
@@ -27,7 +27,7 @@ function drawCards(cards,onPick){
     return;
   }
   cards.forEach(c=>{
-    const cls=['','rare','epic'][c.u.r];
+    const cls=['','rare','epic','gold'][c.u.r];
     const cur=lvOf(c.a,c.u.id), next=cur+1, max=c.u.max;
     const pips=Array.from({length:max},(_,i)=>
       `<i class="pip${i<cur?' on':''}${i===cur?' next':''}"></i>`).join('');
