@@ -128,6 +128,7 @@ function renderHirePicker(){
     G.hireCost = allies.length>=3 ? 6000 : 2000;
     goldTxt.textContent=G.gold;
     hireMerc(el.dataset.k); renderCrew();
+    G.rerolls++;                       // 일손이 늘면 다시 두드릴 여유가 생긴다 (DESIGN 4.1)
     document.getElementById('ov').remove(); advance();
   });
   row.innerHTML='<button id="cancelHire">그만두기</button>';

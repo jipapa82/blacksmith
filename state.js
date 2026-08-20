@@ -8,7 +8,7 @@ let waveSpawned=0, waveKills=0, curWave=null;   // 섬멸형: 이번 웨이브�
 let lv=1, xp=0, pendingLv=0;                    // 전투 중 레벨업 (DESIGN 4.1)
 let foeMul=1, rateMul=1, waveSize=1;
 /* 재료(mats)는 6.4 장비 해금 층을 설계할 때 드랍부터 다시 넣는다 (2026-08-20 제거) */
-const G={gold:0, kills:0, goldMul:1, rerolls:2, hireCost:200, gems:{}};
+const G={gold:0, kills:0, goldMul:1, rerolls:0, hireCost:200, gems:{}};
 
 /* 캔버스와 전장 좌표 */
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');

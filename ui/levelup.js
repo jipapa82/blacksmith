@@ -4,7 +4,7 @@ function lvOf(a,id){ return a.lv[id]||0; }
 function pickCards(){
   const out=[], used=new Set();
   const live=liveAllies();
-  for(let i=0;i<3;i++){      // 3택 고정 — N+1 규칙은 비교 피로로 폐기 (DESIGN 6.7)
+  for(let i=0;i<4;i++){      // 4택 고정 (DESIGN 4.1) — N+1 규칙은 비교 피로로 폐기
     let tries=0, c=null, tgt=null;
     while(tries++<120){
       const r=Math.random(); const rar=r<.58?0:r<.88?1:2;

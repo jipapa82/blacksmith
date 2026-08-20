@@ -13,5 +13,5 @@ const NODES=[
 
 /* 무기와 무관한 공용 노드 — 대장장이 자신의 성장. META.nodes['_global']에 저장 */
 const GLOBAL_NODES=[
-  {id:'nreroll', n:'다시 뽑기', max:2, costs:[2,4], eff:r=>`레벨업 리롤 런당 ${2+r}회`},
+  {id:'nreroll', n:'다시 뽑기', max:2, costs:[2,4], eff:r=>`시작 리롤 +${r} (고용마다 +1과 별개)`},
 ];
