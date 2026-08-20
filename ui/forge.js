@@ -52,7 +52,7 @@ function renderForgeRow(){
 function renderForgeBody(){
   const box=document.getElementById('forgeBody'); if(!box)return;
   let html=allies.map((a,ai)=>`<div class="sock-row">
-      <span class="sock-name">${a.name} · ${a.eq}</span>
+      <span class="sock-name">${weaponIcon(a.key)}${a.name} · ${a.eq}</span>
       ${a.sock.map((s,si)=>{
         if(s){const g=GEMS[s.type];
           return `<button class="slotbtn filled" data-ai="${ai}" data-si="${si}"
@@ -118,7 +118,7 @@ function renderHirePicker(){
   box.innerHTML=`<div class="forge-hint">아직 주인이 없는 장비다. 하나를 골라 들려 보낸다.</div>
     <div class="cards">`+avail.map(([k,v])=>`<div class="card" data-k="${k}">
       <div class="target">새 용병</div>
-      <div class="cname">${v.name}</div>
+      <div class="cname">${weaponIcon(k)}${v.name}</div>
       <div class="cdesc">${v.desc}</div>
       <div class="cdesc" style="color:var(--heat)">필살 · ${v.ultName} (위력 ${50+25*metaRank(k,'nult')}%)</div>
       <div class="crar">공 ${v.atk} · 방 ${v.def} · 체 ${v.hp} · 속 ${v.spd.toFixed(2)}</div>

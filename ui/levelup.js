@@ -33,7 +33,7 @@ function drawCards(cards,onPick){
       `<i class="pip${i<cur?' on':''}${i===cur?' next':''}"></i>`).join('');
     const el=document.createElement('div');
     el.className='card '+cls;
-    el.innerHTML=`<div class="target">${c.a.eq}</div>
+    el.innerHTML=`<div class="target">${weaponIcon(c.a.key)}${c.a.eq}</div>
       <div class="cname">${c.u.n} <span class="lvtag">${next}단계</span></div>
       <div class="pips">${pips}</div>
       <div class="cdesc">${c.u.d(c.a,cur)}</div>

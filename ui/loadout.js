@@ -1,4 +1,19 @@
 /* ===================== 편성 UI ===================== */
+
+/* 무기 문양 아이콘 (SVG) — 캔버스의 도형 언어(DESIGN 7.3)와 같은 모양.
+   카드·정비·부대 어디서든 이걸로 무기를 한눈에 알아본다. */
+function weaponIcon(key){
+  const e=EQUIP[key]; if(!e)return '';
+  const shapes={
+    sword:'<polygon points="9,1 12.5,17 5.5,17"/>',                  // 좁은 삼각 — 단검
+    great:'<polygon points="9,2 17,17 1,17"/>',                      // 넓은 삼각 — 대검
+    shield:'<rect x="2.5" y="2.5" width="13" height="13"/>',         // 사각 — 방패
+    bow:'<polygon points="9,1 17,9 9,17 1,9"/>',                     // 마름모 — 원거리
+    wand:'<polygon points="17,9 13,15.9 5,15.9 1,9 5,2.1 13,2.1"/>', // 육각 — 마법
+  };
+  return `<span class="wicon"><svg viewBox="0 0 18 18" fill="${e.color}" stroke="rgba(255,255,255,.35)" stroke-width="1">${shapes[key]||''}</svg></span>`;
+}
+
 const mercList=document.getElementById('mercList');
 function renderLoadout(){
   mercList.innerHTML='';
