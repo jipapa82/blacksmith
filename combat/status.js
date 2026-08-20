@@ -10,6 +10,10 @@ function elemColor(a){
   const e=elemOf(a);
   return e==='fire'?'#E8963C':e==='pois'?'#8FBF6A':e==='cold'?'#9AD9E8':e==='shock'?'#9B8ACB':null;
 }
+/* 이 무기가 원소 e를 (더) 부여받을 수 있는가 — 무기별 허용 목록 + 1무기 1원소 */
+function elemOk(a,e){
+  return EQUIP[a.key].elems.includes(e)&&(!elemOf(a)||elemOf(a)===e);
+}
 
 /* 아군 적중 시 원소 적용 — hurtMob 끝에서 호출 */
 function applyOnHit(src,m){

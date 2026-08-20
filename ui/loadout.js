@@ -14,6 +14,13 @@ function weaponIcon(key){
   return `<span class="wicon"><svg viewBox="0 0 18 18" fill="${e.color}" stroke="rgba(255,255,255,.35)" stroke-width="1">${shapes[key]||''}</svg></span>`;
 }
 
+/* 무기가 고를 수 있는 원소 표시 (DESIGN 4.1.1 무기별 원소 제한) */
+const ELEM_INFO={fire:['불','#E8963C'],pois:['독','#8FBF6A'],cold:['얼음','#9AD9E8'],shock:['진동','#9B8ACB']};
+function elemChoices(key){
+  return EQUIP[key].elems.map(e=>
+    `<span style="color:${ELEM_INFO[e][1]}">● ${ELEM_INFO[e][0]}</span>`).join(' ');
+}
+
 const mercList=document.getElementById('mercList');
 function renderLoadout(){
   mercList.innerHTML='';
@@ -30,6 +37,7 @@ function renderLoadout(){
       <div class="derived"><span>공 <b>${e.atk}</b></span><span>방 <b>${e.def}</b></span>
         <span>체 <b>${e.hp}</b></span><span>속 <b>${e.spd.toFixed(2)}</b></span></div>
       <div class="trait-note">${e.desc}</div>
+      <div class="derived">원소 ${elemChoices(k)}</div>
       ${bad?`<div class="warn-note">${e.trait==='assassin'?'앞줄에 서면 지킬 후미가 없다':'앞줄에 세우면 둘러싸인다'}</div>`:''}
       ${bad2?'<div class="warn-note">뒷줄에서는 막을 것이 없다</div>':''}`;
     mercList.appendChild(d);

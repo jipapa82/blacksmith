@@ -4,16 +4,16 @@
    ok: 이 카드가 뜰 조건 / d: 설명 / f: 적용 */
 const UP=[
   /* ===== 일반 — 원소 부여 (1무기 1원소: 처음 고른 부여가 그 무기의 원소를 정한다) ===== */
-  {id:'efire', n:'화염 부여', max:3, r:0, ok:a=>!elemOf(a)||elemOf(a)==='fire',
+  {id:'efire', n:'화염 부여', max:3, r:0, ok:a=>elemOk(a,'fire'),
    d:a=>`적중 시 ${STATUS.burn.dur[a.elFire]}초 화상 — 초당 공격력 ${Math.round(STATUS.burn.dpsPct[a.elFire]*100)}% 지속 피해${elemOf(a)?'':'<br>이 무기의 원소가 불로 정해진다'}`,
    f:a=>a.elFire++},
-  {id:'epois', n:'맹독 부여', max:3, r:0, ok:a=>!elemOf(a)||elemOf(a)==='pois',
+  {id:'epois', n:'맹독 부여', max:3, r:0, ok:a=>elemOk(a,'pois'),
    d:a=>`적중 시 중독 1중첩 (최대 ${STATUS.pois.maxStacks[a.elPois]}중첩) — 중첩당 초당 공격력 ${Math.round(STATUS.pois.dpsPct[a.elPois]*100)}%${elemOf(a)?'':'<br>이 무기의 원소가 독으로 정해진다'}`,
    f:a=>a.elPois++},
-  {id:'ecold', n:'냉기 부여', max:3, r:0, ok:a=>!elemOf(a)||elemOf(a)==='cold',
+  {id:'ecold', n:'냉기 부여', max:3, r:0, ok:a=>elemOk(a,'cold'),
    d:a=>`적중 시 ${STATUS.chill.dur}초 한기(이동 -${Math.round(STATUS.chill.slow[a.elCold]*100)}%). 한기 중 ${STATUS.chill.hitsToFreeze[a.elCold]}회 적중 시 ${STATUS.chill.freezeDur[a.elCold].toFixed(1)}초 빙결${elemOf(a)?'':'<br>이 무기의 원소가 얼음으로 정해진다'}`,
    f:a=>a.elCold++},
-  {id:'eshock',n:'진동 부여', max:3, r:0, ok:a=>!elemOf(a)||elemOf(a)==='shock',
+  {id:'eshock',n:'진동 부여', max:3, r:0, ok:a=>elemOk(a,'shock'),
    d:a=>`적중 시 ${STATUS.shock.dur[a.elShock]}초 공명 — 받는 피해 +${Math.round(STATUS.shock.amp[a.elShock]*100)}%${elemOf(a)?'':'<br>이 무기의 원소가 진동으로 정해진다'}`,
    f:a=>a.elShock++},
   {id:'leech', n:'피 먹는 홈',  max:4, r:0, ok:()=>1,

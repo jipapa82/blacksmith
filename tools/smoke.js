@@ -157,6 +157,8 @@ const driver = `
     + ' (노드 1랭크=0.75), 홈=' + allies[0].sock.length);
   const multi=allies.filter(a=>[a.elFire,a.elPois,a.elCold,a.elShock].filter(v=>v>0).length>1);
   out.push('원소 잠금: ' + (multi.length ? 'VIOLATION — 한 무기에 2원소 이상' : 'OK (무기당 최대 1원소)'));
+  const badEl=allies.filter(a=>{const e=elemOf(a);return e&&!EQUIP[a.key].elems.includes(e);});
+  out.push('무기별 원소 제한: ' + (badEl.length ? 'VIOLATION — 허용 밖 원소' : 'OK (허용 목록 준수)'));
   return out.join('\\n');
 })()
 `;
