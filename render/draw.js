@@ -19,6 +19,26 @@ function draw(dt){
   if(F){ctx.strokeStyle='rgba(232,150,60,.15)';ctx.setLineDash([5,7]);
     ctx.beginPath();ctx.moveTo(F.x+26,0);ctx.lineTo(F.x+26,H);ctx.stroke();ctx.setLineDash([]);}
 
+  /* 범위 표시 — 대검 타격 지대는 상시, 범위 필살기는 게이지가 차면 예고 (DESIGN 7.3)
+     좌표는 판정과 같은 cleaveAnchor()에서 나온다 (7.2: 표시=판정) */
+  allies.forEach(a=>{
+    if(a.hp<=0)return;
+    ctx.setLineDash([4,7]);ctx.lineWidth=1.5;
+    if(a.trait==='cleave'){
+      const an=cleaveAnchor(a);
+      ctx.strokeStyle='rgba(232,150,60,.15)';
+      ctx.beginPath();ctx.arc(an.x,an.y,a.cleaveR,0,6.283);ctx.stroke();
+      if(a.ultT>=a.ultCd){
+        ctx.strokeStyle='rgba(232,150,60,.3)';
+        for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(an.ux+i*70,an.uy,90*a.ultR,0,6.283);ctx.stroke();}
+      }
+    }else if(a.trait==='wall'&&a.ultT>=a.ultCd){
+      ctx.strokeStyle='rgba(143,191,106,.32)';
+      ctx.beginPath();ctx.arc(a.x,a.y,135*a.ultR,0,6.283);ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  });
+
   fxs.forEach(f=>{
     f.life+=dt*speed; const t=Math.min(1,f.life/f.dur), a=1-t;
     ctx.globalAlpha=a;

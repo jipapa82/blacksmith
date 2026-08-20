@@ -2,6 +2,13 @@
    규칙: 이펙트가 그려지는 그 좌표, 그 시점에만 판정한다. (DESIGN 7.2)
    setTimeout으로 연출을 나눴다면 피해 계산도 그 안에 넣는다. */
 
+/* 대검의 타격 앵커 — 뒷줄이면 전선 기준. 공격·필살기·범위 표시가 모두 이걸 쓴다 (7.2: 표시=판정) */
+function cleaveAnchor(a){
+  const F=frontAlly(), anchored=!a.front&&F&&F!==a;
+  return {x:anchored?F.x+45:a.x+30, y:anchored?F.y:a.y,        // 기본 공격 중심
+          ux:anchored?F.x+60:a.x+90, uy:anchored?F.y:a.y};     // 내려찍기 시작점
+}
+
 /* 침투자 — 전선(앞줄)을 넘어 들어온 적. 단검(암살)의 사냥감 (DESIGN 3.3) */
 function behindLine(m){
   const F=frontAlly();
@@ -49,8 +56,7 @@ function ultimate(a){
   }
   else if(a.trait==='cleave'){                 // 내려찍기 — 전선에서 앞으로 3연타
     const R=90*a.ultR;
-    const F=frontAlly(), anchored=!a.front&&F&&F!==a;
-    const ax=anchored?F.x+60:a.x+90, ay=anchored?F.y:a.y;
+    const an=cleaveAnchor(a), ax=an.ux, ay=an.uy;
     for(let i=0;i<3;i++){
       const cx=ax+i*70;
       setTimeout(()=>{
@@ -143,12 +149,10 @@ function allyAct(a){
     }
   }else if(a.trait==='cleave'){
     // 뒷줄이면 전선 너머로 내려친다 — 방패가 세우고 대검이 부순다 (DESIGN 3.3)
-    const F=frontAlly();
-    const anchored=!a.front&&F&&F!==a;
-    const cx=anchored?F.x+45:a.x+30, cy=anchored?F.y:a.y;
-    const targets=live.filter(m=>Math.hypot(m.x-cx,m.y-cy)<a.cleaveR);
+    const an=cleaveAnchor(a);
+    const targets=live.filter(m=>Math.hypot(m.x-an.x,m.y-an.y)<a.cleaveR);
     if(!targets.length)return;
-    a.lung=.18; ring(cx+2,cy,a.cleaveR,elemColor(a)||'#E8963C',.55);
+    a.lung=.18; ring(an.x+2,an.y,a.cleaveR,elemColor(a)||'#E8963C',.55);
     targets.forEach(m=>hurtMob(m,atkOf(a),a));
   }else if(a.trait==='shoot'){
     bowShot(a,false);
