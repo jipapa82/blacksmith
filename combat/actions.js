@@ -47,14 +47,16 @@ function ultimate(a){
     beam(a.x,a.y,t.x,t.y,C,3); slashFx(t.x,t.y,C); ring(t.x,t.y,26,C,1.5);
     hurtMob(t,atkOf(a)*6.0*P,a,true);
   }
-  else if(a.trait==='cleave'){                 // 내려찍기 — 앞으로 3연타
+  else if(a.trait==='cleave'){                 // 내려찍기 — 전선에서 앞으로 3연타
     const R=90*a.ultR;
+    const F=frontAlly(), anchored=!a.front&&F&&F!==a;
+    const ax=anchored?F.x+60:a.x+90, ay=anchored?F.y:a.y;
     for(let i=0;i<3;i++){
-      const cx=a.x+90+i*70;
+      const cx=ax+i*70;
       setTimeout(()=>{
         if(!running)return;
-        ring(cx,a.y,R,elemColor(a)||'#E8963C',2);
-        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-a.y)<R)
+        ring(cx,ay,R,elemColor(a)||'#E8963C',2);
+        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-ay)<R)
             .forEach(m=>hurtMob(m,atkOf(a)*0.9*P,a,true));
       },i*90);
     }
@@ -125,21 +127,29 @@ function allyAct(a){
     const t=near(a.range)[0]; if(!t)return;
     a.lung=.14; slashFx(t.x,t.y,elemColor(a)||'#E8963C'); hurtMob(t,atkOf(a),a);
   }else if(a.trait==='assassin'){
-    // 침투자(전선 뒤) 최우선 — 가장 깊이 들어온 놈부터, 어디든 점멸해 벤다. 없으면 근접 (DESIGN 3.3)
-    const infil=live.filter(behindLine).sort((p,q)=>p.x-q.x);
+    // 침투자·대장에겐 암살 일격, 아니면 무리를 질주하며 독을 바르고 온다 (DESIGN 3.3)
     const C=elemColor(a)||'#E8963C';
-    if(infil.length){
-      const t=infil[0];
-      a.lung=.14; beam(a.x,a.y,t.x,t.y,C,1.5); slashFx(t.x,t.y,C);
-      hurtMob(t,atkOf(a)*a.ambush,a);          // 암살 보너스
+    const infil=live.filter(behindLine).sort((p,q)=>p.x-q.x);
+    const mark=infil[0]||live.find(m=>m.type==='boss');
+    if(mark){
+      a.lung=.14; beam(a.x,a.y,mark.x,mark.y,C,1.5); slashFx(mark.x,mark.y,C);
+      hurtMob(mark,atkOf(a)*a.ambush,a);       // 암살 일격 ('기습' 카드로 강화)
     }else{
-      const t=near(a.range)[0]; if(!t)return;
-      a.lung=.14; slashFx(t.x,t.y,C); hurtMob(t,atkOf(a),a);
+      const path=live.slice().sort((p,q)=>p.x-q.x).slice(0,4);   // 가까운 쪽부터 최대 4명 질주
+      a.lung=.14;
+      let px=a.x, py=a.y;
+      path.forEach(m=>{ beam(px,py,m.x,m.y,C,1.2); slashFx(m.x,m.y,C);
+        hurtMob(m,atkOf(a)*.5,a); px=m.x; py=m.y; });             // 얕게 베어 독만 바른다
     }
   }else if(a.trait==='cleave'){
-    const t=near(a.range+22); if(!t.length)return;
-    a.lung=.18; ring(a.x+32,a.y,a.cleaveR,elemColor(a)||'#E8963C',.55);
-    live.filter(m=>Math.hypot(m.x-(a.x+30),m.y-a.y)<a.cleaveR).forEach(m=>hurtMob(m,atkOf(a),a));
+    // 뒷줄이면 전선 너머로 내려친다 — 방패가 세우고 대검이 부순다 (DESIGN 3.3)
+    const F=frontAlly();
+    const anchored=!a.front&&F&&F!==a;
+    const cx=anchored?F.x+45:a.x+30, cy=anchored?F.y:a.y;
+    const targets=live.filter(m=>Math.hypot(m.x-cx,m.y-cy)<a.cleaveR);
+    if(!targets.length)return;
+    a.lung=.18; ring(cx+2,cy,a.cleaveR,elemColor(a)||'#E8963C',.55);
+    targets.forEach(m=>hurtMob(m,atkOf(a),a));
   }else if(a.trait==='shoot'){
     bowShot(a,false);
   }else if(a.trait==='blast'){

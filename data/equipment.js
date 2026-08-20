@@ -3,10 +3,10 @@
    필살기는 장비에 귀속된다. (DESIGN 3.3) */
 /* elems: 이 무기에 부여할 수 있는 원소 — 설정이 어색한 조합은 아예 못 붙는다 (DESIGN 4.1.1) */
 const EQUIP={
-  sword: {name:'낡은 단검',  atk:15,def:1,hp:46, spd:1.25,trait:'assassin', desc:'후미로 새어든 적을 최우선으로 벤다',
+  sword: {name:'낡은 단검',  atk:15,def:1,hp:46, spd:1.25,trait:'assassin', desc:'무리를 질주하며 독을 바르고, 침투자와 대장은 일격에 벤다',
           shape:'tri',color:'#6FC9CE', elems:['pois'],
           ultName:'급소 찌르기', ultDesc:'가장 단단한 침투자의 약점을 노린다', ultCd:8},
-  great: {name:'무딘 대검',  atk:30,def:3,hp:64, spd:0.50,trait:'cleave',desc:'휘두르면 앞의 여럿이 맞는다',
+  great: {name:'무딘 대검',  atk:30,def:3,hp:64, spd:0.50,trait:'cleave',desc:'뒷줄에서는 전선 너머로 내려쳐 무리를 부순다',
           shape:'tri',color:'#6FC9CE', elems:['shock'],
           ultName:'내려찍기', ultDesc:'땅을 갈라 앞을 쓸어버린다', ultCd:9},
   shield:{name:'참나무 방패',atk:6, def:10,hp:120,spd:0.85,trait:'wall',  desc:'적을 몸으로 막아 세운다',

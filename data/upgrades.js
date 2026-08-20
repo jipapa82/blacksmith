@@ -41,7 +41,7 @@ const UP=[
   {id:'reach', n:'긴 자루',     max:4, r:1, ok:a=>a.trait==='wall',
    d:()=>'사거리 +15%', f:a=>a.range*=1.15},
   {id:'ambush', n:'기습',       max:4, r:1, ok:a=>a.trait==='assassin',
-   d:a=>`침투한 적에게 주는 피해 +25% (현재 ${Math.round(a.ambush*100)}%)`, f:a=>a.ambush+=.25},
+   d:a=>`암살 일격(침투자·대장) 피해 +25% (현재 ${Math.round(a.ambush*100)}%)`, f:a=>a.ambush+=.25},
   {id:'ultwide', n:'퍼지는 오의', max:3, r:1, ok:a=>a.trait!=='shoot',
    d:a=>`필살기 범위 +15% (현재 +${Math.round((a.ultR-1)*100)}%)`, f:a=>a.ultR*=1.15},
 

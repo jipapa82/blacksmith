@@ -121,7 +121,8 @@ const driver = `
     return 'incomplete';
   }
 
-  out.push('--- 1회차 (노드 없음, 필살기 위력 50%) ---');
+  out.push('--- 1회차 (노드 없음, 방패+대검 편성 — 전선 앵커 검증) ---');
+  loadout = ['shield','great'];
   out.push('RUN1: ' + playRun('r1'));
   out.push('금고 누적: ' + META.gold + '골드' + (META.gold>0?' OK':' NONE_BANKED'));
 
