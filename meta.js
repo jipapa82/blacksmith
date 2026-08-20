@@ -21,6 +21,19 @@ function metaBuy(k,id){
   META.pts-=c; (META.nodes[k]=META.nodes[k]||{})[id]=r+1; saveMeta();
   return true;
 }
+/* 무기(또는 '_global') 노드 전체 초기화 — 쓴 포인트 전액 환급 (DESIGN 4.5) */
+function metaReset(k){
+  const spent=META.nodes[k]; if(!spent)return 0;
+  let refund=0;
+  for(const [id,r] of Object.entries(spent)){
+    const n=NODES.find(x=>x.id===id)||GLOBAL_NODES.find(x=>x.id===id);
+    if(n) for(let i=0;i<r&&i<n.costs.length;i++) refund+=n.costs[i];
+  }
+  delete META.nodes[k];
+  META.pts+=refund; saveMeta();
+  return refund;
+}
+
 /* mkAlly가 읽는 무기별 영구 보정 */
 function metaMods(k){
   const r=id=>metaRank(k,id);

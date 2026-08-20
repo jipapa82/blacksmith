@@ -162,7 +162,9 @@ canvas{display:block;width:100%;height:auto}
 /* 대장간 — 영구 노드 트리 */
 .meta-wrap{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto;width:min(680px,92%)}
 .meta-weap{border:1px solid var(--edge);border-radius:3px;background:var(--panel);padding:10px 12px}
-.meta-weap h3{font-size:13px;margin-bottom:7px;color:var(--quench);font-weight:500}
+.meta-weap h3{font-size:13px;margin-bottom:7px;color:var(--quench);font-weight:500;
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+.meta-reset{padding:2px 8px;font-size:10px;color:var(--dim)}
 .node-row{display:flex;align-items:center;gap:10px;font-size:11.5px;padding:3px 0}
 .node-row .nn{min-width:96px}
 .node-row .ne{color:var(--dim);flex:1}

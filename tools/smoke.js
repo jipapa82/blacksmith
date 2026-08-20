@@ -156,6 +156,9 @@ const driver = `
   out.push('자동 모드 중 수동 개입(갈무리 리필 틈으로 소수는 정상): ' + (ultFired - before));
   out.push('검증: 방패 ultPow=' + allies.filter(a=>a.key==='shield').map(a=>a.ultPow)
     + ' (노드 1랭크=0.75), 홈=' + allies[0].sock.length);
+  const beforeReset=META.pts, refund=metaReset('wand');
+  out.push('무기 초기화 환급: +' + refund + 'pt'
+    + (refund>0&&META.pts===beforeReset+refund&&!META.nodes.wand?' OK':' WRONG'));
   const multi=allies.filter(a=>[a.elFire,a.elPois,a.elCold,a.elShock].filter(v=>v>0).length>1);
   out.push('원소 잠금: ' + (multi.length ? 'VIOLATION — 한 무기에 2원소 이상' : 'OK (무기당 최대 1원소)'));
   const badEl=allies.filter(a=>{const e=elemOf(a);return e&&!EQUIP[a.key].elems.includes(e);});

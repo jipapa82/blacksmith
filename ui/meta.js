@@ -30,14 +30,25 @@ function nodeRowHtml(k,n){
     <button data-k="${k}" data-id="${n.id}" ${maxed||META.pts<cost?'disabled':''}>
       ${maxed?'완성':cost+'pt'}</button></div>`;
 }
+function metaHead(k,title){
+  const spent=Object.keys(META.nodes[k]||{}).length;
+  return `<h3>${title}${spent?`<button class="meta-reset" data-reset="${k}">초기화 (전액 환급)</button>`:''}</h3>`;
+}
 function renderMeta(){
   const wrap=document.getElementById('metaWrap'); if(!wrap)return;
   wrap.innerHTML=
-    `<div class="meta-weap"><h3>대장장이 공용</h3>
+    `<div class="meta-weap">${metaHead('_global','대장장이 공용')}
       ${GLOBAL_NODES.map(n=>nodeRowHtml('_global',n)).join('')}</div>`
-    +Object.entries(EQUIP).map(([k,e])=>`<div class="meta-weap"><h3>${e.name}</h3>
+    +Object.entries(EQUIP).map(([k,e])=>`<div class="meta-weap">${metaHead(k,e.name)}
       ${NODES.map(n=>nodeRowHtml(k,n)).join('')}</div>`).join('');
   wrap.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    if(b.dataset.reset){                       // 무기별 초기화 — 쓴 포인트 전액 환급
+      if(metaReset(b.dataset.reset)>0){
+        const p=document.getElementById('metaPts'); if(p)p.textContent=META.pts;
+        renderMeta();
+      }
+      return;
+    }
     if(metaBuy(b.dataset.k,b.dataset.id)){
       const p=document.getElementById('metaPts'); if(p)p.textContent=META.pts;
       renderMeta();
