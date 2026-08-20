@@ -7,7 +7,8 @@ let waveIdx=0, waveT=0, spawnT=0, shake=0;
 let waveSpawned=0, waveKills=0, curWave=null;   // 섬멸형: 이번 웨이브의 스폰/처치 집계
 let lv=1, xp=0, pendingLv=0;                    // 전투 중 레벨업 (DESIGN 4.1)
 let foeMul=1, rateMul=1, waveSize=1;
-const G={gold:0, mats:0, kills:0, goldMul:1, rerolls:2, hireCost:200, gems:{}};
+/* 재료(mats)는 6.4 장비 해금 층을 설계할 때 드랍부터 다시 넣는다 (2026-08-20 제거) */
+const G={gold:0, kills:0, goldMul:1, rerolls:2, hireCost:200, gems:{}};
 
 /* 캔버스와 전장 좌표 */
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
@@ -16,7 +17,6 @@ const BACK_X=112, FRONT_X=228, MID_Y=H/2;
 
 /* HUD DOM 참조 */
 const goldTxt=document.getElementById('goldTxt'),
-      matTxt=document.getElementById('matTxt'),
       aliveTxt=document.getElementById('aliveTxt'),
       killTxt=document.getElementById('killTxt'),
       statusTxt=document.getElementById('statusTxt'),

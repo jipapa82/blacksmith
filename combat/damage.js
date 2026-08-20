@@ -4,7 +4,6 @@ function killMob(m,src){
   G.kills++; waveKills++; killTxt.textContent=G.kills;
   const g=Math.round(m.gold*G.goldMul);
   G.gold+=g; goldTxt.textContent=G.gold; num(m.x,m.y-4,'+'+g,'#D9B45C');
-  if(Math.random()<.16||m.type==='boss'){G.mats+=m.type==='boss'?3:1;matTxt.textContent=G.mats;}
   gainXp(m.xp);
   dropLoot(m);
   if(src){

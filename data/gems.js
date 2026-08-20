@@ -20,5 +20,6 @@ const GEM_MAX_GRADE=5;
 const GRADE_TXT=['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
 
 /* 드랍 튜닝 — 홈은 시작 2칸뿐이다. 초반엔 귀하게, 후반엔 합성 재료로 쌓이게.
+   웨이브가 길어진 만큼(마릿수 28→36) 확률을 4%→3%로 내려 웨이브당 개수는 유지 (2026-08-20).
    rate: 잡졸 드랍 확률 / gradeUpPerWave: 웨이브당 +1단계 드랍 확률 증가 / bossGems: 대장 확정 개수 */
-const GEM_DROP={rate:.04, gradeUpPerWave:.02, bossGems:2};
+const GEM_DROP={rate:.03, gradeUpPerWave:.02, bossGems:2};

@@ -29,7 +29,6 @@ function openForge(){
     <div class="ov-title">정비</div>
     <div class="ov-sub">${fallenTxt}</div>
     <div class="purse"><span class="g">골드 <b id="ovGold">${G.gold}</b></span>
-      <span class="m">재료 <b>${G.mats}</b></span>
       <span style="color:var(--dim)">용병 <b>${allies.length}</b> / ${Object.keys(EQUIP).length}</span></div>
     <div class="forge-body" id="forgeBody"></div>
     <div class="ov-row" id="forgeRow"></div>`;
