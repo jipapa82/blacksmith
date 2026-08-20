@@ -10,3 +10,8 @@ const NODES=[
   {id:'nslot', n:'보석 홈',   max:2, costs:[4,8],       eff:r=>`홈 ${2+r}개`},
   {id:'nult',  n:'오의 각성', max:1, costs:[3],         eff:r=>r?'필살기 해금됨':'필살기 해금'},
 ];
+
+/* 무기와 무관한 공용 노드 — 대장장이 자신의 성장. META.nodes['_global']에 저장 */
+const GLOBAL_NODES=[
+  {id:'nreroll', n:'다시 뽑기', max:2, costs:[2,4], eff:r=>`레벨업 리롤 런당 ${2+r}회`},
+];

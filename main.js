@@ -36,7 +36,8 @@ function reset(){
   const o=document.getElementById('ov'); if(o)o.remove();
   waveIdx=0; waveT=0; waveSpawned=0; waveKills=0; curWave=null; mobs=[]; fxs=[]; nums=[];
   lv=1; xp=0; pendingLv=0;
-  G.gold=0; G.mats=0; G.kills=0; G.goldMul=1; G.reroll=10; G.hireCost=200; G._boss=0; G.gems={};
+  G.gold=0; G.mats=0; G.kills=0; G.goldMul=1; G.hireCost=200; G._boss=0; G.gems={};
+  G.rerolls=2+metaRank('_global','nreroll');   // 리롤은 런당 횟수제 (DESIGN 4.1)
   mercLetter=0;
   allies=loadout.map((k,i)=>mkAlly(k,i,i===0)); layoutAllies();
   allies.forEach(a=>a.name=nextMercName());

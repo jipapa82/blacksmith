@@ -14,7 +14,7 @@ function saveMeta(){ try{localStorage.setItem(META_KEY,JSON.stringify(META));}ca
 
 function metaRank(k,id){ return (META.nodes[k]||{})[id]||0; }
 function metaBuy(k,id){
-  const n=NODES.find(x=>x.id===id), r=metaRank(k,id);
+  const n=NODES.find(x=>x.id===id)||GLOBAL_NODES.find(x=>x.id===id), r=metaRank(k,id);
   if(!n||r>=n.max) return false;
   const c=n.costs[r]; if(META.pts<c) return false;
   META.pts-=c; (META.nodes[k]=META.nodes[k]||{})[id]=r+1; saveMeta();

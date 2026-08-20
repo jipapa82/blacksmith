@@ -59,16 +59,16 @@ function openLevelUp(){
     <div class="ov-title">벼려낼 곳</div>
     <div class="ov-sub">싸움이 잠깐 숨을 고른다. 하나를 골라 새기면 바로 이어진다.</div>
     <div class="cards" id="cards"></div>
-    <div class="ov-row"><button id="rerollBtn">다시 뽑기 · ${G.reroll}골드</button></div>`;
+    <div class="ov-row"><button id="rerollBtn">다시 뽑기 · ${G.rerolls}회 남음</button></div>`;
   document.getElementById('arena').appendChild(ov);
   const done=()=>{ document.getElementById('ov').remove(); pendingLv--; phase='fight'; running=true; };
   drawCards(cards,done);
   const rb=document.getElementById('rerollBtn');
-  rb.disabled=G.gold<G.reroll;
+  rb.disabled=G.rerolls<=0;
   rb.onclick=()=>{
-    if(G.gold<G.reroll)return;
-    G.gold-=G.reroll; G.reroll+=5; goldTxt.textContent=G.gold;
-    rb.textContent=`다시 뽑기 · ${G.reroll}골드`; rb.disabled=G.gold<G.reroll;
+    if(G.rerolls<=0)return;
+    G.rerolls--;
+    rb.textContent=`다시 뽑기 · ${G.rerolls}회 남음`; rb.disabled=G.rerolls<=0;
     drawCards(pickCards(),done);
   };
 }
