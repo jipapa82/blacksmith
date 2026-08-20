@@ -6,10 +6,11 @@ const META=(()=>{ try{
     const j=JSON.parse(localStorage.getItem(META_KEY));
     if(j&&typeof j.pts==='number'&&j.nodes){
       if(j.autoUlt===undefined)j.autoUlt=true;   // 필살기 발동 방식 (4.1.2) — 기본 자동
+      if(j.gold===undefined)j.gold=0;            // 대장간 금고 (6.3) — 런의 남은 골드가 누적
       return j;
     }
   }catch(e){}
-  return {pts:0, nodes:{}, autoUlt:true}; })();
+  return {pts:0, gold:0, nodes:{}, autoUlt:true}; })();
 function saveMeta(){ try{localStorage.setItem(META_KEY,JSON.stringify(META));}catch(e){} }
 
 function metaRank(k,id){ return (META.nodes[k]||{})[id]||0; }

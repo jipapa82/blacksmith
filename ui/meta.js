@@ -8,7 +8,9 @@ function openMeta(){
   ov.innerHTML=`
     <div class="ov-eyebrow">영구 성장</div>
     <div class="ov-title">대장간</div>
-    <div class="purse"><span class="m">스탯 포인트 <b id="metaPts">${META.pts}</b></span></div>
+    <div class="purse"><span class="m">스탯 포인트 <b id="metaPts">${META.pts}</b></span>
+      <span class="g">금고 <b>${META.gold}</b>골드</span></div>
+    <div class="ov-sub">금고의 쓸 곳(제작·환전)은 다음 층에서 열린다. 지금은 쌓인다.</div>
     <div class="meta-wrap" id="metaWrap"></div>
     <div class="ov-row"><button class="primary" id="metaClose">닫고 편성으로</button></div>`;
   document.getElementById('arena').appendChild(ov);
