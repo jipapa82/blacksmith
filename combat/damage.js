@@ -57,6 +57,10 @@ function hurtMob(m,dmg,src,isUlt){
   m.hp-=d; m.hit=crit?.22:.14;
   num(m.x,m.y-m.r-4, crit?d+'!':d, crit?'#FFD86B':'#E8963C', crit);
   if(m.hp<=0){ killMob(m,src); return; }
+  if(src&&m.shockT>0&&m.shockLv&&Math.random()<STATUS.shock.stagger[m.shockLv-1]){
+    m.stun=Math.max(m.stun,STATUS.shock.staggerDur*(m.type==='boss'?STATUS.shock.bossStaggerMul:1));
+    ring(m.x,m.y,m.r+6,'#9B8ACB',.7);                                 // 공명: 울려서 휘청인다
+  }
   if(src&&src.gm) applyOnHit(src,m);                                  // 아군 적중 시 원소 부여
 }
 function hurtAlly(a,dmg,from){

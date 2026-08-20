@@ -14,7 +14,7 @@ const UP=[
    d:a=>`적중 시 ${STATUS.chill.dur}초 한기(이동 -${Math.round(STATUS.chill.slow[a.elCold]*100)}%). 한기 중 ${STATUS.chill.hitsToFreeze[a.elCold]}회 적중 시 ${STATUS.chill.freezeDur[a.elCold].toFixed(1)}초 빙결${elemOf(a)?'':'<br>이 무기의 원소가 얼음으로 정해진다'}`,
    f:a=>a.elCold++},
   {id:'eshock',n:'진동 부여', max:3, r:0, ok:a=>elemOk(a,'shock'),
-   d:a=>`적중 시 ${STATUS.shock.dur[a.elShock]}초 공명 — 받는 피해 +${Math.round(STATUS.shock.amp[a.elShock]*100)}%${elemOf(a)?'':'<br>이 무기의 원소가 진동으로 정해진다'}`,
+   d:a=>`적중 시 ${STATUS.shock.dur[a.elShock]}초 공명 — 받는 피해 +${Math.round(STATUS.shock.amp[a.elShock]*100)}%, 맞으면 ${Math.round(STATUS.shock.stagger[a.elShock]*100)}% 확률로 휘청${elemOf(a)?'':'<br>이 무기의 원소가 진동으로 정해진다'}`,
    f:a=>a.elShock++},
   {id:'leech', n:'피 먹는 홈',  max:4, r:0, ok:()=>1,
    d:a=>`처치할 때마다 체력 +2 (현재 ${a.leech})`, f:a=>a.leech+=2},

@@ -7,7 +7,8 @@ const STATUS={
   pois:  {dur:6,  dpsPct:[.08,.16,.24], maxStacks:[5,6,8]},    // 중독: 쌓는 DoT
   chill: {dur:3,  slow:[.20,.35,.50], hitsToFreeze:[5,4,3], freezeDur:[1.2,1.6,2.0],
           immune:4, bossFreezeMul:.5},   // 재빙결 유예(초) — 무한 빙결 방지 / 대장은 절반만 언다
-  shock: {dur:[3,4,5],  amp:[.08,.16,.24]},                    // 공명: 받는 피해 증폭
+  shock: {dur:[3,4,5],  amp:[.08,.16,.24],                     // 공명: 받는 피해 증폭
+          stagger:[.10,.15,.20], staggerDur:.3, bossStaggerMul:.5},  // + 맞으면 확률로 휘청(경직)
   tick:  .5,                                                   // DoT 판정 주기(초)
   syn:{                                                        // 시너지 카드 수치 (단계당)
     shatterPct:.15,     // 서리 파쇄: 최대 체력 비례 추가 피해
