@@ -156,6 +156,13 @@ const driver = `
   out.push('자동 모드 중 수동 개입(갈무리 리필 틈으로 소수는 정상): ' + (ultFired - before));
   out.push('검증: 방패 ultPow=' + allies.filter(a=>a.key==='shield').map(a=>a.ultPow)
     + ' (노드 1랭크=0.75), 홈=' + allies[0].sock.length);
+  gainGem('ruby',5); gainGem('ruby',5);
+  const ft=mergeFinal('ruby:5','ruby:5');
+  const a0=allies[0]; a0.hp=1; a0.sock[0]={type:'ruby',grade:FINAL_GRADE}; recalcGems(a0); recalcAuras();
+  out.push('최종 합성+오라: ' + (ft==='ruby'&&invCount('ruby:6')===1&&AURA_ATK>1.11?'OK':'FAIL'));
+  gainGem('ruby',5); gainGem('emerald',5);
+  const ft2=mergeFinal('ruby:5','emerald:5');
+  out.push('50/50 합성: ' + ((ft2==='ruby'||ft2==='emerald')&&invCount(ft2+':6')>=1?'OK':'FAIL'));
   const beforeReset=META.pts, refund=metaReset('wand');
   out.push('무기 초기화 환급: +' + refund + 'pt'
     + (refund>0&&META.pts===beforeReset+refund&&!META.nodes.wand?' OK':' WRONG'));

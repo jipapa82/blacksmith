@@ -11,7 +11,7 @@ function rollGemType(){ const ks=Object.keys(GEMS); return ks[Math.floor(Math.ra
 function gemTotal(){ return Object.values(G.gems).reduce((a,b)=>a+b,0); }
 function invCount(k){ return G.gems[k]||0; }
 function gainGem(type,grade){
-  grade=Math.min(GEM_MAX_GRADE,Math.max(1,grade));
+  grade=Math.min(FINAL_GRADE,Math.max(1,grade));   // 최종(6)은 합성대에서만 만들어진다
   const k=gemKey(type,grade); G.gems[k]=(G.gems[k]||0)+1;
   gemTxt.textContent=gemTotal();
 }
@@ -41,6 +41,19 @@ function mergeAllGems(){
   if(n) gemTxt.textContent=gemTotal();
   return n;
 }
+/* 최종 합성 — 5단계 둘. 같은 종류=확정, 다른 종류=50/50 (DESIGN 4.4)
+   성공 시 나온 종류를, 실패 시 false를 돌려준다. */
+function mergeFinal(k1,k2){
+  const [t1,g1]=k1.split(':'), [t2,g2]=k2.split(':');
+  if(+g1!==GEM_MAX_GRADE||+g2!==GEM_MAX_GRADE)return false;
+  if(k1===k2&&invCount(k1)<2)return false;
+  if(k1!==k2&&(!invCount(k1)||!invCount(k2)))return false;
+  takeGem(k1); takeGem(k2);
+  const t=(t1===t2)?t1:(Math.random()<.5?t1:t2);
+  gainGem(t,FINAL_GRADE);
+  return t;
+}
+
 function invEntries(){
   return Object.entries(G.gems).map(([k,c])=>{
     const [t,g]=k.split(':'); return {key:k,type:t,grade:+g,count:c};

@@ -37,12 +37,13 @@ function reset(){
   running=false; phase='idle';
   const o=document.getElementById('ov'); if(o)o.remove();
   waveIdx=0; waveT=0; waveSpawned=0; waveKills=0; curWave=null; mobs=[]; fxs=[]; nums=[];
-  lv=1; xp=0; pendingLv=0;
+  lv=1; xp=0; pendingLv=0; hasteT=0;
   G.gold=0; G.kills=0; G.goldMul=1; G.hireCost=200; G._boss=0; G.gems={};
   G.rerolls=metaRank('_global','nreroll');   // 시작 리롤은 노드만큼. 고용마다 +1 (DESIGN 4.1)
   mercLetter=0;
   allies=loadout.map((k,i)=>mkAlly(k,i,i===0)); layoutAllies();
   allies.forEach(a=>a.name=nextMercName());
+  recalcAuras();
   goldTxt.textContent='0'; killTxt.textContent='0'; aliveTxt.textContent='0';
   lvTxt.textContent='1'; gemTxt.textContent='0';
   waveNum.textContent='0'; waveNum.classList.remove('live');

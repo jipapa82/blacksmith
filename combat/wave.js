@@ -19,7 +19,18 @@ function step(dt){
     }
   }
   if(w.boss&&!G._boss&&waveSpawned>=w.count*.4){G._boss=1;mobs.push(mkMob('boss'));}
-  allies.forEach(a=>{ if(a.hp<=0)return;
+  recalcAuras();                                     // 파티 오라 (최종 루비·자수정)
+  if(hasteT>0)hasteT=Math.max(0,hasteT-dt);          // 질풍의 오라
+  allies.forEach(a=>{
+    if(a.hp<=0){
+      if(a.reviveT>0){ a.reviveT-=dt;                // 되살리는 맥박 (최종 토파즈)
+        if(a.reviveT<=0){
+          a.hp=Math.round(maxHpOf(a)*AURA.topaz.reviveHp);
+          ring(a.x,a.y,a.r+16,'#E0C050',2); num(a.x,a.y-20,'부활','#E0C050',1);
+          layoutAllies();
+        } }
+      return;
+    }
     a.charge+=dt*aspdOf(a); if(a.charge>=1){a.charge=0;allyAct(a);}
     a.ultT=Math.min(a.ultCd,a.ultT+dt);
     if(META.autoUlt&&a.ultT>=a.ultCd){          // 자동 모드: 뭉칠 때까지 기다렸다 쏜다. 수동은 차서 기다린다 (4.1.2)

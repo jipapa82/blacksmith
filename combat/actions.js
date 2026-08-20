@@ -45,6 +45,7 @@ function ultimate(a){
   if(!live.length)return false;
   const P=a.ultPow;
   shake=6;
+  if(a.gm.auraHaste)hasteT=AURA.emerald.hasteDur;   // 질풍의 오라 (최종 에메랄드)
 
   if(a.trait==='assassin'){                    // 급소 찌르기 — 침투자 중 최대 체력 대상 일격
     const infil=live.filter(behindLine);

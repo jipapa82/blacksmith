@@ -14,6 +14,7 @@ function mkAlly(k,i,front){
     syDeton:0, syHarvest:0, syReap:0,                                            // 회수 시너지 (필살기)
     ultCd:e.ultCd, ultT:e.ultCd*.5, ultPow:mm.ultPow, ultRank:mm.ultRank, ultR:1, ultWait:0,
     sock:Array(mm.slots).fill(null), gm:null,
+    reviveUsed:false, reviveT:0,                                   // 되살리는 맥박 (최종 토파즈)
     lv:{}, mods:[]};
   recalcGems(a); a.hp=maxHpOf(a);
   return a;
@@ -45,22 +46,39 @@ function mkMob(type){
 function recalcGems(a){
   const gm={atkMul:1,aspdMul:1,hpMul:1,defAdd:0,critAdd:0,dodgeAdd:0,
     leechAdd:0,critDmgAdd:0,                     // 무색 보석의 2번째 스탯 (4.2)
-    synFire:0,synPois:0,synCold:0,synShock:0};   // 보석×원소 시너지 합 (DESIGN 4.2)
+    synFire:0,synPois:0,synCold:0,synShock:0,    // 보석×원소 시너지 합 (DESIGN 4.2)
+    auraFreeze:0,auraRevive:false,auraDotCrit:false,auraHaste:false};  // 최종 보석 오라 (4.4)
   a.sock.forEach(s=>{ if(!s)return;
-    const g=GEMS[s.type], v=g.v[s.grade-1];
+    const g=GEMS[s.type], gi=Math.min(s.grade,GEM_MAX_GRADE)-1, v=g.v[gi];
     if(g.stat==='atk')gm.atkMul+=v; else if(g.stat==='aspd')gm.aspdMul+=v;
     else if(g.stat==='hp')gm.hpMul+=v; else if(g.stat==='crit')gm.critAdd+=v;
     else if(g.stat==='def')gm.defAdd+=v; else gm.dodgeAdd+=v;
-    if(g.stat2){ const v2=g.v2[s.grade-1];
+    if(g.stat2){ const v2=g.v2[gi];
       if(g.stat2==='leech')gm.leechAdd+=v2; else if(g.stat2==='critD')gm.critDmgAdd+=v2; }
-    if(g.elem){ const sv=g.syn[s.grade-1];
+    if(g.elem){ const sv=g.syn[gi];
       if(g.elem==='fire')gm.synFire+=sv; else if(g.elem==='pois')gm.synPois+=sv;
-      else if(g.elem==='cold')gm.synCold+=sv; else gm.synShock+=sv; } });
+      else if(g.elem==='cold')gm.synCold+=sv; else gm.synShock+=sv; }
+    if(s.grade>=FINAL_GRADE){                    // 자기 무기에 붙는 오라 (파티 오라는 recalcAuras)
+      if(s.type==='sapphire')gm.auraFreeze=AURA.sapphire.freezeDur;
+      else if(s.type==='topaz')gm.auraRevive=true;
+      else if(s.type==='diamond')gm.auraDotCrit=true;
+      else if(s.type==='emerald')gm.auraHaste=true;
+    } });
   a.gm=gm;
 }
-function atkOf(a){ return Math.round(a.atk*a.gm.atkMul); }
-function aspdOf(a){ return a.aspd*a.gm.aspdMul; }
-function defOf(a){ return a.def+a.gm.defAdd; }
+/* 파티 오라 (최종 루비·자수정) — 살아 있는 착용자 기준, 매 스텝 갱신 */
+let AURA_ATK=1, AURA_DEF=0;
+function recalcAuras(){
+  AURA_ATK=1; AURA_DEF=0;
+  allies.forEach(a=>{ if(a.hp<=0)return;
+    a.sock.forEach(s=>{ if(!s||s.grade<FINAL_GRADE)return;
+      if(s.type==='ruby')AURA_ATK+=AURA.ruby.atkMul;
+      else if(s.type==='amethyst')AURA_DEF+=AURA.amethyst.defAdd; }); });
+}
+
+function atkOf(a){ return Math.round(a.atk*a.gm.atkMul*AURA_ATK); }
+function aspdOf(a){ return a.aspd*a.gm.aspdMul*(hasteT>0?1+AURA.emerald.haste:1); }
+function defOf(a){ return a.def+a.gm.defAdd+AURA_DEF; }
 function critOf(a){ return a.crit+a.gm.critAdd; }
 function dodgeOf(a){ return Math.min(.6,a.gm.dodgeAdd); }
 function maxHpOf(a){ return Math.round(a.maxhp*a.gm.hpMul); }

@@ -158,6 +158,9 @@ canvas{display:block;width:100%;height:auto}
 .gemchip button{padding:1px 7px;font-size:10px}
 #mergeAllBtn{padding:4px 10px;font-size:11px}
 .forge-hint{font-size:11px;color:var(--dim);text-align:center;line-height:1.6}
+.gemchip.final{border-color:var(--gold);box-shadow:0 0 8px rgba(217,180,92,.3)}
+.final-forge{border:1px solid var(--edge);border-radius:3px;background:#1A1C22;
+  padding:9px 12px;display:flex;flex-direction:column;gap:7px;align-items:center}
 
 /* 대장간 — 영구 노드 트리 */
 .meta-wrap{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto;width:min(680px,92%)}

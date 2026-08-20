@@ -72,5 +72,14 @@ function hurtAlly(a,dmg,from){
   a.hp-=d; a.hit=.14; num(a.x,a.y-a.r-6,d,'#C4574F');
   if(a.thorns&&from) hurtMob(from,a.thorns,a);
   if(a.repel&&from&&from.hp>0) from.x=Math.min(W+20,from.x+40*a.repel);   // 밀치는 반격 (DESIGN 4.1.1)
-  if(a.hp<=0){burst(a.x,a.y,'#C4574F');shake=8;layoutAllies();}
+  if(a.gm.auraFreeze&&from&&from.hp>0&&from.freezeCd<=0){                 // 서리 갑옷 (최종 사파이어)
+    from.freezeT=a.gm.auraFreeze*(from.type==='boss'?STATUS.chill.bossFreezeMul:1);
+    from.freezeCd=from.freezeT+STATUS.chill.immune;
+    ring(from.x,from.y,from.r+10,'#9AD9E8',1.2);
+  }
+  if(a.hp<=0){
+    burst(a.x,a.y,'#C4574F');shake=8;
+    if(a.gm.auraRevive&&!a.reviveUsed){a.reviveUsed=true;a.reviveT=AURA.topaz.reviveT;}  // 되살리는 맥박
+    layoutAllies();
+  }
 }

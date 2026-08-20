@@ -56,11 +56,16 @@ function statusCount(m){
   return (m.burn?1:0)+(m.pois?1:0)+((m.chillT>0||m.freezeT>0)?1:0)+(m.shockT>0?1:0);
 }
 
-/* 지속 피해 — 방어 무시, 치명타·원소 적용 없음 */
+/* 지속 피해 — 방어 무시, 원소 재적용 없음.
+   치명타도 없음 — 단, 최종 다이아(꿰뚫는 빛) 착용 무기의 도트는 치명타가 터진다 */
 function dotDamage(m,d,c,src){
   if(m.hp<=0)return;
+  let crit=false;
+  if(src&&src.gm&&src.gm.auraDotCrit&&Math.random()<critOf(src)){
+    d*=src.critD+src.gm.critDmgAdd; crit=true;
+  }
   d=Math.max(1,Math.round(d));
-  m.hp-=d; num(m.x,m.y-m.r-4,d,c);
+  m.hp-=d; num(m.x,m.y-m.r-4,crit?d+'!':d,crit?'#FFD86B':c,crit);
   if(m.hp<=0) killMob(m,src);
 }
 
