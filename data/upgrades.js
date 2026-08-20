@@ -72,7 +72,7 @@ const UP=[
 
   /* ===== 전설 — 회수: 농사 짓고 필살기로 거둔다 (필살기 해금 + 원소 보유 시에만) ===== */
   {id:'detona', n:'기폭', max:2, r:2, ok:()=>allies.some(x=>x.elFire||x.elPois),
-   d:a=>`필살기가 화상·중독을 터뜨린다 — 남은 지속 피해의 ${Math.round((STATUS.syn.detBase+STATUS.syn.detPerLv*(a.syDeton+1))*100)}%를 즉시`,
+   d:a=>`필살기가 화상·중독을 터뜨린다 — 남은 지속 피해의 ${Math.round((STATUS.syn.detBase+STATUS.syn.detPerLv*(a.syDeton+1))*100)}% × 걸린 상태이상 종류 수(최대 4)를 즉시`,
    f:a=>a.syDeton++},
   {id:'harvest', n:'추수', max:2, r:2,
    ok:()=>allies.some(x=>x.elFire||x.elPois||x.elCold||x.elShock),

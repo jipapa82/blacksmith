@@ -40,11 +40,12 @@ function hurtMob(m,dmg,src,isUlt){
     if(isUlt&&src.syHarvest)                                          // 추수: 상태이상 1종당 증가
       dmg*=1+STATUS.syn.harvestPct*src.syHarvest*statusCount(m);
     if(isUlt&&src.syDeton){                                           // 기폭: 남은 DoT를 즉시 회수
+      const sc=statusCount(m);                                        // 소모 전에 센다
       let rem=0;
       if(m.burn){rem+=m.burn.dps*Math.max(0,m.burn.t); m.burn=null;}
       if(m.pois){rem+=m.pois.dps*m.pois.n*Math.max(0,m.pois.t); m.pois=null;}
       if(rem>0){
-        dmg+=rem*(STATUS.syn.detBase+STATUS.syn.detPerLv*src.syDeton);
+        dmg+=rem*(STATUS.syn.detBase+STATUS.syn.detPerLv*src.syDeton)*sc;  // × 상태이상 종류 수 (최대 4)
         ring(m.x,m.y,m.r+14,'#E8963C',1.6);
       }
     }
