@@ -8,7 +8,7 @@ function killMob(m,src){
   dropLoot(m);
   if(src){
     if(src.leech){src.hp=Math.min(maxHpOf(src),src.hp+src.leech);}
-    if(src.syReap&&src.ultOn&&statusCount(m)>0)          // 갈무리: 상태이상 적 처치 → 게이지 회복
+    if(src.syReap&&statusCount(m)>0)                     // 갈무리: 상태이상 적 처치 → 게이지 회복
       src.ultT=Math.min(src.ultCd,src.ultT+src.ultCd*STATUS.syn.reapPct*src.syReap);
     if(src.deathBlast){ ring(m.x,m.y,34,'#E8963C',.6);
       mobs.forEach(o=>{if(o.hp>0&&o!==m&&Math.hypot(o.x-m.x,o.y-m.y)<34)hurtMob(o,atkOf(src)*.4,src);}); }

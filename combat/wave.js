@@ -21,12 +21,10 @@ function step(dt){
   if(w.boss&&!G._boss&&waveSpawned>=w.count*.4){G._boss=1;mobs.push(mkMob('boss'));}
   allies.forEach(a=>{ if(a.hp<=0)return;
     a.charge+=dt*aspdOf(a); if(a.charge>=1){a.charge=0;allyAct(a);}
-    if(a.ultOn){
-      a.ultT=Math.min(a.ultCd,a.ultT+dt);
-      if(META.autoUlt&&a.ultT>=a.ultCd){        // 자동 모드: 뭉칠 때까지 기다렸다 쏜다. 수동은 차서 기다린다 (4.1.2)
-        a.ultWait+=dt;
-        if((ultWorth(a)||a.ultWait>6)&&ultimate(a)){a.ultT=0;a.ultWait=0;}
-      }
+    a.ultT=Math.min(a.ultCd,a.ultT+dt);
+    if(META.autoUlt&&a.ultT>=a.ultCd){          // 자동 모드: 뭉칠 때까지 기다렸다 쏜다. 수동은 차서 기다린다 (4.1.2)
+      a.ultWait+=dt;
+      if((ultWorth(a)||a.ultWait>6)&&ultimate(a)){a.ultT=0;a.ultWait=0;}
     }
     a.hit=Math.max(0,a.hit-dt); a.lung=Math.max(0,a.lung-dt); });
   mobs.forEach(m=>{ if(m.hp<=0)return;

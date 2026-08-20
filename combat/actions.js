@@ -12,7 +12,7 @@ function behindLine(m){
 function fireUlt(i){
   if(!running)return false;
   const a=allies[i];
-  if(!a||a.hp<=0||!a.ultOn||a.ultT<a.ultCd)return false;
+  if(!a||a.hp<=0||a.ultT<a.ultCd)return false;
   if(ultimate(a)){ a.ultT=0; return true; }
   return false;
 }

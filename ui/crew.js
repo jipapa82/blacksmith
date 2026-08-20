@@ -29,7 +29,7 @@ function renderCrew(){
       m.innerHTML=list.map(x=>`<span class="mod">${x}</span>`).join(''); }
     const ub=el.querySelector('.ultbtn');
     if(ub){
-      ub.style.display=(a.ultOn&&!META.autoUlt)?'':'none';   // 수동 모드에만
+      ub.style.display=META.autoUlt?'none':'';               // 수동 모드에만
       ub.disabled=!(running&&a.hp>0&&a.ultT>=a.ultCd);
       ub.classList.toggle('ready',running&&a.hp>0&&a.ultT>=a.ultCd);
     }

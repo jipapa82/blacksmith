@@ -120,7 +120,7 @@ function renderHirePicker(){
       <div class="target">새 용병</div>
       <div class="cname">${v.name}</div>
       <div class="cdesc">${v.desc}</div>
-      <div class="cdesc" style="color:var(--heat)">필살 · ${v.ultName}${metaRank(k,'nult')?'':' (미해금)'}</div>
+      <div class="cdesc" style="color:var(--heat)">필살 · ${v.ultName} (위력 ${50+25*metaRank(k,'nult')}%)</div>
       <div class="crar">공 ${v.atk} · 방 ${v.def} · 체 ${v.hp} · 속 ${v.spd.toFixed(2)}</div>
     </div>`).join('')+`</div>`;
   box.querySelectorAll('.card').forEach(el=>el.onclick=()=>{
