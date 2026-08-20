@@ -34,7 +34,8 @@ function mkMob(type){
   const f=FOE[type], m=foeMul*waveScale(waveIdx);
   /* 경험치는 웨이브마다 +6% — 후반 웨이브가 길어져도 레벨업(판단) 밀도를 유지한다 (DESIGN 8.2) */
   return{type,name:f.name,behav:f.behav,color:f.color,r:f.r,gold:f.gold,xp:Math.round(f.xp*(1+waveIdx*.06)),
-    hp:Math.round(f.hp*m),maxhp:Math.round(f.hp*m),atk:Math.round(f.atk*(1+waveIdx*.08)*foeMul),
+    /* 공격력 성장은 최소한(+4%/웨이브) — 압박은 물량·체력이 담당한다 (DESIGN 8.2) */
+    hp:Math.round(f.hp*m),maxhp:Math.round(f.hp*m),atk:Math.round(f.atk*(1+waveIdx*.04)*foeMul),
     def:Math.round(f.def*(1+waveIdx*.07)*foeMul),
     mv:f.mv*(1+waveIdx*.015),aspd:f.aspd,charge:Math.random()*.5,
     x:W-6+Math.random()*44,y:34+Math.random()*(H-68),hit:0,lung:0,stun:0,
