@@ -26,5 +26,6 @@ function metaMods(k){
   const r=id=>metaRank(k,id);
   return { atkMul:1+.05*r('natk'), aspdMul:1+.04*r('naspd'), hpMul:1+.06*r('nhp'),
     defAdd:r('ndef'), slots:2+r('nslot'),
-    ultPow:.5+.25*r('nult') };   // 필살기는 기본 제공(50%), 노드로 연마 (DESIGN 4.5)
+    ultPow:.5+.25*r('nult'),     // 필살기는 기본 제공(50%), 노드로 연마 (DESIGN 4.5)
+    ultRank:r('nult') };         // 활은 연마 축이 연사 수 (5+2×랭크)
 }

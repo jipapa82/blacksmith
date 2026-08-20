@@ -23,7 +23,7 @@ function ultWorth(a){
   let s=0;
   for(const m of mobs){
     if(m.hp<=0)continue;
-    if(a.trait==='shoot'){ if(m.x>a.x+130)s+=w(m); }
+    if(a.trait==='shoot'){ if(m.x>a.x)s+=w(m); }
     else if(a.trait==='blast'){ if(m.x>a.x)s+=w(m); }
     else if(a.trait==='cleave'){ if(m.x>a.x&&m.x<a.x+320*a.ultR&&Math.abs(m.y-a.y)<90*a.ultR)s+=w(m); }
     else if(a.trait==='assassin'){ if(behindLine(m)||m.type==='boss')s+=4; }  // 침투자나 대장이 있으면 즉시
@@ -67,18 +67,10 @@ function ultimate(a){
       m.x+=80; m.stun=1.3;
     });
   }
-  else if(a.trait==='shoot'){                  // 화살비 — 떨어지는 순간에 맞는다
-    const x0=a.x+130, x1=W-20, R=34*a.ultR;
-    for(let i=0;i<14;i++){
-      const px=x0+Math.random()*(x1-x0), py=30+Math.random()*(H-60);
-      setTimeout(()=>{
-        if(!running)return;
-        beam(px,-10,px,py,elemColor(a)||'#6FC9CE',4);
-        ring(px,py,R,elemColor(a)||'#6FC9CE',1.6);
-        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-px,m.y-py)<R)
-            .forEach(m=>hurtMob(m,atkOf(a)*1.5*P,a,true));
-      },i*55);
-    }
+  else if(a.trait==='shoot'){                  // 질풍 연사 — 순간적으로 공속을 몰아쓴다
+    const n=5+2*a.ultRank;                     // 연마 랭크당 +2발: 5/7/9/11 (DESIGN 4.5)
+    for(let i=0;i<n;i++)
+      setTimeout(()=>{ if(running) bowShot(a,true); }, i*110);
   }
   else if(a.trait==='blast'){                  // 불바다 — 앞쪽 절반, 순차 폭발
     const x0=a.x+120, R=115*a.ultR;
@@ -94,6 +86,36 @@ function ultimate(a){
   }
   return true;
 }
+/* 활 사격 한 발 — 기본 공격과 필살기 '질풍 연사'가 공유한다.
+   isUlt=true면 발마다 필살기 판정(기폭·추수 적용). */
+function bowShot(a,isUlt){
+  const live=mobs.filter(m=>m.hp>0);
+  if(!live.length)return;
+  const rows=[];
+  for(let i=0;i<a.arrows;i++){
+    let best=null,bn=-1;
+    live.forEach(m=>{ if(m.x<=a.x)return;
+      if(rows.some(y=>Math.abs(y-m.y)<a.pierceW))return;
+      const n=live.filter(o=>Math.abs(o.y-m.y)<a.pierceW&&o.x>a.x).length;
+      if(n>bn){bn=n;best=m;} });
+    if(!best)break;
+    rows.push(best.y);
+  }
+  if(!rows.length)return;
+  a.lung=.1;
+  // 줄이 늘면 줄당 피해를 나눈다(총합 +20%씩), 관통은 한 명 뚫을 때마다 62%로 (DESIGN 7.1)
+  const rowMul = a.arrows>1 ? (1+.2*(a.arrows-1))/a.arrows : 1;
+  rows.forEach(y=>{
+    // 가까운 순으로 정렬해 관통 수만큼만 맞춘다
+    const line=live.filter(m=>Math.abs(m.y-y)<a.pierceW&&m.x>a.x)
+                   .sort((p,q)=>p.x-q.x);
+    const hits=line.slice(0, 1+a.pierce);
+    const endX = hits.length ? hits[hits.length-1].x+14 : W;
+    beam(a.x+12,a.y,endX,y,elemColor(a)||'#6FC9CE',isUlt?3.5:2.5);
+    hits.forEach((m,i)=>hurtMob(m,atkOf(a)*rowMul*Math.pow(.62,i),a,isUlt));
+  });
+}
+
 function allyAct(a){
   const live=mobs.filter(m=>m.hp>0);
   if(!live.length)return;
@@ -119,29 +141,7 @@ function allyAct(a){
     a.lung=.18; ring(a.x+32,a.y,a.cleaveR,elemColor(a)||'#E8963C',.55);
     live.filter(m=>Math.hypot(m.x-(a.x+30),m.y-a.y)<a.cleaveR).forEach(m=>hurtMob(m,atkOf(a),a));
   }else if(a.trait==='shoot'){
-    const rows=[];
-    for(let i=0;i<a.arrows;i++){
-      let best=null,bn=-1;
-      live.forEach(m=>{ if(m.x<=a.x)return;
-        if(rows.some(y=>Math.abs(y-m.y)<a.pierceW))return;
-        const n=live.filter(o=>Math.abs(o.y-m.y)<a.pierceW&&o.x>a.x).length;
-        if(n>bn){bn=n;best=m;} });
-      if(!best)break;
-      rows.push(best.y);
-    }
-    if(!rows.length)return;
-    a.lung=.1;
-    // 줄이 늘면 줄당 피해를 나눈다(총합 +20%씩), 관통은 한 명 뚫을 때마다 62%로 (DESIGN 7.1)
-    const rowMul = a.arrows>1 ? (1+.2*(a.arrows-1))/a.arrows : 1;
-    rows.forEach(y=>{
-      // 가까운 순으로 정렬해 관통 수만큼만 맞춘다
-      const line=live.filter(m=>Math.abs(m.y-y)<a.pierceW&&m.x>a.x)
-                     .sort((p,q)=>p.x-q.x);
-      const hits=line.slice(0, 1+a.pierce);
-      const endX = hits.length ? hits[hits.length-1].x+14 : W;
-      beam(a.x+12,a.y,endX,y,elemColor(a)||'#6FC9CE',2.5);
-      hits.forEach((m,i)=>hurtMob(m,atkOf(a)*rowMul*Math.pow(.62,i),a));
-    });
+    bowShot(a,false);
   }else if(a.trait==='blast'){
     let bx=0,by=0,bn=0;
     live.forEach(m=>{const n=live.filter(o=>Math.hypot(o.x-m.x,o.y-m.y)<a.blastR).length;
