@@ -7,6 +7,7 @@ function mkAlly(k,i,front){
     maxhp:Math.round(e.hp*mm.hpMul), hp:0, aspd:e.spd*mm.aspdMul, charge:0,
     front, x:front?FRONT_X:BACK_X, y:MID_Y, r:front?18:15, hit:0, lung:0,
     blastR:60, pierceW:14, arrows:1, pierce:0, chain:0, cleaveR:56, thorns:0, blockR:1, range:72,
+    ambush:1.8,                                                    // 암살: 침투자에게 주는 피해 배수
     leech:0, deathBlast:0, repel:0, crit:.05, critD:1.5,
     elFire:0, elPois:0, elCold:0, elShock:0,                       // 원소 부여 단계
     syShatter:0, syColdcut:0, syFirespread:0, syDotamp:0, syReso:0, syMixer:0,   // 시너지 단계

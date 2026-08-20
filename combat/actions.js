@@ -2,6 +2,12 @@
    규칙: 이펙트가 그려지는 그 좌표, 그 시점에만 판정한다. (DESIGN 7.2)
    setTimeout으로 연출을 나눴다면 피해 계산도 그 안에 넣는다. */
 
+/* 침투자 — 전선(앞줄)을 넘어 들어온 적. 단검(암살)의 사냥감 (DESIGN 3.3) */
+function behindLine(m){
+  const F=frontAlly();
+  return m.x < (F?F.x+30:FRONT_X+30);
+}
+
 /* 필살기 수동 발동 — 키 1~5와 부대 카드 버튼이 부른다 (DESIGN 4.1.2) */
 function fireUlt(i){
   if(!running)return false;
@@ -20,7 +26,8 @@ function ultWorth(a){
     if(a.trait==='shoot'){ if(m.x>a.x+130)s+=w(m); }
     else if(a.trait==='blast'){ if(m.x>a.x)s+=w(m); }
     else if(a.trait==='cleave'){ if(m.x>a.x&&m.x<a.x+320*a.ultR&&Math.abs(m.y-a.y)<90*a.ultR)s+=w(m); }
-    else{ const R=(a.trait==='wall'?135:120)*a.ultR; if(Math.hypot(m.x-a.x,m.y-a.y)<R)s+=w(m); }
+    else if(a.trait==='assassin'){ if(behindLine(m)||m.type==='boss')s+=4; }  // 침투자나 대장이 있으면 즉시
+    else{ const R=135*a.ultR; if(Math.hypot(m.x-a.x,m.y-a.y)<R)s+=w(m); }
     if(s>=4)return true;
   }
   return false;
@@ -32,10 +39,13 @@ function ultimate(a){
   const P=a.ultPow;
   shake=6;
 
-  if(a.trait==='melee'){                       // 회전 베기 — 자기 주위
-    const R=120*a.ultR;
-    ring(a.x,a.y,R,elemColor(a)||'#E8963C',2);
-    live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<R).forEach(m=>hurtMob(m,atkOf(a)*2.2*P,a,true));
+  if(a.trait==='assassin'){                    // 급소 찌르기 — 침투자 중 최대 체력 대상 일격
+    const infil=live.filter(behindLine);
+    const pool=infil.length?infil:live;        // 침투자가 없으면 전장 최대 체력(대장 사냥)
+    const t=pool.reduce((p,q)=>q.hp>p.hp?q:p);
+    const C=elemColor(a)||'#E8963C';
+    beam(a.x,a.y,t.x,t.y,C,3); slashFx(t.x,t.y,C); ring(t.x,t.y,26,C,1.5);
+    hurtMob(t,atkOf(a)*6.0*P,a,true);
   }
   else if(a.trait==='cleave'){                 // 내려찍기 — 앞으로 3연타
     const R=90*a.ultR;
@@ -89,9 +99,21 @@ function allyAct(a){
   if(!live.length)return;
   const near=r=>live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<r)
                     .sort((p,q)=>Math.hypot(p.x-a.x,p.y-a.y)-Math.hypot(q.x-a.x,q.y-a.y));
-  if(a.trait==='wall'||a.trait==='melee'){
+  if(a.trait==='wall'){
     const t=near(a.range)[0]; if(!t)return;
     a.lung=.14; slashFx(t.x,t.y,elemColor(a)||'#E8963C'); hurtMob(t,atkOf(a),a);
+  }else if(a.trait==='assassin'){
+    // 침투자(전선 뒤) 최우선 — 가장 깊이 들어온 놈부터, 어디든 점멸해 벤다. 없으면 근접 (DESIGN 3.3)
+    const infil=live.filter(behindLine).sort((p,q)=>p.x-q.x);
+    const C=elemColor(a)||'#E8963C';
+    if(infil.length){
+      const t=infil[0];
+      a.lung=.14; beam(a.x,a.y,t.x,t.y,C,1.5); slashFx(t.x,t.y,C);
+      hurtMob(t,atkOf(a)*a.ambush,a);          // 암살 보너스
+    }else{
+      const t=near(a.range)[0]; if(!t)return;
+      a.lung=.14; slashFx(t.x,t.y,C); hurtMob(t,atkOf(a),a);
+    }
   }else if(a.trait==='cleave'){
     const t=near(a.range+22); if(!t.length)return;
     a.lung=.18; ring(a.x+32,a.y,a.cleaveR,elemColor(a)||'#E8963C',.55);

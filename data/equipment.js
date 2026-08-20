@@ -2,8 +2,8 @@
    용병 능력치는 0. 모든 수치는 여기서 온다. (DESIGN 2.1)
    필살기는 장비에 귀속된다. (DESIGN 3.3) */
 const EQUIP={
-  sword: {name:'낡은 검',    atk:14,def:2,hp:52, spd:1.10,trait:'melee', desc:'앞의 적 하나를 벤다',
-          shape:'tri',color:'#6FC9CE', ultName:'회전 베기', ultDesc:'주위를 크게 한 바퀴 돈다', ultCd:7},
+  sword: {name:'낡은 단검',  atk:15,def:1,hp:46, spd:1.25,trait:'assassin', desc:'후미로 새어든 적을 최우선으로 벤다',
+          shape:'tri',color:'#6FC9CE', ultName:'급소 찌르기', ultDesc:'가장 단단한 침투자의 약점을 노린다', ultCd:8},
   great: {name:'무딘 대검',  atk:30,def:3,hp:64, spd:0.50,trait:'cleave',desc:'휘두르면 앞의 여럿이 맞는다',
           shape:'tri',color:'#6FC9CE', ultName:'내려찍기', ultDesc:'땅을 갈라 앞을 쓸어버린다', ultCd:9},
   shield:{name:'참나무 방패',atk:6, def:10,hp:120,spd:0.85,trait:'wall',  desc:'적을 몸으로 막아 세운다',

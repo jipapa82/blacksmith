@@ -4,7 +4,7 @@ function renderLoadout(){
   mercList.innerHTML='';
   loadout.forEach((k,i)=>{
     const e=EQUIP[k], front=i===0;
-    const bad=front&&(e.trait==='shoot'||e.trait==='blast');
+    const bad=front&&(e.trait==='shoot'||e.trait==='blast'||e.trait==='assassin');
     const bad2=!front&&e.trait==='wall';
     const d=document.createElement('div'); d.className='merc-row';
     d.innerHTML=`<div class="merc-top">
@@ -15,7 +15,7 @@ function renderLoadout(){
       <div class="derived"><span>공 <b>${e.atk}</b></span><span>방 <b>${e.def}</b></span>
         <span>체 <b>${e.hp}</b></span><span>속 <b>${e.spd.toFixed(2)}</b></span></div>
       <div class="trait-note">${e.desc}</div>
-      ${bad?'<div class="warn-note">앞줄에 세우면 둘러싸인다</div>':''}
+      ${bad?`<div class="warn-note">${e.trait==='assassin'?'앞줄에 서면 지킬 후미가 없다':'앞줄에 세우면 둘러싸인다'}</div>`:''}
       ${bad2?'<div class="warn-note">뒷줄에서는 막을 것이 없다</div>':''}`;
     mercList.appendChild(d);
   });
