@@ -7,7 +7,8 @@ function step(dt){
   const total=w.count+(w.boss?1:0);
   timeFill.style.width=Math.min(100,waveKills/total*100)+'%';
   if(waveSpawned<w.count){
-    spawnT-=dt;
+    // 한산 가속: 전장에 적이 8마리를 밑돌면 부족한 만큼 스폰이 빨라진다, 최대 5배 (DESIGN 3.6)
+    spawnT-=dt*(1+4*Math.max(0,1-mobs.length/8));
     if(spawnT<=0){
       spawnT=Math.max(.10,w.every)/rateMul*(.6+Math.random()*.8);
       const r=Math.random(); let acc=0,pick=w.mix[0][0];
@@ -22,7 +23,10 @@ function step(dt){
     a.charge+=dt*aspdOf(a); if(a.charge>=1){a.charge=0;allyAct(a);}
     if(a.ultOn){
       a.ultT=Math.min(a.ultCd,a.ultT+dt);
-      if(META.autoUlt&&a.ultT>=a.ultCd&&ultimate(a)) a.ultT=0;   // 자동 모드. 수동은 차서 기다린다 (4.1.2)
+      if(META.autoUlt&&a.ultT>=a.ultCd){        // 자동 모드: 뭉칠 때까지 기다렸다 쏜다. 수동은 차서 기다린다 (4.1.2)
+        a.ultWait+=dt;
+        if((ultWorth(a)||a.ultWait>6)&&ultimate(a)){a.ultT=0;a.ultWait=0;}
+      }
     }
     a.hit=Math.max(0,a.hit-dt); a.lung=Math.max(0,a.lung-dt); });
   mobs.forEach(m=>{ if(m.hp<=0)return;

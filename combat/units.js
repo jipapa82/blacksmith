@@ -7,11 +7,11 @@ function mkAlly(k,i,front){
     maxhp:Math.round(e.hp*mm.hpMul), hp:0, aspd:e.spd*mm.aspdMul, charge:0,
     front, x:front?FRONT_X:BACK_X, y:MID_Y, r:front?18:15, hit:0, lung:0,
     blastR:60, pierceW:14, arrows:1, pierce:0, chain:0, cleaveR:56, thorns:0, blockR:1, range:72,
-    leech:0, deathBlast:0, crit:.05, critD:1.5,
+    leech:0, deathBlast:0, repel:0, crit:.05, critD:1.5,
     elFire:0, elPois:0, elCold:0, elShock:0,                       // 원소 부여 단계
     syShatter:0, syColdcut:0, syFirespread:0, syDotamp:0, syReso:0, syMixer:0,   // 시너지 단계
     syDeton:0, syHarvest:0, syReap:0,                                            // 회수 시너지 (필살기)
-    ultOn:mm.ultOn, ultCd:e.ultCd, ultT:e.ultCd*.5, ultPow:1, ultR:1,
+    ultOn:mm.ultOn, ultCd:e.ultCd, ultT:e.ultCd*.5, ultPow:1, ultR:1, ultWait:0,
     sock:Array(mm.slots).fill(null), gm:null,
     lv:{}, mods:[]};
   recalcGems(a); a.hp=maxHpOf(a);
@@ -30,7 +30,8 @@ function hireMerc(k){
 }
 function mkMob(type){
   const f=FOE[type], m=foeMul*waveScale(waveIdx);
-  return{type,name:f.name,behav:f.behav,color:f.color,r:f.r,gold:f.gold,xp:f.xp,
+  /* 경험치는 웨이브마다 +6% — 후반 웨이브가 길어져도 레벨업(판단) 밀도를 유지한다 (DESIGN 8.2) */
+  return{type,name:f.name,behav:f.behav,color:f.color,r:f.r,gold:f.gold,xp:Math.round(f.xp*(1+waveIdx*.06)),
     hp:Math.round(f.hp*m),maxhp:Math.round(f.hp*m),atk:Math.round(f.atk*(1+waveIdx*.08)*foeMul),
     def:Math.round(f.def*(1+waveIdx*.07)*foeMul),
     mv:f.mv*(1+waveIdx*.015),aspd:f.aspd,charge:Math.random()*.5,

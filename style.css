@@ -144,6 +144,7 @@ canvas{display:block;width:100%;height:auto}
 .gemchip .dot2{width:9px;height:9px;border-radius:50%;flex:none}
 .gemchip .cnt{color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:10px}
 .gemchip button{padding:1px 7px;font-size:10px}
+#mergeAllBtn{padding:4px 10px;font-size:11px}
 .forge-hint{font-size:11px;color:var(--dim);text-align:center;line-height:1.6}
 
 /* 대장간 — 영구 노드 트리 */

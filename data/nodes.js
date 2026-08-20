@@ -8,5 +8,5 @@ const NODES=[
   {id:'nhp',   n:'단단한 심', max:5, costs:[1,1,2,2,3], eff:r=>`체력 +${6*r}%`},
   {id:'ndef',  n:'두꺼운 판', max:3, costs:[1,2,3],     eff:r=>`방어 +${r}`},
   {id:'nslot', n:'보석 홈',   max:2, costs:[4,8],       eff:r=>`홈 ${2+r}개`},
-  {id:'nult',  n:'오의 각성', max:1, costs:[5],         eff:r=>r?'필살기 해금됨':'필살기 해금'},
+  {id:'nult',  n:'오의 각성', max:1, costs:[3],         eff:r=>r?'필살기 해금됨':'필살기 해금'},
 ];

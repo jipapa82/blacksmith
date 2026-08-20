@@ -26,6 +26,21 @@ function mergeGems(k){
   if(gr>=GEM_MAX_GRADE||invCount(k)<2)return false;
   takeGem(k); takeGem(k); gainGem(t,gr+1); return true;
 }
+/* 일괄 합성 — 종류마다 낮은 단계부터 쌍을 전부 밀어 올린다. 오름차순이라 연쇄가 저절로 된다. */
+function mergeAllGems(){
+  let n=0;
+  for(const t of Object.keys(GEMS)){
+    for(let gr=1; gr<GEM_MAX_GRADE; gr++){
+      const k=gemKey(t,gr), pairs=Math.floor(invCount(k)/2);
+      if(!pairs) continue;
+      G.gems[k]-=pairs*2; if(G.gems[k]<=0) delete G.gems[k];
+      const up=gemKey(t,gr+1); G.gems[up]=(G.gems[up]||0)+pairs;
+      n+=pairs;
+    }
+  }
+  if(n) gemTxt.textContent=gemTotal();
+  return n;
+}
 function invEntries(){
   return Object.entries(G.gems).map(([k,c])=>{
     const [t,g]=k.split(':'); return {key:k,type:t,grade:+g,count:c};

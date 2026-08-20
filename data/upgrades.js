@@ -18,6 +18,8 @@ const UP=[
    f:a=>a.elShock++},
   {id:'leech', n:'피 먹는 홈',  max:4, r:0, ok:()=>1,
    d:a=>`처치할 때마다 체력 +2 (현재 ${a.leech})`, f:a=>a.leech+=2},
+  {id:'repel', n:'밀치는 반격', max:3, r:0, ok:()=>1,
+   d:a=>`맞으면 공격자가 ${40*(a.repel+1)}만큼 뒤로 밀려난다 — 파고드는 적을 떼어낸다`, f:a=>a.repel++},
 
   /* ===== 희귀 — 무기 행동 ===== */
   {id:'wide',  n:'폭발 확대',   max:5, r:1, ok:a=>a.trait==='blast',

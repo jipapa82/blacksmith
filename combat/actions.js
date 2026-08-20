@@ -11,6 +11,21 @@ function fireUlt(i){
   return false;
 }
 
+/* 자동 발동 가치 판정 — 적이 뭉쳤을 때만 쏜다. 잡졸 1, 대장 4로 세어 4 이상 (DESIGN 4.1.2) */
+function ultWorth(a){
+  const w=m=>m.type==='boss'?4:1;
+  let s=0;
+  for(const m of mobs){
+    if(m.hp<=0)continue;
+    if(a.trait==='shoot'){ if(m.x>a.x+130)s+=w(m); }
+    else if(a.trait==='blast'){ if(m.x>a.x)s+=w(m); }
+    else if(a.trait==='cleave'){ if(m.x>a.x&&m.x<a.x+320*a.ultR&&Math.abs(m.y-a.y)<90*a.ultR)s+=w(m); }
+    else{ const R=(a.trait==='wall'?135:120)*a.ultR; if(Math.hypot(m.x-a.x,m.y-a.y)<R)s+=w(m); }
+    if(s>=4)return true;
+  }
+  return false;
+}
+
 function ultimate(a){
   const live=mobs.filter(m=>m.hp>0);
   if(!live.length)return false;

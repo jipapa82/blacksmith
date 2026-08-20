@@ -8,7 +8,7 @@ function restoreCrew(){
   const fallen=[];
   allies.forEach(a=>{
     if(a.hp<=0){ fallen.push({eq:a.eq, old:a.name}); a.name=nextMercName(); }
-    a.hp=maxHpOf(a); a.charge=0; a.hit=0; a.lung=0;
+    a.hp=maxHpOf(a); a.charge=0; a.hit=0; a.lung=0; a.ultWait=0;
   });
   layoutAllies();
   return fallen;
@@ -63,6 +63,7 @@ function renderForgeBody(){
       }).join('')}
     </div>`).join('');
   const inv=invEntries();
+  const canMergeAll=inv.some(e=>e.count>=2&&e.grade<GEM_MAX_GRADE);
   html+=`<div class="gem-inv">`+(inv.length?inv.map(e=>{
       const g=GEMS[e.type];
       return `<span class="gemchip ${selGem===e.key?'sel':''}" data-key="${e.key}">
@@ -72,10 +73,18 @@ function renderForgeBody(){
         <span class="cnt">×${e.count}</span>
         ${e.count>=2&&e.grade<GEM_MAX_GRADE?`<button data-merge="${e.key}">합성</button>`:''}
       </span>`;
-    }).join(''):'<span class="forge-hint">보석이 없다. 적을 잡다 보면 가끔 떨어진다.</span>')+`</div>
+    }).join(''):'<span class="forge-hint">보석이 없다. 적을 잡다 보면 가끔 떨어진다.</span>')
+    +(canMergeAll?`<button id="mergeAllBtn">일괄 합성</button>`:'')+`</div>
   <div class="forge-hint">보석을 고르고 홈(+)을 누르면 끼운다. 보석을 안 고른 채 찬 홈을 누르면 뺀다.<br>
-    합성: 같은 보석 2개 → 한 단계 위 1개.</div>`;
+    합성: 같은 보석 2개 → 한 단계 위 1개. 일괄 합성은 합칠 수 있는 걸 전부 (연쇄까지) 밀어 올린다.</div>`;
   box.innerHTML=html;
+
+  const mab=document.getElementById('mergeAllBtn');
+  if(mab) mab.onclick=()=>{
+    mergeAllGems();
+    if(selGem&&!invCount(selGem)) selGem=null;
+    renderForgeBody();
+  };
 
   box.querySelectorAll('.gemchip').forEach(el=>el.onclick=ev=>{
     const mk=ev.target.dataset&&ev.target.dataset.merge;

@@ -65,5 +65,6 @@ function hurtAlly(a,dmg,from){
   const d=Math.max(1,Math.round(dmg-defOf(a)));
   a.hp-=d; a.hit=.14; num(a.x,a.y-a.r-6,d,'#C4574F');
   if(a.thorns&&from) hurtMob(from,a.thorns,a);
+  if(a.repel&&from&&from.hp>0) from.x=Math.min(W+20,from.x+40*a.repel);   // 밀치는 반격 (DESIGN 4.1.1)
   if(a.hp<=0){burst(a.x,a.y,'#C4574F');shake=8;layoutAllies();}
 }
