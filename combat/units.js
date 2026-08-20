@@ -37,18 +37,22 @@ function mkMob(type){
     def:Math.round(f.def*(1+waveIdx*.07)*foeMul),
     mv:f.mv*(1+waveIdx*.015),aspd:f.aspd,charge:Math.random()*.5,
     x:W-6+Math.random()*44,y:34+Math.random()*(H-68),hit:0,lung:0,stun:0,
-    burn:null,pois:null,chillT:0,chillHits:0,chillLv:0,freezeT:0,freezeCd:0,shockT:0,shockLv:0};
+    burn:null,pois:null,chillT:0,chillHits:0,chillLv:0,freezeT:0,freezeCd:0,shockT:0,shockLv:0,shockAmp:0};
 }
 
 /* ===== 보석 스탯 반영 (DESIGN 4.2) =====
    장착된 보석의 합을 a.gm에 캐시해두고, 전투 계산은 아래 *Of() 접근자만 쓴다. */
 function recalcGems(a){
-  const gm={atkMul:1,aspdMul:1,hpMul:1,defAdd:0,critAdd:0,dodgeAdd:0};
+  const gm={atkMul:1,aspdMul:1,hpMul:1,defAdd:0,critAdd:0,dodgeAdd:0,
+    synFire:0,synPois:0,synCold:0,synShock:0};   // 보석×원소 시너지 합 (DESIGN 4.2)
   a.sock.forEach(s=>{ if(!s)return;
     const g=GEMS[s.type], v=g.v[s.grade-1];
     if(g.stat==='atk')gm.atkMul+=v; else if(g.stat==='aspd')gm.aspdMul+=v;
     else if(g.stat==='hp')gm.hpMul+=v; else if(g.stat==='crit')gm.critAdd+=v;
-    else if(g.stat==='def')gm.defAdd+=v; else gm.dodgeAdd+=v; });
+    else if(g.stat==='def')gm.defAdd+=v; else gm.dodgeAdd+=v;
+    if(g.elem){ const sv=g.syn[s.grade-1];
+      if(g.elem==='fire')gm.synFire+=sv; else if(g.elem==='pois')gm.synPois+=sv;
+      else if(g.elem==='cold')gm.synCold+=sv; else gm.synShock+=sv; } });
   a.gm=gm;
 }
 function atkOf(a){ return Math.round(a.atk*a.gm.atkMul); }

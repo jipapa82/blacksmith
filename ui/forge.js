@@ -69,13 +69,15 @@ function renderForgeBody(){
         <i class="dot2" style="background:${g.color}"></i>${g.name} ${GRADE_TXT[e.grade-1]}
         <span class="cnt">${g.desc} +${g.kind==='mul'||g.stat==='crit'||g.stat==='dodge'
           ?Math.round(g.v[e.grade-1]*100)+'%':g.v[e.grade-1]}</span>
+        ${g.elem?`<span class="cnt" style="color:${ELEM_INFO[g.elem][1]}">↔${ELEM_INFO[g.elem][0]}</span>`:''}
         <span class="cnt">×${e.count}</span>
         ${e.count>=2&&e.grade<GEM_MAX_GRADE?`<button data-merge="${e.key}">합성</button>`:''}
       </span>`;
     }).join(''):'<span class="forge-hint">보석이 없다. 적을 잡다 보면 가끔 떨어진다.</span>')
     +(canMergeAll?`<button id="mergeAllBtn">일괄 합성</button>`:'')+`</div>
   <div class="forge-hint">보석을 고르고 홈(+)을 누르면 끼운다. 보석을 안 고른 채 찬 홈을 누르면 뺀다.<br>
-    합성: 같은 보석 2개 → 한 단계 위 1개. 일괄 합성은 합칠 수 있는 걸 전부 (연쇄까지) 밀어 올린다.</div>`;
+    합성: 같은 보석 2개 → 한 단계 위 1개. 일괄 합성은 합칠 수 있는 걸 전부 (연쇄까지) 밀어 올린다.<br>
+    ↔ 표시 보석은 같은 원소의 무기에 끼우면 시너지가 발현된다.</div>`;
   box.innerHTML=html;
 
   const mab=document.getElementById('mergeAllBtn');

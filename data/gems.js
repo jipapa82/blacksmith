@@ -2,19 +2,22 @@
    6종 × 5단계, 순수 스탯. (DESIGN 4.2)
    kind: mul = 배율(%), add = 가산. v[단계-1] = 효과량.
    단계당 가치는 합성 비용(2개→1개, 지수)을 따라 오른다. */
+/* elem: 매칭 원소, syn[등급-1]: 시너지 크기 (DESIGN 4.2)
+   시너지는 그 원소가 확정된 무기의 홈에서만 발현된다 — 효과 자체가 원소 전용이라 저절로.
+   기본 스탯(v)은 어느 무기에서든 그대로 — 꽝 없음 원칙 유지. */
 const GEMS={
   ruby:    {name:'루비',      color:'#E05252', stat:'atk',   kind:'mul', desc:'공격력',
-            v:[.06,.10,.16,.26,.42]},
+            v:[.06,.10,.16,.26,.42], elem:'fire',  syn:[.10,.20,.30,.40,.50]},  // 화상 피해 +
   emerald: {name:'에메랄드',  color:'#5FBF6A', stat:'aspd',  kind:'mul', desc:'공격 속도',
-            v:[.05,.08,.13,.21,.34]},
+            v:[.05,.08,.13,.21,.34], elem:'pois',  syn:[1,2,3,4,5]},            // 중독 중첩 상한 +
   sapphire:{name:'사파이어',  color:'#5A8FD9', stat:'hp',    kind:'mul', desc:'최대 체력',
-            v:[.07,.12,.19,.30,.48]},
+            v:[.07,.12,.19,.30,.48], elem:'cold',  syn:[.10,.20,.30,.40,.50]},  // 빙결 지속 +
   topaz:   {name:'토파즈',    color:'#E0C050', stat:'crit',  kind:'add', desc:'치명타 확률',
-            v:[.04,.07,.11,.17,.26]},
+            v:[.04,.07,.11,.17,.26], elem:null},                                // 무색 — 번개 추가 시 승격 후보
   amethyst:{name:'자수정',    color:'#9B6FD0', stat:'def',   kind:'add', desc:'방어',
-            v:[1,2,4,6,10]},
+            v:[1,2,4,6,10],          elem:'shock', syn:[.02,.04,.06,.08,.10]},  // 공명 증폭 +
   diamond: {name:'다이아몬드',color:'#D8E4EA', stat:'dodge', kind:'add', desc:'회피',
-            v:[.03,.05,.08,.13,.20]},
+            v:[.03,.05,.08,.13,.20], elem:null},                                // 무색 — 범용
 };
 const GEM_MAX_GRADE=5;
 const GRADE_TXT=['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];

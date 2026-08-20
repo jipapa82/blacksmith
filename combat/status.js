@@ -21,11 +21,12 @@ function applyOnHit(src,m){
   const dotAmp=1+STATUS.syn.dotAmp*src.syDotamp;
   if(src.elFire){
     m.burn={t:STATUS.burn.dur[src.elFire-1],
-      dps:atkOf(src)*STATUS.burn.dpsPct[src.elFire-1]*dotAmp,
+      dps:atkOf(src)*STATUS.burn.dpsPct[src.elFire-1]*dotAmp*(1+src.gm.synFire),  // 루비 시너지
       pt:m.burn?m.burn.pt:0, src};
   }
   if(src.elPois){
-    const n=Math.min(STATUS.pois.maxStacks[src.elPois-1],(m.pois?m.pois.n:0)+1);
+    const cap=STATUS.pois.maxStacks[src.elPois-1]+src.gm.synPois;                 // 에메랄드: 중첩 상한 +
+    const n=Math.min(cap,(m.pois?m.pois.n:0)+1);
     m.pois={n, t:STATUS.pois.dur, dps:atkOf(src)*STATUS.pois.dpsPct[src.elPois-1]*dotAmp,
       pt:m.pois?m.pois.pt:0, src};
   }
@@ -34,9 +35,10 @@ function applyOnHit(src,m){
     m.chillLv=Math.max(m.chillLv,src.elCold);              // 감속 세기는 건 무기의 단계
     if(m.freezeCd<=0){                                     // 재빙결 유예 중엔 카운트도 안 쌓인다
       m.chillHits++;
-      if(m.chillHits>=STATUS.chill.hitsToFreeze[src.elCold-1]){
+      if(m.chillHits>=STATUS.chill.hitsToFreeze){
         m.chillHits=0;
-        m.freezeT=STATUS.chill.freezeDur[src.elCold-1]*(m.type==='boss'?STATUS.chill.bossFreezeMul:1);
+        m.freezeT=STATUS.chill.freezeDur[src.elCold-1]*(1+src.gm.synCold)          // 사파이어: 빙결 지속 +
+                  *(m.type==='boss'?STATUS.chill.bossFreezeMul:1);
         m.freezeCd=m.freezeT+STATUS.chill.immune;
         ring(m.x,m.y,m.r+10,'#9AD9E8',1.2);
       }
@@ -45,6 +47,7 @@ function applyOnHit(src,m){
   if(src.elShock){
     m.shockT=STATUS.shock.dur[src.elShock-1];
     m.shockLv=Math.max(m.shockLv,src.elShock);
+    m.shockAmp=Math.max(m.shockAmp,STATUS.shock.amp[src.elShock-1]+src.gm.synShock);  // 자수정: 증폭 +
   }
 }
 
@@ -66,7 +69,7 @@ function statusTick(m,dt){
   if(m.freezeT>0) m.freezeT-=dt;
   if(m.freezeCd>0) m.freezeCd-=dt;
   if(m.chillT>0){ m.chillT-=dt; if(m.chillT<=0){m.chillHits=0;m.chillLv=0;} }
-  if(m.shockT>0){ m.shockT-=dt; if(m.shockT<=0)m.shockLv=0; }
+  if(m.shockT>0){ m.shockT-=dt; if(m.shockT<=0){m.shockLv=0;m.shockAmp=0;} }
   if(m.burn){
     m.burn.t-=dt; m.burn.pt+=dt;
     while(m.burn&&m.burn.pt>=STATUS.tick&&m.hp>0){

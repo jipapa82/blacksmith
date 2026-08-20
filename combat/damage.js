@@ -22,7 +22,8 @@ function killMob(m,src){
       ring(m.x,m.y,STATUS.syn.resoR,'#9B8ACB',1.6);
       mobs.forEach(o=>{ if(o.hp>0&&o!==m&&Math.hypot(o.x-m.x,o.y-m.y)<STATUS.syn.resoR){
         hurtMob(o,atkOf(src)*STATUS.syn.resoPct*src.syReso,src);
-        if(o.hp>0){o.shockT=STATUS.shock.dur;o.shockLv=Math.max(o.shockLv,1);} } });
+        if(o.hp>0){o.shockT=STATUS.shock.dur[0];o.shockLv=Math.max(o.shockLv,1);
+          o.shockAmp=Math.max(o.shockAmp,STATUS.shock.amp[0]);} } });
     }
   }
 }
@@ -30,7 +31,7 @@ function hurtMob(m,dmg,src,isUlt){
   if(m.hp<=0)return;
   let crit=false;
   if(src && Math.random()<critOf(src)){ dmg*=src.critD; crit=true; }
-  if(m.shockT>0&&m.shockLv) dmg*=1+STATUS.shock.amp[m.shockLv-1];     // 공명: 받는 피해 증폭
+  if(m.shockT>0&&m.shockAmp) dmg*=1+m.shockAmp;                       // 공명: 받는 피해 증폭 (자수정 포함)
   if(src){
     if(src.syColdcut&&(m.chillT>0||m.freezeT>0))
       dmg*=1+STATUS.syn.coldcut*src.syColdcut;                        // 한파의 날
