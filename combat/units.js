@@ -15,6 +15,8 @@ function mkAlly(k,i,front){
     syShatter:0, syColdcut:0, syFirespread:0, syDotamp:0, syReso:0, syMixer:0,   // 시너지 단계
     syDeton:0, syHarvest:0, syReap:0,                                            // 회수 시너지 (필살기)
     ultCd:e.ultCd, ultT:e.ultCd*.5, ultPow:mm.ultPow, ultRank:mm.ultRank, ultR:1, ultWait:0, dblUlt:0,
+    dblHit:0, finisher:0, heavyHand:0, momentum:0, _cmT:null, _cmN:0,   // 평타 강화 (4.1.1)
+    ultHaste:0, echo:0,                                                 // 필살 강화 (4.1.2)
     sock:Array(mm.slots).fill(null), gm:null,
     reviveUsed:false, reviveT:0,                                   // 되살리는 맥박 (최종 토파즈)
     lv:{}, mods:[]};

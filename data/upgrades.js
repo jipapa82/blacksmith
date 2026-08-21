@@ -22,6 +22,16 @@ const UP=[
   {id:'repel', n:'밀치는 반격', max:3, r:0, when:'피격 시', ok:()=>1,
    d:a=>`이 무기가 맞으면 때린 적이 ${60*(a.repel+1)}만큼 튕겨나고 공격 충전도 처음부터 — 파고드는 적을 떼어낸다`, f:a=>a.repel++},
 
+  /* ===== 일반 — 평타·필살 강화 (카드 = 행동 변주. DESIGN 4.1.1) ===== */
+  {id:'dbl',   n:'이중 타격',   max:3, r:0, when:'기본 공격', ok:()=>1,
+   d:a=>`기본 공격이 ${12*(a.dblHit+1)}% 확률로 즉시 한 번 더 나간다`, f:a=>a.dblHit++},
+  {id:'finish',n:'마무리 일격', max:3, r:0, when:'적중 시', ok:()=>1,
+   d:a=>`체력 30% 이하의 적에게 이 무기 피해 +${25*(a.finisher+1)}%`, f:a=>a.finisher++},
+  {id:'heavy', n:'묵직한 손',   max:3, r:0, when:'적중 시', ok:()=>1,
+   d:a=>`기본 공격이 적을 ${10*(a.heavyHand+1)}만큼 밀어낸다 (대장 제외)`, f:a=>a.heavyHand++},
+  {id:'uhaste',n:'빠른 오의',   max:3, r:0, when:'필살기', ok:()=>1,
+   d:a=>`이 무기 필살기 게이지 충전 속도 +${15*(a.ultHaste+1)}%`, f:a=>a.ultHaste++},
+
   /* ===== 일반 — 스탯 (% 배율 층: 노드=정수 기반, 카드=합산 후 한 번 곱. DESIGN 4.1.1) ===== */
   {id:'whet',  n:'숫돌질',    max:4, r:0, when:'상시', ok:()=>1,
    d:a=>`이 무기 공격력 +12% (현재 카드 합 +${Math.round((a.cardAtkMul-1)*100)}%)`, f:a=>a.cardAtkMul+=.12},
@@ -60,6 +70,11 @@ const UP=[
    d:a=>`침투자(전선을 넘어온 적)·대장 일격 피해 ×${(a.ambush+.25).toFixed(2)} (현재 ×${a.ambush.toFixed(2)})`, f:a=>a.ambush+=.25},
   {id:'ultwide', n:'퍼지는 오의', max:3, r:1, when:'필살기', ok:a=>a.trait!=='shoot',
    d:a=>`이 무기 필살기 범위 +15% (현재 +${Math.round((a.ultR-1)*100)}%)`, f:a=>a.ultR*=1.15},
+  {id:'momentum', n:'몰아치기', max:3, r:1, when:'적중 시', ok:()=>1,
+   d:a=>`같은 적을 연속으로 때릴 때마다 피해 +${6*(a.momentum+1)}%씩 누적 (최대 5회) — 대상을 바꾸면 초기화`,
+   f:a=>a.momentum++},
+  {id:'echo', n:'메아리', max:2, r:1, when:'필살기', ok:()=>1,
+   d:a=>`필살기 발동 후 게이지가 ${12*(a.echo+1)}% 찬 채로 시작한다`, f:a=>a.echo++},
 
   /* ===== 전설 — 시너지: "A 상태의 적에게 B" (상태는 누가 걸었든 판정) ===== */
   {id:'rune',  n:'파열의 룬',   max:3, r:2, when:'처치 시', ok:()=>1,

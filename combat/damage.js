@@ -37,6 +37,11 @@ function hurtMob(m,dmg,src,isUlt){
   if(src && Math.random()<critOf(src)){ dmg*=src.critD+(src.gm?src.gm.critDmgAdd:0); crit=true; }  // 다이아: 치명 피해 +
   if(m.shockT>0&&m.shockAmp) dmg*=1+m.shockAmp;                       // 공명: 받는 피해 증폭 (자수정 포함)
   if(src){
+    if(src.finisher&&m.hp<=m.maxhp*.3) dmg*=1+.25*src.finisher;       // 마무리 일격 — 처형
+    if(src.momentum){                                                 // 몰아치기 — 같은 대상 연속 타격 누적
+      if(src._cmT===m) src._cmN=Math.min(5,src._cmN+1); else {src._cmT=m; src._cmN=0;}
+      dmg*=1+.06*src.momentum*src._cmN;
+    }
     if(src.syColdcut&&(m.chillT>0||m.freezeT>0))
       dmg*=1+STATUS.syn.coldcut*src.syColdcut;                        // 한파의 날
     if(src.syMixer&&statusCount(m)>=2)
@@ -63,6 +68,8 @@ function hurtMob(m,dmg,src,isUlt){
   m.hp-=d; m.hit=crit?.22:.14;
   num(m.x,m.y-m.r-4, crit?d+'!':d, crit?'#FFD86B':'#E8963C', crit);
   if(m.hp<=0){ killMob(m,src); return; }
+  if(src&&src.heavyHand&&!isUlt&&m.type!=='boss')                     // 묵직한 손 — 평타가 밀어낸다
+    m.x=Math.min(W+20,m.x+10*src.heavyHand);
   if(src&&m.shockT>0&&m.shockLv&&Math.random()<STATUS.shock.stagger[m.shockLv-1]){
     m.stun=Math.max(m.stun,STATUS.shock.staggerDur*(m.type==='boss'?STATUS.shock.bossStaggerMul:1));
     ring(m.x,m.y,m.r+6,'#9B8ACB',.7);                                 // 공명: 울려서 휘청인다

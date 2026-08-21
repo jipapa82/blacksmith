@@ -31,11 +31,13 @@ function step(dt){
         } }
       return;
     }
-    a.charge+=dt*aspdOf(a); if(a.charge>=1){a.charge=0;allyAct(a);}
-    a.ultT=Math.min(a.ultCd,a.ultT+dt);
+    a.charge+=dt*aspdOf(a);
+    if(a.charge>=1){a.charge=0;allyAct(a);
+      if(a.dblHit&&Math.random()<.12*a.dblHit)allyAct(a);}       // 이중 타격 — 즉시 한 번 더
+    a.ultT=Math.min(a.ultCd,a.ultT+dt*(1+.15*a.ultHaste));       // 빠른 오의 — 충전 가속
     if(META.autoUlt&&a.ultT>=a.ultCd){          // 자동 모드: 뭉칠 때까지 기다렸다 쏜다. 수동은 차서 기다린다 (4.1.2)
       a.ultWait+=dt;
-      if((ultWorth(a)||a.ultWait>6)&&ultimate(a)){a.ultT=0;a.ultWait=0;}
+      if((ultWorth(a)||a.ultWait>6)&&ultimate(a)){a.ultT=a.ultCd*.12*a.echo;a.ultWait=0;}   // 메아리 — 일부 보존
     }
     a.hit=Math.max(0,a.hit-dt); a.lung=Math.max(0,a.lung-dt); });
   mobs.forEach(m=>{ if(m.hp<=0)return;

@@ -20,7 +20,7 @@ function fireUlt(i){
   if(!running)return false;
   const a=allies[i];
   if(!a||a.hp<=0||a.ultT<a.ultCd)return false;
-  if(ultimate(a)){ a.ultT=0; return true; }
+  if(ultimate(a)){ a.ultT=a.ultCd*.12*a.echo; return true; }   // 메아리 — 게이지 일부 보존
   return false;
 }
 
