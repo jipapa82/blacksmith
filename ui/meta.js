@@ -32,7 +32,7 @@ function weaponRowHtml(k,e){
       ${L?`<button class="meta-reset" data-reset="${k}">초기화 (비용 환급)</button>`:''}</h3>
     <div class="node-row">
       <span class="pips">${pips}</span>
-      <span class="ne">강마다 ${WLEVEL.perLevel}</span>
+      <span class="ne">강마다 ${enhDesc(k)}</span>
       <button data-k="${k}" data-id="lvl" ${maxed||META.gold<cost?'disabled':''}>
         ${maxed?'완성':`강화 · ${cost}골드${rate<1?` (${Math.round(rate*100)}%)`:''}`}</button></div>
     <div class="cw-sec" style="border:0;padding-top:0;margin-top:3px">${ms}</div>

@@ -74,12 +74,25 @@ function metaReset(k){
   return refund;
 }
 
-/* mkAlly가 읽는 무기별 영구 보정 — 강마다 전 스탯 상승 + 마일스톤 해금 (DESIGN 4.5) */
+/* mkAlly가 읽는 무기별 영구 보정 — 강당 상승은 무기 성격(equipment.js의 enh)을 따른다.
+   마일스톤: 2·5·10강 연마 Ⅰ·Ⅱ·Ⅲ, 3·7강 홈 확장 — 마지막 해금이 10강의 메리트. (DESIGN 4.5) */
 function metaMods(k){
-  const L=metaRank(k,'lvl');
-  const ultRank=L>=9?3:L>=5?2:L>=2?1:0;          // 2·5·9강에 연마 Ⅰ·Ⅱ·Ⅲ
-  return { atkAdd:L, aspdAdd:.03*L, hpAdd:5*L, defAdd:L,
+  const L=metaRank(k,'lvl'), g=EQUIP[k]&&EQUIP[k].enh||{};
+  const ultRank=L>=10?3:L>=5?2:L>=2?1:0;
+  return { atkAdd:(g.atk||0)*L, aspdAdd:(g.aspd||0)*L, hpAdd:(g.hp||0)*L, defAdd:(g.def||0)*L,
+    critAdd:(g.crit||0)*L, critDmgAdd:(g.critD||0)*L,
     slots:2+(L>=3?1:0)+(L>=7?1:0),               // 3·7강에 홈 확장
     ultPow:.5+.25*ultRank,                       // 필살기는 기본 제공(50%), 강으로 연마
     ultRank };                                   // 활은 연마 축이 연사 수 (5+2×랭크)
+}
+/* 강당 상승 설명 — 대장간 표시용. "어떤 스탯이 얼마나"는 equipment.js의 enh 한 줄이 원본 */
+function enhDesc(k){
+  const g=EQUIP[k].enh||{}, p=[];
+  if(g.atk)p.push('공격력 +'+g.atk);
+  if(g.aspd)p.push('공속 +'+g.aspd);
+  if(g.hp)p.push('체력 +'+g.hp);
+  if(g.def)p.push('방어 +'+g.def);
+  if(g.crit)p.push('치명 +'+Math.round(g.crit*1000)/10+'%p');
+  if(g.critD)p.push('치명 피해 +'+Math.round(g.critD*100)+'%p');
+  return p.join(' · ');
 }

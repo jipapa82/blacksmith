@@ -1,6 +1,6 @@
 /* ===================== 유닛 생성/배치 ===================== */
 function mkAlly(k,i,front){
-  const e=EQUIP[k], mm=metaMods(k);   // 영구 노드 보정 (DESIGN 4.5)
+  const e=EQUIP[k], mm=metaMods(k);   // 영구 강화 보정 (DESIGN 4.5)
   const a={key:k, name:'용병 '+String.fromCharCode(65+i), eq:e.name, trait:e.trait, shape:e.shape, color:e.color,
     base:{atk:e.atk,hp:e.hp},
     atk:e.atk+mm.atkAdd, def:e.def+mm.defAdd,
@@ -8,7 +8,8 @@ function mkAlly(k,i,front){
     front, x:front?FRONT_X:BACK_X, y:MID_Y, r:front?18:15, hit:0, lung:0,
     blastR:60, pierceW:14, arrows:1, pierce:0, chain:0, cleaveR:56, thorns:0, blockR:1, range:72,
     ambush:1.8, dashN:3,                                           // 암살: 일격 배수 / 질주 대상 수 ('이어지는 질주')
-    leech:0, deathBlast:0, repel:0, crit:.05, critD:1.5,
+    leech:0, deathBlast:0, repel:0,
+    crit:.05+mm.critAdd, critD:1.5+mm.critDmgAdd,                  // 강화로 오르는 치명(무기 성격, 4.5)
     cardAtkMul:1, cardAspdMul:1, cardHpMul:1,                      // 스탯 카드 % 배율 층 (DESIGN 4.1.1)
     elFire:0, elPois:0, elCold:0, elShock:0,                       // 원소 부여 단계
     syShatter:0, syColdcut:0, syFirespread:0, syDotamp:0, syReso:0, syMixer:0,   // 시너지 단계
