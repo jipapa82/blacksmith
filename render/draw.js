@@ -50,9 +50,18 @@ function draw(dt){
       ctx.beginPath();ctx.moveTo(f.x-13,f.y-13);ctx.lineTo(f.x+13,f.y+13);ctx.stroke();}
     else if(f.k==='p'){ctx.fillStyle=f.c;
       ctx.beginPath();ctx.arc(f.x+f.vx*f.life,f.y+f.vy*f.life,2.4*a,0,6.283);ctx.fill();}
+    else if(f.k==='flash'){ctx.globalAlpha=f.alp*a;ctx.fillStyle=f.c;   // 화면 물들이기 (7.5)
+      ctx.fillRect(-20,-20,W+40,H+40);}
     ctx.globalAlpha=1;
   });
   fxs=fxs.filter(f=>f.life<f.dur);
+
+  /* 투사체 — 진행 방향으로 짧은 꼬리를 그린다 (7.5) */
+  projs.forEach(p=>{
+    const l=Math.hypot(p.vx,p.vy)||1, ux=p.vx/l, uy=p.vy/l;
+    ctx.strokeStyle=p.c; ctx.lineWidth=p.isUlt?3:2;
+    ctx.beginPath(); ctx.moveTo(p.x-ux*11,p.y-uy*11); ctx.lineTo(p.x,p.y); ctx.stroke();
+  });
 
   mobs.forEach(m=>{
     shapePath(m.x+(m.lung>0?-5:0),m.y,m.r,m.type==='boss'?'sq':'circle');
@@ -93,8 +102,9 @@ function draw(dt){
     }
   });
   nums.forEach(n=>{n.life+=dt*speed;const a=1-n.life/.75;
+    const pop=n.big?1+.8*Math.max(0,1-n.life/.12):1;       // 큰 숫자는 튀어나오며 시작 (7.5)
     ctx.globalAlpha=Math.max(0,a);ctx.fillStyle=n.c;
-    ctx.font=(n.big?'600 20px':'600 14px')+' "IBM Plex Mono"';ctx.textAlign='center';
+    ctx.font='600 '+Math.round((n.big?20:14)*pop)+'px "IBM Plex Mono"';ctx.textAlign='center';
     ctx.fillText(n.t,n.x,n.y-n.life*26);ctx.globalAlpha=1;});
   nums=nums.filter(n=>n.life<.75);
 }

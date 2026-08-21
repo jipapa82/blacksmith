@@ -3,7 +3,11 @@ let last=0;
 function frame(ts){
   requestAnimationFrame(frame);
   const dtRaw=Math.min(.05,(ts-last)/1000||0); last=ts;
-  if(running) step(dtRaw*speed);
+  if(running){
+    if(hitstop>0) hitstop-=dtRaw;                          // 히트스톱 — 세상이 잠깐 멎는다 (7.5)
+    else step(dtRaw*speed*(slowT>0?.3:1));                 // 대장 처치 슬로모
+    if(slowT>0) slowT-=dtRaw;
+  }
   draw(dtRaw);
 }
 
@@ -41,6 +45,7 @@ function reset(){
   running=false; phase='idle';
   const o=document.getElementById('ov'); if(o)o.remove();
   waveIdx=0; waveT=0; waveSpawned=0; waveKills=0; curWave=null; mobs=[]; fxs=[]; nums=[];
+  projs=[]; hitstop=0; slowT=0;
   lv=1; xp=0; pendingLv=0; hasteT=0;
   G.gold=0; G.kills=0; G.goldMul=1; G.hireCost=200; G._boss=0; G.gems={};
   G.rerolls=metaRank('_global','nreroll');   // 시작 리롤은 노드만큼. 고용마다 +1 (DESIGN 4.1)

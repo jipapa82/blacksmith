@@ -10,6 +10,7 @@ function step(dt){
     delayed=delayed.filter(d=>d.t>0);
     due.forEach(d=>d.fn());
   }
+  stepProjs(dt);                                 // 투사체 이동·명중 (7.5)
   const total=w.count+(w.boss?1:0);
   timeFill.style.width=Math.min(100,waveKills/total*100)+'%';
   if(waveSpawned<w.count){
@@ -24,7 +25,10 @@ function step(dt){
         if(Math.random()<.7&&waveSpawned<w.count){mobs.push(mkMob(pick));waveSpawned++;}
     }
   }
-  if(w.boss&&!G._boss&&waveSpawned>=w.count*.4){G._boss=1;mobs.push(mkMob('boss'));sfx('boss');}
+  if(w.boss&&!G._boss&&waveSpawned>=w.count*.4){ // 대장 등장 — 화면이 알린다 (7.5)
+    G._boss=1; const b=mkMob('boss'); mobs.push(b); sfx('boss');
+    flash('#C4574F',.16,.45); shake=10; num(b.x-40,b.y,'대장 출현','#C4574F',1);
+  }
   recalcAuras();                                     // 파티 오라 (최종 루비·자수정)
   if(hasteT>0)hasteT=Math.max(0,hasteT-dt);          // 질풍의 오라
   allies.forEach(a=>{
@@ -65,7 +69,7 @@ function step(dt){
 function beginWave(){
   curWave=waveSpec(waveIdx);
   waveT=0; spawnT=0; waveSpawned=0; waveKills=0; mobs=[]; G._boss=0;
-  delayed=[];                                    // 지난 웨이브의 연출 지연은 버린다
+  delayed=[]; projs=[];                          // 지난 웨이브의 연출 지연·투사체는 버린다
   aliveTxt.textContent=curWave.count+(curWave.boss?1:0);
   waveNum.textContent=fmtWave(waveIdx+1); waveNum.classList.add('live');
   waveTitle.textContent=curWave.title; statusTxt.textContent='교전 중';

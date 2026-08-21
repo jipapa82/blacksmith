@@ -3,7 +3,9 @@
 let loadout=['shield','bow'];   // 기본 편성: 용병 A 참나무 방패(앞줄) + 용병 B 사냥 활(뒷줄)
 let speed=1, running=false, phase='idle';
 let allies=[], mobs=[], fxs=[], nums=[];
+let projs=[];                                   // 투사체 (아군 화살·적 화살) — combat/actions.js가 굴린다
 let waveIdx=0, waveT=0, spawnT=0, shake=0;
+let hitstop=0, slowT=0;                         // 주스: 히트스톱 / 대장 처치 슬로모 (DESIGN 7.5)
 let waveSpawned=0, waveKills=0, curWave=null;   // 섬멸형: 이번 웨이브의 스폰/처치 집계
 let lv=1, xp=0, pendingLv=0;                    // 전투 중 레벨업 (DESIGN 4.1)
 let hasteT=0;                                   // 질풍의 오라(최종 에메랄드) 남은 시간

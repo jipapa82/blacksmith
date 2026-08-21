@@ -4,6 +4,36 @@
 let delayed=[];                                  // 게임 시간 지연 실행 큐 — wave.js의 step이 돌린다
 function after(ms,fn){ delayed.push({t:ms/1000,fn}); }
 
+/* ===== 투사체 (DESIGN 7.5) — 화살이 실제로 날아가고, 닿는 순간 판정한다 (7.2의 완성) ===== */
+function fireArrow(a,th,dmg,isUlt){
+  projs.push({x:a.x+12*Math.cos(th), y:a.y+12*Math.sin(th),
+    vx:Math.cos(th)*520, vy:Math.sin(th)*520,
+    dmg, dec:.62, left:1+a.pierce, w:a.pierceW, src:a, isUlt, foe:false,
+    c:elemColor(a)||'#6FC9CE', hit:new Set()});
+}
+function stepProjs(dt){
+  for(const p of projs){
+    p.x+=p.vx*dt; p.y+=p.vy*dt;
+    if(p.foe){                                   // 적 화살 → 아군 명중
+      for(const al of allies){
+        if(al.hp<=0)continue;
+        if(Math.hypot(al.x-p.x,al.y-p.y)<al.r+4){ hurtAlly(al,p.dmg,p.srcM); p.left=0; break; }
+      }
+    }else{                                       // 아군 화살 → 경로의 적, 관통마다 62%로
+      for(const m of mobs){
+        if(m.hp<=0||p.hit.has(m))continue;
+        if(Math.hypot(m.x-p.x,m.y-p.y)<m.r+3+(p.w-14)/2){
+          p.hit.add(m);
+          hurtMob(m,p.dmg,p.src,p.isUlt);
+          p.dmg*=p.dec; p.left--;
+          if(p.left<=0)break;
+        }
+      }
+    }
+  }
+  projs=projs.filter(p=>p.left>0&&p.x>-30&&p.x<W+30&&p.y>-30&&p.y<H+30);
+}
+
 /* 대검의 타격 앵커 — 뒷줄이면 전선 기준. 공격·필살기·범위 표시가 모두 이걸 쓴다 (7.2: 표시=판정) */
 function cleaveAnchor(a){
   const F=frontAlly(), anchored=!a.front&&F&&F!==a;
@@ -47,6 +77,8 @@ function ultimate(a,isEcho){
   if(!live.length)return false;
   const P=a.ultPow;
   shake=6; sfx('ult');
+  flash(elemColor(a)||'#D8E4EA',.10,.18);        // 발동 순간 화면이 원소 색으로 물든다 (7.5)
+  hitstop=Math.max(hitstop,.05);
   /* 이중 오의 — 첫 발동의 연출이 끝난 뒤에 한 번 더 (활 연사는 볼리 종료 후 0.25초).
      겹쳐 쏘면 "두 번"이 아니라 "길어진 한 번"으로 읽힌다 (DESIGN 4.1.2, 7.2) */
   if(a.dblUlt&&!isEcho){
@@ -116,19 +148,8 @@ function bowShot(a,isUlt){
   const rowMul = a.arrows>1 ? (1+.2*(a.arrows-1))/a.arrows : 1;
   const SPREAD=.13;                            // 부채꼴 발 간격 (라디안, 약 7.5°)
   a.lung=.1;
-  for(let i=0;i<a.arrows;i++){
-    const th=base+(i-(a.arrows-1)/2)*SPREAD;
-    const cs=Math.cos(th), sn=Math.sin(th);
-    const hits=live.map(m=>{
-        const dx=m.x-a.x, dy=m.y-a.y;
-        return {m, t:dx*cs+dy*sn, off:Math.abs(dy*cs-dx*sn)};   // 경로 진행거리 / 수직 거리
-      }).filter(h=>h.t>10&&h.off<a.pierceW&&h.m.hp>0)
-      .sort((p,q)=>p.t-q.t)
-      .slice(0,1+a.pierce);
-    const end=hits.length?hits[hits.length-1].t+14:W;           // 마지막 명중 지점까지 (표시=판정, 7.2)
-    beam(a.x+12*cs,a.y+12*sn,a.x+end*cs,a.y+end*sn,elemColor(a)||'#6FC9CE',isUlt?3.5:2.5);
-    hits.forEach((h,j)=>hurtMob(h.m,atkOf(a)*rowMul*Math.pow(.62,j),a,isUlt));
-  }
+  for(let i=0;i<a.arrows;i++)                    // 실제 투사체 — 날아가 닿는 순간 판정 (7.5)
+    fireArrow(a,base+(i-(a.arrows-1)/2)*SPREAD,atkOf(a)*rowMul,isUlt);
 }
 
 function allyAct(a){
@@ -209,9 +230,11 @@ function mobStep(m,dt){
   }else{
     m.charge+=dt*m.aspd;
     if(m.charge>=1){ m.charge=0; m.lung=.12;
-      if(m.behav==='range') beam(m.x,m.y,tgt.x,tgt.y,'#9B8ACB',2);
-      else slashFx(tgt.x,tgt.y,'#C4574F');
-      hurtAlly(tgt,m.atk,m); }
+      if(m.behav==='range'){                     // 궁수도 실제 화살을 쏜다 (7.5)
+        const th=Math.atan2(tgt.y-m.y,tgt.x-m.x);
+        projs.push({x:m.x,y:m.y,vx:Math.cos(th)*330,vy:Math.sin(th)*330,
+          dmg:m.atk,left:1,w:14,foe:true,srcM:m,c:'#9B8ACB'});
+      }else{ slashFx(tgt.x,tgt.y,'#C4574F'); hurtAlly(tgt,m.atk,m); } }
   }
   for(const o of mobs){
     if(o===m||o.hp<=0)continue;

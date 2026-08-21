@@ -1,7 +1,12 @@
 /* ===================== 피해 처리 ===================== */
 let _resoDepth=0;   // 공명 파열 연쇄 깊이 — 연쇄마다 폭발 피해 ×0.55 (7.1 연쇄 폭발 규칙)
+let _critStopT=-9;  // 치명타 히트스톱 스로틀 — 잦으면 멈칫이 아니라 렉이다 (7.5)
 function killMob(m,src){
-  burst(m.x,m.y,m.color); sfx('kill');
+  if(m.type==='boss'){                           // 대장 처치 — 세상이 잠깐 멎는다 (7.5)
+    hitstop=Math.max(hitstop,.12); slowT=.6; shake=12;
+    flash('#FFD86B',.15,.35); burst(m.x,m.y,m.color,24,1.8);
+  }else burst(m.x,m.y,m.color);
+  sfx('kill');
   G.kills++; waveKills++; killTxt.textContent=G.kills;
   const g=Math.round(m.gold*G.goldMul);
   G.gold+=g; goldTxt.textContent=G.gold; num(m.x,m.y-4,'+'+g,'#D9B45C');
@@ -73,6 +78,7 @@ function hurtMob(m,dmg,src,isUlt){
   }
   const d=Math.max(1,Math.round(dmg-m.def));
   m.hp-=d; m.hit=crit?.22:.14;
+  if(crit&&waveT-_critStopT>.5){ hitstop=Math.max(hitstop,.03); _critStopT=waveT; }   // 치명 멈칫 (7.5)
   num(m.x,m.y-m.r-4, crit?d+'!':d, crit?'#FFD86B':'#E8963C', crit);
   if(m.hp<=0){ killMob(m,src); return; }
   if(src&&src.heavyHand&&!isUlt&&m.type!=='boss')                     // 묵직한 손 — 평타가 밀어낸다
