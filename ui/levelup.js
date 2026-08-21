@@ -15,7 +15,10 @@ function pickCards(){
       const rar=r<goldP?3:r<goldP+.09?2:r<goldP+.09+rareP?1:0;   // 황금 / 전설 9% / 희귀(천장) / 나머지 일반
       const cands=UP.filter(u=>u.r===rar&&!used.has(u.id));
       if(!cands.length)continue;
-      const u=cands[Math.floor(Math.random()*cands.length)];
+      /* 볼거리 가중치 (DESIGN 4.1) — 같은 희귀도 안에서 vis 카드는 3배로 자주 뽑힌다 */
+      const pool=[];
+      cands.forEach(u=>{for(let k=0,w=u.vis?3:1;k<w;k++)pool.push(u);});
+      const u=pool[Math.floor(Math.random()*pool.length)];
       const valid=live.filter(a=>u.ok(a)&&lvOf(a,u.id)<u.max);
       if(!valid.length)continue;
       c=u; tgt=valid[Math.floor(Math.random()*valid.length)]; break;
