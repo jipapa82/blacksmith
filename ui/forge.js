@@ -27,6 +27,15 @@ function gemStatText(g,gr,type){
   if(gr>=FINAL_GRADE&&type) t+=` · ${AURA[type].n}: ${AURA[type].d}`;
   return t;
 }
+/* 등급 줄에 넣는 짧은 값 — "+16%" / "+11% +2" (이름은 컬럼 머리가 담당) */
+function gemValText(g,gr){
+  const pct=s=>s==='leech'||s==='def'?false:true;
+  const f=(s,v)=>pct(s)?Math.round(v*100)+'%':v;
+  const gi=Math.min(gr,GEM_MAX_GRADE)-1;
+  let t='+'+f(g.stat,g.v[gi]);
+  if(g.stat2)t+=' +'+f(g.stat2,g.v2[gi]);
+  return t;
+}
 
 function openForge(){
   phase='forge'; selGem=null; altar=[]; finalMsg=''; sfx('clear');
@@ -86,15 +95,22 @@ function renderForgeBody(){
       const g=GEMS[t];
       return `<div class="gem-col">
         <div class="gc-hd" style="color:${g.color}"><i class="dot2" style="background:${g.color}"></i>${g.name}
+          <span class="cnt">${g.desc}${g.stat2?' · '+g.desc2:''}</span>
           ${g.elem?`<span class="cnt" style="color:${ELEM_INFO[g.elem][1]}">↔${ELEM_INFO[g.elem][0]}</span>`:''}</div>
         ${byType[t].map(e=>`<div class="gc-row ${e.grade>=FINAL_GRADE?'final':''} ${selGem===e.key?'sel':''}"
             data-key="${e.key}" title="${gemStatText(g,e.grade,t)}">
-          <b style="color:${g.color}">${GRADE_TXT[e.grade-1]}</b><span class="cnt">×${e.count}</span>
+          <b style="color:${g.color}">${GRADE_TXT[e.grade-1]}</b><span class="cnt">${gemValText(g,e.grade)}</span>
+          <span class="cnt">×${e.count}</span>
           ${e.count>=2&&e.grade<GEM_MAX_GRADE?`<button data-merge="${e.key}">합성</button>`:''}
         </div>`).join('')}
       </div>`;
-    }).join(''):'<span class="forge-hint">보석이 없다. 적을 잡다 보면 가끔 떨어진다.</span>')+`</div>`
-    +(canMergeAll?`<div class="gem-inv"><button id="mergeAllBtn">일괄 합성</button></div>`:'');
+    }).join(''):'<span class="forge-hint">보석이 없다. 적을 잡다 보면 가끔 떨어진다.</span>')+`</div>`;
+  /* 고른 보석의 전체 효과 (시너지·오라 포함) — 줄에는 요약 값만 있으니 여기서 자세히 */
+  if(selGem){
+    const [st,sg]=selGem.split(':');
+    html+=`<div class="forge-hint" style="margin-top:4px"><b style="color:${GEMS[st].color}">${GEMS[st].name} ${GRADE_TXT[+sg-1]}</b> — ${gemStatText(GEMS[st],+sg,st)}</div>`;
+  }
+  html+=canMergeAll?`<div class="gem-inv"><button id="mergeAllBtn">일괄 합성</button></div>`:'';
   /* 최종 합성대 — Ⅴ 둘을 올려 최종 보석을 만든다 (DESIGN 4.4) */
   const fives=inv.filter(e=>e.grade===GEM_MAX_GRADE);
   if(fives.length||altar.length){

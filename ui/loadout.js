@@ -15,7 +15,8 @@ function weaponIcon(key){
 }
 
 /* 무기가 고를 수 있는 원소 표시 (DESIGN 4.1.1 무기별 원소 제한) */
-const ELEM_INFO={fire:['불','#E8963C'],pois:['독','#8FBF6A'],cold:['얼음','#9AD9E8'],shock:['진동','#9B8ACB']};
+/* 원소 정식 명칭 — 화염·독·냉기·진동. 상태이상은 화상·중독·한기·빙결·공명·휘청 (DESIGN 4.1.1 용어 사전) */
+const ELEM_INFO={fire:['화염','#E8963C'],pois:['독','#8FBF6A'],cold:['냉기','#9AD9E8'],shock:['진동','#9B8ACB']};
 function elemChoices(key){
   return EQUIP[key].elems.map(e=>
     `<span style="color:${ELEM_INFO[e][1]}">● ${ELEM_INFO[e][0]}</span>`).join(' ');
