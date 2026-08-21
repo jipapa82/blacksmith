@@ -7,7 +7,7 @@ function mkAlly(k,i,front){
     maxhp:e.hp+mm.hpAdd, hp:0, aspd:e.spd+mm.aspdAdd, charge:0,
     front, x:front?FRONT_X:BACK_X, y:MID_Y, r:front?18:15, hit:0, lung:0,
     blastR:60, pierceW:14, arrows:1, pierce:0, chain:0, cleaveR:56, thorns:0, blockR:1, range:72,
-    ambush:1.8, dashN:3,                                           // 암살: 일격 배수 / 질주 대상 수 ('이어지는 질주')
+    ambush:1.8, dashN:3, clones:0,                                 // 암살: 일격 배수 / 질주 대상 수 / 그림자 분신 수
     leech:0, deathBlast:0, repel:0,
     crit:.05+mm.critAdd, critD:1.5+mm.critDmgAdd,                  // 강화로 오르는 치명(무기 성격, 4.5)
     elFire:0, elPois:0, elCold:0, elShock:0,                       // 원소 부여 단계

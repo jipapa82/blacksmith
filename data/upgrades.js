@@ -23,6 +23,8 @@ const UP=[
   /* ===== 희귀 — 무기 행동 ===== */
   {id:'dash',  n:'이어지는 질주', max:3, r:1, when:'기본 공격', ok:a=>a.trait==='assassin',
    d:a=>`침투자(전선을 넘어온 적)·대장이 없을 때의 질주가 ${a.dashN+2}명을 벤다 (현재 ${a.dashN}명) — 벤 수만큼 독이 발린다`, f:a=>a.dashN+=2},
+  {id:'clone', n:'그림자 분신', max:3, r:1, when:'기본 공격', ok:a=>a.trait==='assassin',
+   d:a=>`기본 공격 뒤에 분신 ${a.clones+1}기가 따라 공격한다 — 피해는 30%, 독은 온전히 바른다`, f:a=>a.clones++},
   {id:'wide',  n:'폭발 확대',   max:5, r:1, when:'상시', ok:a=>a.trait==='blast',
    d:a=>`이 무기 폭발 반경 +12% (현재 ${Math.round(a.blastR)})`, f:a=>a.blastR*=1.12},
   {id:'chain', n:'불티 번짐',   max:3, r:1, when:'기본 공격', ok:a=>a.trait==='blast',

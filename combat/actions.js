@@ -137,19 +137,26 @@ function allyAct(a){
     a.lung=.14; slashFx(t.x,t.y,elemColor(a)||'#E8963C'); hurtMob(t,atkOf(a),a);
   }else if(a.trait==='assassin'){
     // 침투자·대장에겐 암살 일격, 아니면 무리를 질주하며 독을 바르고 온다 (DESIGN 3.3)
-    const C=elemColor(a)||'#E8963C';
-    const infil=live.filter(behindLine).sort((p,q)=>p.x-q.x);
-    const mark=infil[0]||live.find(m=>m.type==='boss');
-    if(mark){
-      a.lung=.14; beam(a.x,a.y,mark.x,mark.y,C,1.5); slashFx(mark.x,mark.y,C);
-      hurtMob(mark,atkOf(a)*a.ambush,a);       // 암살 일격 ('기습' 카드로 강화)
-    }else{
-      const path=live.slice().sort((p,q)=>p.x-q.x).slice(0,a.dashN);   // 가까운 쪽부터 질주 — 기본 3, '이어지는 질주'로 +2씩
-      a.lung=.14;
-      let px=a.x, py=a.y;
-      path.forEach(m=>{ beam(px,py,m.x,m.y,C,1.2); slashFx(m.x,m.y,C);
-        hurtMob(m,atkOf(a)*.5,a); px=m.x; py=m.y; });             // 얕게 베어 독만 바른다
-    }
+    // mult<1이면 그림자 분신의 공격 — 피해만 줄고 독은 온전히 발린다
+    const strike=(mult,C)=>{
+      const live2=mobs.filter(m=>m.hp>0);
+      if(!live2.length)return;
+      const infil=live2.filter(behindLine).sort((p,q)=>p.x-q.x);
+      const mark=infil[0]||live2.find(m=>m.type==='boss');
+      if(mark){
+        beam(a.x,a.y,mark.x,mark.y,C,1.5); slashFx(mark.x,mark.y,C);
+        hurtMob(mark,atkOf(a)*a.ambush*mult,a);   // 암살 일격 ('기습' 카드로 강화)
+      }else{
+        const path=live2.slice().sort((p,q)=>p.x-q.x).slice(0,a.dashN);   // 가까운 쪽부터 질주 — 기본 3, '이어지는 질주'로 +2씩
+        let px=a.x, py=a.y;
+        path.forEach(m=>{ beam(px,py,m.x,m.y,C,1.2); slashFx(m.x,m.y,C);
+          hurtMob(m,atkOf(a)*.5*mult,a); px=m.x; py=m.y; });      // 얕게 베어 독만 바른다
+      }
+    };
+    a.lung=.14;
+    strike(1,elemColor(a)||'#E8963C');
+    for(let c=1;c<=a.clones;c++)                                  // 그림자 분신 — 시차를 두고 따라 친다 (7.2)
+      setTimeout(()=>{ if(running&&a.hp>0) strike(.3,'#77808C'); },c*120);
   }else if(a.trait==='cleave'){
     // 뒷줄이면 전선 너머로 내려친다 — 방패가 세우고 대검이 부순다 (DESIGN 3.3)
     const an=cleaveAnchor(a);
