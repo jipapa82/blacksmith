@@ -60,7 +60,6 @@ function beginWave(){
   phase='fight'; running=true;
 }
 function advance(){
-  waveIdx++;
-  if(waveIdx>=16){ showEnd(true); return; }
+  waveIdx++;             // 상한 없음 — 무한 웨이브. 런의 끝은 전멸 또는 정비 화면의 귀환 (DESIGN 3.7)
   beginWave();
 }

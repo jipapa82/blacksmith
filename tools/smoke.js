@@ -75,6 +75,9 @@ const driver = `
 ;(function(){
   const out = [];
   out.push('waveCount 1/4/8/12/16: ' + [0,3,7,11,15].map(waveCount).join('/'));
+  out.push('무한 스펙: ' + (waveCount(16)===waveCount(15) && waveCount(40)===waveCount(15)
+    && waveSpec(16).title==='끝없는 물결 1' && waveSpec(19).boss && !waveSpec(16).boss
+    ? 'OK (마릿수 캡·이름·대장 주기)' : 'WRONG'));
 
   let ultFired = 0;
   function playRun(tag){
@@ -170,6 +173,23 @@ const driver = `
   out.push('원소 잠금: ' + (multi.length ? 'VIOLATION — 한 무기에 2원소 이상' : 'OK (무기당 최대 1원소)'));
   const badEl=allies.filter(a=>{const e=elemOf(a);return e&&!EQUIP[a.key].elems.includes(e);});
   out.push('무기별 원소 제한: ' + (badEl.length ? 'VIOLATION — 허용 밖 원소' : 'OK (허용 목록 준수)'));
+
+  out.push('--- 4회차 (귀환 검증 — 첫 정비에서 런을 끝낸다) ---');
+  loadout=['shield','wand'];
+  const bestBefore=META.best;
+  startRun();
+  let r4='';
+  for(let i4=0;i4<200&&!r4;i4++){
+    let g4=0;
+    while(running&&g4++<400000) step(1/60);
+    if(phase==='levelup'){ const c=document.getElementById('cards').children;
+      if(c.length&&c[0].onclick)c[0].onclick(); else r4='NOCARDS'; }
+    else if(phase==='forge'){ document.getElementById('retreatBtn').onclick(); r4='retreat'; }
+    else if(phase==='end') r4='died';
+  }
+  out.push('귀환: ' + (r4==='retreat'&&phase==='end'
+    ? 'OK (웨이브 '+(waveIdx+1)+' 정비에서 종료, 최고 기록 '+META.best+(META.best>bestBefore?' 갱신':'')+')'
+    : r4==='died' ? '귀환 전 전멸 (허용)' : 'WRONG '+r4));
   return out.join('\\n');
 })()
 `;

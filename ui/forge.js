@@ -51,10 +51,14 @@ function openForge(){
 function renderForgeRow(){
   const row=document.getElementById('forgeRow'); if(!row)return;
   row.innerHTML=`<button id="hireBtn">용병 고용 · ${G.hireCost}골드</button>
+    <button id="retreatBtn" title="런을 여기서 끝낸다. 정산은 전멸과 같다 — 아끼는 건 시간이다">귀환</button>
     <button class="primary" id="nextBtn">다음 웨이브</button>`;
   const hb=document.getElementById('hireBtn');
   hb.disabled=G.gold<G.hireCost||allies.length>=Object.keys(EQUIP).length;
   hb.onclick=()=>renderHirePicker();
+  document.getElementById('retreatBtn').onclick=()=>{
+    document.getElementById('ov').remove(); showEnd(true);   // 자발적 귀환 (DESIGN 3.7)
+  };
   document.getElementById('nextBtn').onclick=()=>{
     document.getElementById('ov').remove(); advance();
   };
