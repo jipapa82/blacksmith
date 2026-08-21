@@ -195,7 +195,7 @@ function renderHirePicker(){
       <div class="target">새 용병</div>
       <div class="cname">${weaponIcon(k)}${v.name}</div>
       <div class="cdesc">${v.desc}</div>
-      <div class="cdesc" style="color:var(--heat)">필살 · ${v.ultName} (위력 ${50+25*metaRank(k,'nult')}%)</div>
+      <div class="cdesc" style="color:var(--heat)">필살 · ${v.ultName} (위력 ${Math.round(metaMods(k).ultPow*100)}%)</div>
       <div class="cdesc">원소 ${elemChoices(k)}</div>
       <div class="crar">공 ${v.atk} · 방 ${v.def} · 체 ${v.hp} · 속 ${v.spd.toFixed(2)}</div>
     </div>`).join('')+`</div>`;

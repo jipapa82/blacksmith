@@ -9,8 +9,23 @@ const META=(()=>{ try{
       if(j.gold===undefined)j.gold=0;            // 대장간 금고 (6.3) — 런의 남은 골드가 누적
       if(j.best===undefined)j.best=0;            // 최고 웨이브 기록 (3.7)
       if(j.sound===undefined)j.sound=true;       // 효과음 (7.4) — 기본 켬
-      if(j.pity===undefined)j.pity={};           // 강화 천장 — 노드별 실패 누적 (4.5)
+      if(j.pity===undefined)j.pity={};           // 강화 천장 — 무기별 실패 누적 (4.5)
       if(j.pts>0){ j.gold+=j.pts*200; j.pts=0; } // 스탯 포인트 폐지 — 1pt = 200골드 일괄 환전 (4.5)
+      /* 구 노드 저장 마이그레이션 — 스탯 4종·홈·연마를 무기 레벨 하나로 (4.5).
+         레벨은 스탯 4종 중 최고 강을 승계, 홈·연마 구매액은 골드로 환급 (해금이 자동이 됐으므로) */
+      for(const k of Object.keys(j.nodes||{})){
+        const o=j.nodes[k];
+        if(!o||(o.natk===undefined&&o.naspd===undefined&&o.nhp===undefined
+          &&o.ndef===undefined&&o.nslot===undefined&&o.nult===undefined))continue;
+        const lvl=Math.max(o.lvl||0,o.natk||0,o.naspd||0,o.nhp||0,o.ndef||0);
+        const slotCost=[2000,8000], ultCost=[500,1500,4000];
+        for(let i=0;i<(o.nslot||0);i++)j.gold+=slotCost[i]||0;
+        for(let i=0;i<(o.nult||0);i++)j.gold+=ultCost[i]||0;
+        const keep={};
+        if(lvl)keep.lvl=lvl;
+        if(o.nreroll)keep.nreroll=o.nreroll;
+        if(Object.keys(keep).length)j.nodes[k]=keep; else delete j.nodes[k];
+      }
       return j;
     }
   }catch(e){}
@@ -18,47 +33,53 @@ const META=(()=>{ try{
 function saveMeta(){ try{localStorage.setItem(META_KEY,JSON.stringify(META));}catch(e){} }
 
 function metaRank(k,id){ return (META.nodes[k]||{})[id]||0; }
-function nodeCost(n,r){ return n.fixed?n.costs[r]:enhCost(r); }
-/* 현재 성공률 — 기본 사다리 + 천장(실패 누적 ×3%p) */
-function enhRateOf(k,id,r){
-  return Math.min(1,ENH_RATE[r]+ENH_PITY*(META.pity[k+'.'+id]||0));
+/* 현재 강화 성공률 — 기본 사다리 + 천장(실패 누적 ×3%p) */
+function enhRateOf(k){
+  return Math.min(1,WLEVEL.rate[metaRank(k,'lvl')]+WLEVEL.pity*(META.pity[k]||0));
 }
-/* 강화/구매 시도 — 골드 소모. 반환: 'ok' | 'fail'(강화 실패, 하락 없음) | false(불가) */
+/* 강화/구매 시도 — 골드 소모. 반환: 'ok' | 'fail'(강화 실패, 하락 없음) | false(불가)
+   id 'lvl' = 무기 강화(확률), 그 외 = GLOBAL_NODES 정액 구매 */
 function metaBuy(k,id){
-  const n=NODES.find(x=>x.id===id)||GLOBAL_NODES.find(x=>x.id===id), r=metaRank(k,id);
-  if(!n||r>=n.max) return false;
-  const c=nodeCost(n,r); if(META.gold<c) return false;
-  META.gold-=c;
-  if(!n.fixed&&Math.random()>=enhRateOf(k,id,r)){
-    META.pity[k+'.'+id]=(META.pity[k+'.'+id]||0)+1;   // 실패 — 골드만 녹고 천장이 쌓인다
-    saveMeta(); sfx('fail');
-    return 'fail';
+  if(id==='lvl'){
+    const r=metaRank(k,'lvl');
+    if(r>=WLEVEL.max) return false;
+    const c=WLEVEL.cost(r); if(META.gold<c) return false;
+    META.gold-=c;
+    if(Math.random()>=enhRateOf(k)){
+      META.pity[k]=(META.pity[k]||0)+1;          // 실패 — 골드만 녹고 천장이 쌓인다
+      saveMeta(); sfx('fail');
+      return 'fail';
+    }
+    delete META.pity[k];
+    (META.nodes[k]=META.nodes[k]||{}).lvl=r+1; saveMeta();
+    sfx('hammer');                               // 무기를 두드리는 망치질 (7.4)
+    return 'ok';
   }
-  delete META.pity[k+'.'+id];
-  (META.nodes[k]=META.nodes[k]||{})[id]=r+1; saveMeta();
-  sfx('hammer');                                 // 무기를 두드리는 망치질 (7.4)
+  const n=GLOBAL_NODES.find(x=>x.id===id), r=metaRank(k,id);
+  if(!n||r>=n.max) return false;
+  const c=n.costs[r]; if(META.gold<c) return false;
+  META.gold-=c; (META.nodes[k]=META.nodes[k]||{})[id]=r+1; saveMeta();
+  sfx('hammer');
   return 'ok';
 }
-/* 무기(또는 '_global') 노드 전체 초기화 — 강화·구매 비용 전액 환급.
+/* 무기(또는 '_global') 초기화 — 강화·구매 비용 전액 환급.
    실패로 녹은 골드는 돌아오지 않는다 (DESIGN 4.5) */
 function metaReset(k){
   const spent=META.nodes[k]; if(!spent)return 0;
   let refund=0;
-  for(const [id,r] of Object.entries(spent)){
-    const n=NODES.find(x=>x.id===id)||GLOBAL_NODES.find(x=>x.id===id);
-    if(n) for(let i=0;i<r&&i<n.max;i++) refund+=nodeCost(n,i);
-  }
-  delete META.nodes[k];
-  for(const key of Object.keys(META.pity)) if(key.indexOf(k+'.')===0) delete META.pity[key];
+  if(spent.lvl) for(let i=0;i<spent.lvl;i++) refund+=WLEVEL.cost(i);
+  for(const n of GLOBAL_NODES){ const r=spent[n.id]||0; for(let i=0;i<r;i++) refund+=n.costs[i]; }
+  delete META.nodes[k]; delete META.pity[k];
   META.gold+=refund; saveMeta();
   return refund;
 }
 
-/* mkAlly가 읽는 무기별 영구 보정 — 스탯은 정수 가산 (DESIGN 4.5) */
+/* mkAlly가 읽는 무기별 영구 보정 — 강마다 전 스탯 상승 + 마일스톤 해금 (DESIGN 4.5) */
 function metaMods(k){
-  const r=id=>metaRank(k,id);
-  return { atkAdd:r('natk'), aspdAdd:.03*r('naspd'), hpAdd:5*r('nhp'),
-    defAdd:r('ndef'), slots:2+r('nslot'),
-    ultPow:.5+.25*r('nult'),     // 필살기는 기본 제공(50%), 노드로 연마 (DESIGN 4.5)
-    ultRank:r('nult') };         // 활은 연마 축이 연사 수 (5+2×랭크)
+  const L=metaRank(k,'lvl');
+  const ultRank=L>=9?3:L>=5?2:L>=2?1:0;          // 2·5·9강에 연마 Ⅰ·Ⅱ·Ⅲ
+  return { atkAdd:L, aspdAdd:.03*L, hpAdd:5*L, defAdd:L,
+    slots:2+(L>=3?1:0)+(L>=7?1:0),               // 3·7강에 홈 확장
+    ultPow:.5+.25*ultRank,                       // 필살기는 기본 제공(50%), 강으로 연마
+    ultRank };                                   // 활은 연마 축이 연사 수 (5+2×랭크)
 }

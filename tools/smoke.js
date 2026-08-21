@@ -52,8 +52,9 @@ const documentStub = {
   addEventListener() {},
 };
 const storage = {};
-/* 구 저장 마이그레이션 검증용 — 스탯 포인트 10pt가 2,000골드로 환전되어야 한다 (DESIGN 4.5) */
-storage['blacksmith-meta-v1']=JSON.stringify({pts:10,gold:0,nodes:{},autoUlt:true});
+/* 구 저장 마이그레이션 검증용 — 10pt→2,000골드 환전 + 구 노드(natk4·nhp2·nult1)가
+   무기 레벨 4강 + 연마 구매액 500골드 환급으로 승계되어야 한다 (DESIGN 4.5) */
+storage['blacksmith-meta-v1']=JSON.stringify({pts:10,gold:0,nodes:{wand:{natk:4,nhp:2,nult:1}},autoUlt:true});
 const localStorageStub = {
   getItem(k) { return k in storage ? storage[k] : null; },
   setItem(k, v) { storage[k] = String(v); },
@@ -77,8 +78,10 @@ const driver = `
 ;(function(){
   const out = [];
   out.push('waveCount 1/4/8/12/16: ' + [0,3,7,11,15].map(waveCount).join('/'));
-  out.push('포인트 환전 마이그레이션: ' + (META.pts===0&&META.gold===2000
-    ? 'OK (10pt → 2000골드)' : 'WRONG pts='+META.pts+' gold='+META.gold));
+  out.push('저장 마이그레이션: ' + (META.pts===0&&META.gold===2500
+    &&metaRank('wand','lvl')===4&&(META.nodes.wand||{}).natk===undefined
+    ? 'OK (10pt→2000골드, 구 노드→지팡이 +4강, 연마 환급 500골드)'
+    : 'WRONG pts='+META.pts+' gold='+META.gold+' lvl='+metaRank('wand','lvl')));
   out.push('무한 스테이지: ' + (waveCount(16)===waveCount(0) && waveCount(31)===waveCount(15)
     && waveSpec(16).title===WAVE_TITLES[0] && waveSpec(19).boss && !waveSpec(16).boss
     && waveSpec(17).mix.length===1 && waveSpec(20).mix.length===3
@@ -135,31 +138,35 @@ const driver = `
   out.push('RUN1: ' + playRun('r1'));
   out.push('금고 누적: ' + META.gold + '골드' + (META.gold>0?' OK':' NONE_BANKED'));
 
-  // 테스트용 골드 지급 후 정액 구매·강화 (연마·리롤·수동 발동·강화 경로 검증)
+  // 테스트용 골드 지급 — 공용 구매 + 무기 강화 + 마일스톤 검증
   META.gold += 20000;
   const bought = [];
-  for (const kk of ['shield','wand','sword','bow'])
-    if (metaBuy(kk,'nult')==='ok') bought.push(kk+'.nult');
   if (metaBuy('_global','nreroll')==='ok') bought.push('_global.nreroll');
+  metaBuy('shield','lvl'); metaBuy('shield','lvl');           // 방패 2강 — 연마 Ⅰ
+  metaBuy('bow','lvl'); metaBuy('bow','lvl');                 // 활 2강 — 연사 7발
   let enhOk=0, enhFail=0;
-  for (let t=0;t<60&&metaRank('wand','natk')<10;t++){
-    const res=metaBuy('wand','natk');
+  for (let t=0;t<80&&metaRank('wand','lvl')<10;t++){
+    const res=metaBuy('wand','lvl');
     if(res==='ok')enhOk++; else if(res==='fail')enhFail++; else break;
   }
-  out.push('구매·강화(+20000골드 지급): ' + bought.join(', ')
-    + ' | 벼린 날 +' + metaRank('wand','natk') + '강 (성공 ' + enhOk + '/실패 ' + enhFail + ') | 금고 ' + META.gold);
+  const mmW=metaMods('wand');
+  out.push('구매·강화(+20000골드): ' + bought.join(', ')
+    + ' | 지팡이 +' + metaRank('wand','lvl') + '강 (성공 ' + enhOk + '/실패 ' + enhFail + ') | 금고 ' + META.gold);
+  out.push('마일스톤: ' + (mmW.slots>=3&&(metaRank('wand','lvl')<5||mmW.ultPow>=1)
+    ? 'OK (3강 홈 3' + (metaRank('wand','lvl')>=5?' · 5강 연마 Ⅱ':'') + ')'
+    : 'WRONG lvl='+metaRank('wand','lvl')+' slots='+mmW.slots+' ultPow='+mmW.ultPow));
   /* 강화 실패·천장 — 난수를 고정해 결정적으로 검증 */
   const mr=Math.random;
-  (META.nodes.great=META.nodes.great||{}).natk=9;
-  META.gold+=enhCost(9)*2;
+  (META.nodes.great=META.nodes.great||{}).lvl=9;
+  META.gold+=WLEVEL.cost(9)*2;
   Math.random=()=>0.99;                      // 10강 15%면 무조건 실패
-  const f1=metaBuy('great','natk');
-  const rateAfterFail=enhRateOf('great','natk',9);
+  const f1=metaBuy('great','lvl');
+  const rateAfterFail=enhRateOf('great');
   Math.random=()=>0;                         // 무조건 성공
-  const s1=metaBuy('great','natk');
+  const s1=metaBuy('great','lvl');
   Math.random=mr;
   out.push('강화 실패·천장: ' + (f1==='fail'&&Math.abs(rateAfterFail-.18)<1e-9
-    &&s1==='ok'&&metaRank('great','natk')===10&&META.pity['great.natk']===undefined
+    &&s1==='ok'&&metaRank('great','lvl')===10&&META.pity.great===undefined
     ? 'OK (실패 유지 → 15%+3%p → 성공 시 천장 초기화)' : 'WRONG '+f1+'/'+rateAfterFail+'/'+s1));
   out.push('저장 확인: ' + (localStorage.getItem('blacksmith-meta-v1') ? 'localStorage OK' : 'MISSING'));
 
@@ -168,7 +175,7 @@ const driver = `
   loadout = ['shield','bow'];
   startRun();
   const bowAlly = allies.find(a=>a.key==='bow');
-  out.push('활 연사 수(연마 1랭크 → 7발): ' + (5+2*bowAlly.ultRank) + ((5+2*bowAlly.ultRank)===7?' OK':' WRONG'));
+  out.push('활 연사 수(2강 연마 Ⅰ → 7발): ' + (5+2*bowAlly.ultRank) + ((5+2*bowAlly.ultRank)===7?' OK':' WRONG'));
   out.push('리롤 횟수(기본0 + 노드1랭크 → 1이어야 함): ' + G.rerolls + (G.rerolls===1?' OK':' WRONG'));
   out.push('RUN2: ' + playRun('r2'));
   out.push('필살기 수동 발동 횟수: ' + ultFired + (ultFired>0?' OK':' NONE_FIRED'));
@@ -180,7 +187,7 @@ const driver = `
   out.push('RUN3: ' + playRun('r3'));
   out.push('자동 모드 중 수동 개입(갈무리 리필 틈으로 소수는 정상): ' + (ultFired - before));
   out.push('검증: 방패 ultPow=' + allies.filter(a=>a.key==='shield').map(a=>a.ultPow)
-    + ' (노드 1랭크=0.75), 홈=' + allies[0].sock.length);
+    + ' (2강=0.75), 홈=' + allies[0].sock.length);
   gainGem('ruby',5); gainGem('ruby',5);
   const ft=mergeFinal('ruby:5','ruby:5');
   const a0=allies[0]; a0.hp=1; a0.sock[0]={type:'ruby',grade:FINAL_GRADE}; recalcGems(a0); recalcAuras();
