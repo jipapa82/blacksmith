@@ -157,6 +157,7 @@ canvas{display:block;width:100%;height:auto}
 .slotbtn{width:34px;height:34px;border-radius:3px;border:1px dashed var(--edge);background:#191B21;
   cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--dim);padding:0}
 .slotbtn.filled{border-style:solid;background:#1E2027}
+.slotbtn.elem{border-style:double;border-width:3px}   /* 1번 홈 = 원소 홈 (DESIGN 4.2) */
 .gem-inv{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:660px}
 /* 보석 인벤토리 — 종류별 세로 컬럼, 등급별 보유량이 한눈에 (2026-08-21) */
 .gem-cols{display:flex;justify-content:center;flex-wrap:wrap;max-width:680px;text-align:left}

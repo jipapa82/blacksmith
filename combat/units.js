@@ -69,22 +69,20 @@ function recalcGems(a){
       else if(s.type==='emerald')gm.auraHaste=true;
     } });
   a.gm=gm;
-  /* 원소는 보석에서 온다 (DESIGN 4.2) — 허용 원소 중 첫 원소 보석이 확정(1무기 1원소),
-     그 원소 보석의 최고 등급이 단계를 정한다: Ⅰ~Ⅱ=1, Ⅲ~Ⅳ=2, Ⅴ+=3 (합성이 곧 심화).
-     허용 밖 원소 보석은 스탯만 발현 — 꽝 없음. 빼고 다른 색을 끼우면 원소 교체 */
+  /* 원소는 보석에서 온다 (DESIGN 4.2) — 1번 홈이 "원소 홈":
+     거기 끼운 유색 보석이(허용 원소일 때만) 원소를 부여하고, 그 등급이 단계를 정한다:
+     Ⅰ~Ⅱ=1, Ⅲ~Ⅳ=2, Ⅴ+=3 (합성이 곧 심화). 다른 홈의 원소 보석은 스탯·시너지만.
+     허용 밖·무색이면 원소 없음 — 스탯은 그대로 (꽝 없음) */
   a.elFire=a.elPois=a.elCold=a.elShock=0;
-  const allow=EQUIP[a.key].elems;
-  let elem=null, best=0;
-  a.sock.forEach(s=>{ if(!s)return;
-    const ge=GEMS[s.type].elem;
-    if(!ge||allow.indexOf(ge)<0)return;
-    if(!elem)elem=ge;
-    if(ge===elem)best=Math.max(best,Math.min(s.grade,GEM_MAX_GRADE));
-  });
-  if(elem){
-    const lv=best>=5?3:best>=3?2:1;
-    if(elem==='fire')a.elFire=lv; else if(elem==='pois')a.elPois=lv;
-    else if(elem==='cold')a.elCold=lv; else a.elShock=lv;
+  const s0=a.sock[0];
+  if(s0){
+    const ge=GEMS[s0.type].elem;
+    if(ge&&EQUIP[a.key].elems.indexOf(ge)>=0){
+      const gr=Math.min(s0.grade,GEM_MAX_GRADE);
+      const lv=gr>=5?3:gr>=3?2:1;
+      if(ge==='fire')a.elFire=lv; else if(ge==='pois')a.elPois=lv;
+      else if(ge==='cold')a.elCold=lv; else a.elShock=lv;
+    }
   }
 }
 /* 파티 오라 (최종 루비·자수정) — 살아 있는 착용자 기준, 매 스텝 갱신 */

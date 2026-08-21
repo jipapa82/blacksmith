@@ -79,11 +79,13 @@ function renderForgeBody(){
   let html=allies.map((a,ai)=>`<div class="sock-row">
       <span class="sock-name">${weaponIcon(a.key)}${a.name} · ${a.eq}</span>
       ${a.sock.map((s,si)=>{
+        const elHome=si===0;   // 1번 홈 = 원소 홈 (DESIGN 4.2)
+        const elTitle=elHome?`[원소 홈 — 허용: ${EQUIP[a.key].elems.map(e=>ELEM_INFO[e][0]).join('·')}] `:'';
         if(s){const g=GEMS[s.type];
-          return `<button class="slotbtn filled" data-ai="${ai}" data-si="${si}"
-            title="${g.name} ${GRADE_TXT[s.grade-1]} — ${gemStatText(g,s.grade,s.type)}"
+          return `<button class="slotbtn filled${elHome?' elem':''}" data-ai="${ai}" data-si="${si}"
+            title="${elTitle}${g.name} ${GRADE_TXT[s.grade-1]} — ${gemStatText(g,s.grade,s.type)}"
             style="border-color:${g.color};color:${g.color}${s.grade>=FINAL_GRADE?`;box-shadow:0 0 7px ${g.color}`:''}">${GRADE_TXT[s.grade-1]}</button>`;}
-        return `<button class="slotbtn" data-ai="${ai}" data-si="${si}">+</button>`;
+        return `<button class="slotbtn${elHome?' elem':''}" data-ai="${ai}" data-si="${si}" title="${elTitle}빈 홈">${elHome?'◆':'+'}</button>`;
       }).join('')}
     </div>`).join('');
   const inv=invEntries();
@@ -131,8 +133,8 @@ function renderForgeBody(){
   }
   html+=`<div class="forge-hint">보석을 고르고 홈(+)을 누르면 끼운다. 보석을 안 고른 채 찬 홈을 누르면 뺀다.<br>
     합성: 같은 보석 2개 → 한 등급 위 1개. 일괄 합성은 합칠 수 있는 걸 전부 (연쇄까지) 밀어 올린다.<br>
-    ↔ 표시 보석을 허용 무기의 홈에 끼우면 <b>그 원소가 부여된다</b> — 첫 원소 보석이 원소를 확정하고,
-    최고 등급이 단계를 정한다 (Ⅰ~Ⅱ=1 · Ⅲ~Ⅳ=2 · Ⅴ=3단계). 허용 밖 원소는 스탯만.</div>`;
+    <b>◆ 1번 홈은 원소 홈</b> — 거기 끼운 유색 보석이 원소와 단계를 정한다
+    (허용 원소만, 등급 Ⅰ~Ⅱ=1 · Ⅲ~Ⅳ=2 · Ⅴ=3단계). 다른 홈의 원소 보석은 스탯·시너지만.</div>`;
   box.innerHTML=html;
 
   const mab=document.getElementById('mergeAllBtn');
