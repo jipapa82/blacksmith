@@ -79,11 +79,28 @@ function statSnap(a){
     crit:critOf(a),critD:a.critD+a.gm.critDmgAdd,dodge:dodgeOf(a),leech:a.leech+a.gm.leechAdd,
     el:elemOf(a),elLv:a.elFire||a.elPois||a.elCold||a.elShock||0};
 }
+/* 무기의 현재 원소 효과 설명 — 수치는 실제 판정 그대로 (STATUS + 보석 시너지·카드 합산, 7.2 표시=판정) */
+function elemDesc(a){
+  const dot=1+STATUS.syn.dotAmp*a.syDotamp;
+  if(a.elFire){const l=a.elFire-1;
+    return `적중 시 ${STATUS.burn.dur[l]}초 화상 — 초당 공격력의 ${Math.round(STATUS.burn.dpsPct[l]*(1+a.gm.synFire)*dot*100)}% 피해, 재적중 시 갱신`;}
+  if(a.elPois){const l=a.elPois-1;
+    return `적중 시 중독 +1중첩 (최대 ${STATUS.pois.maxStacks[l]+a.gm.synPois}중첩, ${STATUS.pois.dur}초) — 중첩당 초당 공격력의 ${Math.round(STATUS.pois.dpsPct[l]*dot*100)}% 피해`;}
+  if(a.elCold){const l=a.elCold-1;
+    return `적중 시 ${STATUS.chill.dur}초 한기 (이동 -${Math.round(STATUS.chill.slow[l]*100)}%), 한기 중 ${STATUS.chill.hitsToFreeze}회 적중 시 ${(STATUS.chill.freezeDur[l]*(1+a.gm.synCold)).toFixed(1)}초 빙결`;}
+  if(a.elShock){const l=a.elShock-1;
+    return `적중 시 ${STATUS.shock.dur[l]}초 공명 — 받는 모든 피해 +${Math.round((STATUS.shock.amp[l]+a.gm.synShock)*100)}%, 맞을 때 ${Math.round(STATUS.shock.stagger[l]*100)}% 확률 휘청`;}
+  return '';
+}
+function elemLine(a){
+  const d=elemDesc(a);
+  return d?`<div class="sock-elem" style="color:${elemColor(a)}">↳ ${d}</div>`:'';
+}
 /* 홈 si에 gem을 끼웠다 치고 스탯을 재보고 원상 복구 */
 function previewWith(a,si,gem){
   const old=a.sock[si];
   a.sock[si]=gem; recalcGems(a);
-  const snap=statSnap(a);
+  const snap=statSnap(a); snap.elDesc=elemDesc(a);
   a.sock[si]=old; recalcGems(a);
   return snap;
 }
@@ -110,10 +127,13 @@ function gemPreview(a){
   if(Math.abs(nx.critD-cur.critD)>1e-9)d.push('치피 +'+Math.round((nx.critD-cur.critD)*100)+'%p');
   if(Math.abs(nx.dodge-cur.dodge)>1e-9)d.push('회피 +'+Math.round((nx.dodge-cur.dodge)*100)+'%p');
   if(nx.leech!==cur.leech)d.push('흡혈 +'+(nx.leech-cur.leech));
-  let el='';
-  if(nx.el!==cur.el||nx.elLv!==cur.elLv)
+  let el='', elDetail='';
+  if(nx.el!==cur.el||nx.elLv!==cur.elLv){
     el=(d.length?' · ':'')+(nx.el?`<b style="color:${ELEM_INFO[nx.el][1]}">원소 ${ELEM_INFO[nx.el][0]} ${nx.elLv}단계</b>`:'원소 없음');
-  return `<div class="sock-prev">${si===0?'◆ 원소 홈':'홈 '+(si+1)}에 끼우면: ${d.join(' · ')||(el?'':'변화 없음')}${el}</div>`;
+    if(nx.el&&nx.elDesc)
+      elDetail=`<div class="sock-elem" style="color:${ELEM_INFO[nx.el][1]};opacity:.85">↳ ${nx.elDesc}</div>`;
+  }
+  return `<div class="sock-prev">${si===0?'◆ 원소 홈':'홈 '+(si+1)}에 끼우면: ${d.join(' · ')||(el?'':'변화 없음')}${el}</div>${elDetail}`;
 }
 
 /* 보석 장착/합성 화면 */
@@ -130,7 +150,7 @@ function renderForgeBody(){
             style="border-color:${g.color};color:${g.color}${s.grade>=FINAL_GRADE?`;box-shadow:0 0 7px ${g.color}`:''}">${GRADE_TXT[s.grade-1]}</button>`;}
         return `<button class="slotbtn${elHome?' elem':''}" data-ai="${ai}" data-si="${si}" title="${elTitle}빈 홈">${elHome?'◆':'+'}</button>`;
       }).join('')}</div>
-      ${statLine(a)}${gemPreview(a)}
+      ${statLine(a)}${elemLine(a)}${gemPreview(a)}
     </div>`).join('');
   const inv=invEntries();
   const canMergeAll=inv.some(e=>e.count>=2&&e.grade<GEM_MAX_GRADE);
