@@ -40,11 +40,13 @@ function ultWorth(a){
   return false;
 }
 
-function ultimate(a){
+function ultimate(a,isEcho){
   const live=mobs.filter(m=>m.hp>0);
   if(!live.length)return false;
   const P=a.ultPow;
   shake=6; sfx('ult');
+  /* 이중 오의 — 잇달아 한 번 더 (쿨타임 페널티는 카드가 ultCd에 반영, DESIGN 4.1.2) */
+  if(a.dblUlt&&!isEcho) setTimeout(()=>{ if(running&&a.hp>0) ultimate(a,true); },450);
   if(a.gm.auraHaste)hasteT=AURA.emerald.hasteDur;   // 질풍의 오라 (최종 에메랄드)
 
   if(a.trait==='assassin'){                    // 급소 찌르기 — 침투자 중 최대 체력 대상 일격
