@@ -79,17 +79,22 @@ function renderForgeBody(){
     </div>`).join('');
   const inv=invEntries();
   const canMergeAll=inv.some(e=>e.count>=2&&e.grade<GEM_MAX_GRADE);
-  html+=`<div class="gem-inv">`+(inv.length?inv.map(e=>{
-      const g=GEMS[e.type];
-      return `<span class="gemchip ${e.grade>=FINAL_GRADE?'final':''} ${selGem===e.key?'sel':''}" data-key="${e.key}">
-        <i class="dot2" style="background:${g.color}"></i>${g.name} ${GRADE_TXT[e.grade-1]}
-        <span class="cnt">${gemStatText(g,e.grade,e.type)}</span>
-        ${g.elem?`<span class="cnt" style="color:${ELEM_INFO[g.elem][1]}">↔${ELEM_INFO[g.elem][0]}</span>`:''}
-        <span class="cnt">×${e.count}</span>
-        ${e.count>=2&&e.grade<GEM_MAX_GRADE?`<button data-merge="${e.key}">합성</button>`:''}
-      </span>`;
-    }).join(''):'<span class="forge-hint">보석이 없다. 적을 잡다 보면 가끔 떨어진다.</span>')
-    +(canMergeAll?`<button id="mergeAllBtn">일괄 합성</button>`:'')+`</div>`;
+  /* 종류별 세로 컬럼 — 보석마다 등급별 보유량이 한눈에 (2026-08-21) */
+  const byType={};
+  inv.forEach(e=>{(byType[e.type]=byType[e.type]||[]).push(e);});
+  html+=`<div class="gem-cols">`+(inv.length?Object.keys(GEMS).filter(t=>byType[t]).map(t=>{
+      const g=GEMS[t];
+      return `<div class="gem-col">
+        <div class="gc-hd" style="color:${g.color}"><i class="dot2" style="background:${g.color}"></i>${g.name}
+          ${g.elem?`<span class="cnt" style="color:${ELEM_INFO[g.elem][1]}">↔${ELEM_INFO[g.elem][0]}</span>`:''}</div>
+        ${byType[t].map(e=>`<div class="gc-row ${e.grade>=FINAL_GRADE?'final':''} ${selGem===e.key?'sel':''}"
+            data-key="${e.key}" title="${gemStatText(g,e.grade,t)}">
+          <b style="color:${g.color}">${GRADE_TXT[e.grade-1]}</b><span class="cnt">×${e.count}</span>
+          ${e.count>=2&&e.grade<GEM_MAX_GRADE?`<button data-merge="${e.key}">합성</button>`:''}
+        </div>`).join('')}
+      </div>`;
+    }).join(''):'<span class="forge-hint">보석이 없다. 적을 잡다 보면 가끔 떨어진다.</span>')+`</div>`
+    +(canMergeAll?`<div class="gem-inv"><button id="mergeAllBtn">일괄 합성</button></div>`:'');
   /* 최종 합성대 — Ⅴ 둘을 올려 최종 보석을 만든다 (DESIGN 4.4) */
   const fives=inv.filter(e=>e.grade===GEM_MAX_GRADE);
   if(fives.length||altar.length){
@@ -120,7 +125,7 @@ function renderForgeBody(){
     renderForgeBody();
   };
 
-  box.querySelectorAll('.gemchip').forEach(el=>el.onclick=ev=>{
+  box.querySelectorAll('.gc-row').forEach(el=>el.onclick=ev=>{
     const mk=ev.target.dataset&&ev.target.dataset.merge;
     if(mk){ mergeGems(mk); sfx('hammer'); if(!invCount(selGem)) selGem=null; renderForgeBody(); return; }
     selGem = selGem===el.dataset.key ? null : el.dataset.key;

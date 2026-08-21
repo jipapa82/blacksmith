@@ -72,7 +72,7 @@ input[type=range]{width:100%;accent-color:var(--quench)}
 canvas{display:block;width:100%;height:auto}
 
 .crew{display:flex;gap:9px;padding:11px 15px;border-top:1px solid var(--edge);flex-wrap:wrap}
-.cw{flex:1;min-width:158px;border:1px solid var(--edge);border-radius:2px;padding:8px 10px;background:var(--panel)}
+.cw{flex:1;min-width:196px;border:1px solid var(--edge);border-radius:2px;padding:8px 10px;background:var(--panel)}
 .cw-top{display:flex;align-items:center;gap:6px;font-size:11.5px;margin-bottom:6px}
 .cw-tag{font-size:9.5px;padding:1px 6px;border-radius:2px;border:1px solid var(--edge);color:var(--dim)}
 .cw-tag.front{border-color:var(--heat);color:var(--heat)}
@@ -83,7 +83,13 @@ canvas{display:block;width:100%;height:auto}
 .cw-hp i.hot{background:var(--heat)}
 .cw-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);margin-top:3px;
   display:flex;justify-content:space-between}
-.cw-mods{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px}
+.cw-stats{margin-top:5px;display:grid;grid-template-columns:1fr 1fr;gap:1px 12px;
+  font-size:10px;color:var(--dim)}
+.cw-stats span{display:flex;justify-content:space-between;gap:6px}
+.cw-stats b{color:var(--steel);font-family:'IBM Plex Mono',monospace;font-weight:500}
+.cw-sec{margin-top:5px;padding-top:5px;border-top:1px solid var(--edge);
+  display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.sec-lb{font-size:9px;color:var(--dim);letter-spacing:.5px;margin-right:2px}
 .mod{font-size:9.5px;padding:1px 5px;border-radius:2px;background:#2E323B;color:var(--dim)}
 .ultbtn{width:100%;margin-top:6px;padding:3px 6px;font-size:10.5px}
 .ultbtn.ready{background:var(--heat);border-color:var(--heat);color:var(--forge);font-weight:500;
@@ -150,6 +156,18 @@ canvas{display:block;width:100%;height:auto}
   cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--dim);padding:0}
 .slotbtn.filled{border-style:solid;background:#1E2027}
 .gem-inv{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:660px}
+/* 보석 인벤토리 — 종류별 세로 컬럼, 등급별 보유량이 한눈에 (2026-08-21) */
+.gem-cols{display:flex;justify-content:center;flex-wrap:wrap;max-width:680px;text-align:left}
+.gem-col{padding:2px 12px;border-left:1px solid var(--edge);min-width:96px}
+.gem-col:first-child{border-left:0}
+.gc-hd{display:flex;align-items:center;gap:5px;font-size:11px;margin-bottom:3px}
+.gc-row{display:flex;align-items:center;gap:7px;padding:2px 5px;font-size:11px;cursor:pointer;border-radius:2px}
+.gc-row:hover{background:var(--edge)}
+.gc-row.sel{outline:2px solid var(--quench)}
+.gc-row.final{box-shadow:0 0 7px rgba(217,180,92,.35)}
+.gc-row b{font-weight:500;font-family:'IBM Plex Mono',monospace}
+.gc-row .cnt{color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:10px}
+.gc-row button{padding:0 6px;font-size:9.5px;margin-left:auto}
 .gemchip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--edge);background:var(--panel);
   border-radius:2px;padding:4px 8px;font-size:11px;cursor:pointer}
 .gemchip.sel{outline:2px solid var(--quench)}
