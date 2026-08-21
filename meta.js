@@ -35,10 +35,10 @@ function metaReset(k){
   return refund;
 }
 
-/* mkAlly가 읽는 무기별 영구 보정 */
+/* mkAlly가 읽는 무기별 영구 보정 — 스탯은 정수 가산 (DESIGN 4.5) */
 function metaMods(k){
   const r=id=>metaRank(k,id);
-  return { atkMul:1+.05*r('natk'), aspdMul:1+.04*r('naspd'), hpMul:1+.06*r('nhp'),
+  return { atkAdd:r('natk'), aspdAdd:.03*r('naspd'), hpAdd:5*r('nhp'),
     defAdd:r('ndef'), slots:2+r('nslot'),
     ultPow:.5+.25*r('nult'),     // 필살기는 기본 제공(50%), 노드로 연마 (DESIGN 4.5)
     ultRank:r('nult') };         // 활은 연마 축이 연사 수 (5+2×랭크)

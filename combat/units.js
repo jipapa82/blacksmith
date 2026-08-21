@@ -3,8 +3,8 @@ function mkAlly(k,i,front){
   const e=EQUIP[k], mm=metaMods(k);   // 영구 노드 보정 (DESIGN 4.5)
   const a={key:k, name:'용병 '+String.fromCharCode(65+i), eq:e.name, trait:e.trait, shape:e.shape, color:e.color,
     base:{atk:e.atk,hp:e.hp},
-    atk:Math.round(e.atk*mm.atkMul), def:e.def+mm.defAdd,
-    maxhp:Math.round(e.hp*mm.hpMul), hp:0, aspd:e.spd*mm.aspdMul, charge:0,
+    atk:e.atk+mm.atkAdd, def:e.def+mm.defAdd,
+    maxhp:e.hp+mm.hpAdd, hp:0, aspd:e.spd+mm.aspdAdd, charge:0,
     front, x:front?FRONT_X:BACK_X, y:MID_Y, r:front?18:15, hit:0, lung:0,
     blastR:60, pierceW:14, arrows:1, pierce:0, chain:0, cleaveR:56, thorns:0, blockR:1, range:72,
     ambush:1.8,                                                    // 암살: 침투자에게 주는 피해 배수

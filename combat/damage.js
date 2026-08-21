@@ -8,7 +8,10 @@ function killMob(m,src){
   dropLoot(m);
   if(src){
     const lch=src.leech+(src.gm?src.gm.leechAdd:0);          // 피 먹는 홈 + 토파즈 흡혈
-    if(lch){src.hp=Math.min(maxHpOf(src),src.hp+lch);}
+    if(lch&&src.hp<maxHpOf(src)){                            // 실제로 회복될 때만 초록 숫자 (7.3 가독성)
+      src.hp=Math.min(maxHpOf(src),src.hp+lch);
+      num(src.x,src.y-src.r-10,'+'+lch,'#8FBF6A');
+    }
     if(src.syReap&&statusCount(m)>0)                     // 갈무리: 상태이상 적 처치 → 게이지 회복
       src.ultT=Math.min(src.ultCd,src.ultT+src.ultCd*STATUS.syn.reapPct*src.syReap);
     if(src.deathBlast){ ring(m.x,m.y,34,'#E8963C',.6);
@@ -71,7 +74,10 @@ function hurtAlly(a,dmg,from){
   const d=Math.max(1,Math.round(dmg-defOf(a)));
   a.hp-=d; a.hit=.14; num(a.x,a.y-a.r-6,d,'#C4574F');
   if(a.thorns&&from) hurtMob(from,a.thorns,a);
-  if(a.repel&&from&&from.hp>0) from.x=Math.min(W+20,from.x+40*a.repel);   // 밀치는 반격 (DESIGN 4.1.1)
+  if(a.repel&&from&&from.hp>0){                                           // 밀치는 반격 (DESIGN 4.1.1)
+    from.x=Math.min(W+20,from.x+60*a.repel); from.charge=0;               // 밀려나면 재충전도 처음부터
+    ring(from.x,from.y,from.r+5,'#D8E4EA',.9);                            // 튕겨나는 게 보여야 한다 (7.3)
+  }
   if(a.gm.auraFreeze&&from&&from.hp>0&&from.freezeCd<=0){                 // 서리 갑옷 (최종 사파이어)
     from.freezeT=a.gm.auraFreeze*(from.type==='boss'?STATUS.chill.bossFreezeMul:1);
     from.freezeCd=from.freezeT+STATUS.chill.immune;
