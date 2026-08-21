@@ -52,6 +52,8 @@ const documentStub = {
   addEventListener() {},
 };
 const storage = {};
+/* 구 저장 마이그레이션 검증용 — 스탯 포인트 10pt가 2,000골드로 환전되어야 한다 (DESIGN 4.5) */
+storage['blacksmith-meta-v1']=JSON.stringify({pts:10,gold:0,nodes:{},autoUlt:true});
 const localStorageStub = {
   getItem(k) { return k in storage ? storage[k] : null; },
   setItem(k, v) { storage[k] = String(v); },
@@ -75,6 +77,8 @@ const driver = `
 ;(function(){
   const out = [];
   out.push('waveCount 1/4/8/12/16: ' + [0,3,7,11,15].map(waveCount).join('/'));
+  out.push('포인트 환전 마이그레이션: ' + (META.pts===0&&META.gold===2000
+    ? 'OK (10pt → 2000골드)' : 'WRONG pts='+META.pts+' gold='+META.gold));
   out.push('무한 스테이지: ' + (waveCount(16)===waveCount(0) && waveCount(31)===waveCount(15)
     && waveSpec(16).title===WAVE_TITLES[0] && waveSpec(19).boss && !waveSpec(16).boss
     && waveSpec(17).mix.length===1 && waveSpec(20).mix.length===3
@@ -120,7 +124,7 @@ const driver = `
         document.getElementById('nextBtn').onclick();
       } else if (phase === 'end') {
         return statusTxt.textContent + ' | wave=' + (waveIdx+1) + ' Lv' + lv
-          + ' kills=' + G.kills + ' pts=' + META.pts;
+          + ' kills=' + G.kills + ' 금고=' + META.gold;
       } else return 'UNEXPECTED phase=' + phase;
     }
     return 'incomplete';
@@ -131,16 +135,32 @@ const driver = `
   out.push('RUN1: ' + playRun('r1'));
   out.push('금고 누적: ' + META.gold + '골드' + (META.gold>0?' OK':' NONE_BANKED'));
 
-  // 테스트용 포인트 지급 후 노드 구매 (연마·리롤·수동 발동 경로 검증)
-  META.pts += 12;
+  // 테스트용 골드 지급 후 정액 구매·강화 (연마·리롤·수동 발동·강화 경로 검증)
+  META.gold += 20000;
   const bought = [];
-  if (metaBuy('shield','nult')) bought.push('shield.nult');
-  if (metaBuy('wand','nult')) bought.push('wand.nult');
-  if (metaBuy('sword','nult')) bought.push('sword.nult');
-  if (metaBuy('bow','nult')) bought.push('bow.nult');
-  if (metaBuy('_global','nreroll')) bought.push('_global.nreroll');
-  while (metaBuy('wand','natk')) bought.push('wand.natk');
-  out.push('노드 구매(+12pt 테스트 지급): ' + (bought.join(', ')||'포인트 부족') + ' | 남은 pts=' + META.pts);
+  for (const kk of ['shield','wand','sword','bow'])
+    if (metaBuy(kk,'nult')==='ok') bought.push(kk+'.nult');
+  if (metaBuy('_global','nreroll')==='ok') bought.push('_global.nreroll');
+  let enhOk=0, enhFail=0;
+  for (let t=0;t<60&&metaRank('wand','natk')<10;t++){
+    const res=metaBuy('wand','natk');
+    if(res==='ok')enhOk++; else if(res==='fail')enhFail++; else break;
+  }
+  out.push('구매·강화(+20000골드 지급): ' + bought.join(', ')
+    + ' | 벼린 날 +' + metaRank('wand','natk') + '강 (성공 ' + enhOk + '/실패 ' + enhFail + ') | 금고 ' + META.gold);
+  /* 강화 실패·천장 — 난수를 고정해 결정적으로 검증 */
+  const mr=Math.random;
+  (META.nodes.great=META.nodes.great||{}).natk=9;
+  META.gold+=enhCost(9)*2;
+  Math.random=()=>0.99;                      // 10강 15%면 무조건 실패
+  const f1=metaBuy('great','natk');
+  const rateAfterFail=enhRateOf('great','natk',9);
+  Math.random=()=>0;                         // 무조건 성공
+  const s1=metaBuy('great','natk');
+  Math.random=mr;
+  out.push('강화 실패·천장: ' + (f1==='fail'&&Math.abs(rateAfterFail-.18)<1e-9
+    &&s1==='ok'&&metaRank('great','natk')===10&&META.pity['great.natk']===undefined
+    ? 'OK (실패 유지 → 15%+3%p → 성공 시 천장 초기화)' : 'WRONG '+f1+'/'+rateAfterFail+'/'+s1));
   out.push('저장 확인: ' + (localStorage.getItem('blacksmith-meta-v1') ? 'localStorage OK' : 'MISSING'));
 
   out.push('--- 2회차 (수동 모드, 방패+활 편성 — 질풍 연사 검증) ---');
@@ -168,9 +188,9 @@ const driver = `
   gainGem('ruby',5); gainGem('emerald',5);
   const ft2=mergeFinal('ruby:5','emerald:5');
   out.push('50/50 합성: ' + ((ft2==='ruby'||ft2==='emerald')&&invCount(ft2+':6')>=1?'OK':'FAIL'));
-  const beforeReset=META.pts, refund=metaReset('wand');
-  out.push('무기 초기화 환급: +' + refund + 'pt'
-    + (refund>0&&META.pts===beforeReset+refund&&!META.nodes.wand?' OK':' WRONG'));
+  const beforeReset=META.gold, refund=metaReset('wand');
+  out.push('무기 초기화 환급: +' + refund + '골드'
+    + (refund>0&&META.gold===beforeReset+refund&&!META.nodes.wand?' OK':' WRONG'));
   const multi=allies.filter(a=>[a.elFire,a.elPois,a.elCold,a.elShock].filter(v=>v>0).length>1);
   out.push('원소 잠금: ' + (multi.length ? 'VIOLATION — 한 무기에 2원소 이상' : 'OK (무기당 최대 1원소)'));
   const badEl=allies.filter(a=>{const e=elemOf(a);return e&&!EQUIP[a.key].elems.includes(e);});
