@@ -16,6 +16,7 @@ function mkAlly(k,i,front){
     ultCd:e.ultCd, ultT:e.ultCd*.5, ultPow:mm.ultPow, ultRank:mm.ultRank, ultR:1, ultWait:0, dblUlt:0,
     dblHit:0, finisher:0, heavyHand:0, momentum:0, _cmT:null, _cmN:0,   // 평타 강화 (4.1.1)
     ultHaste:0, echo:0,                                                 // 필살 강화 (4.1.2)
+    breather:0, guard:0, lastStand:0, lastStandUsed:false, noHitT:0,    // 생존 행동 (4.1.1)
     sock:Array(mm.slots).fill(null), gm:null,
     reviveUsed:false, reviveT:0,                                   // 되살리는 맥박 (최종 토파즈)
     lv:{}, mods:[]};

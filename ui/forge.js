@@ -9,6 +9,7 @@ function restoreCrew(){
   allies.forEach(a=>{
     if(a.hp<=0){ fallen.push({eq:a.eq, old:a.name}); a.name=nextMercName(); }
     a.hp=maxHpOf(a); a.charge=0; a.hit=0; a.lung=0; a.ultWait=0; a.reviveT=0;
+    a.lastStandUsed=false; a.noHitT=0;           // 마지막 숨은 웨이브당 1회 (4.1.1)
   });
   layoutAllies();
   return fallen;

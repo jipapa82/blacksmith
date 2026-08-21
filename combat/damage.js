@@ -76,10 +76,29 @@ function hurtMob(m,dmg,src,isUlt){
   }
   if(src&&src.gm) applyOnHit(src,m);                                  // 아군 적중 시 원소 부여
 }
+/* 사망 처리 — '마지막 숨'(웨이브당 1회)이 먼저 막는다 (DESIGN 4.1.1) */
+function allyDown(a){
+  if(a.lastStand&&!a.lastStandUsed){
+    a.lastStandUsed=true;
+    a.hp=Math.round(maxHpOf(a)*(.3+.2*(a.lastStand-1)));
+    ring(a.x,a.y,a.r+14,'#D8E4EA',2); num(a.x,a.y-a.r-14,'마지막 숨','#D8E4EA',1);
+    return;
+  }
+  burst(a.x,a.y,'#C4574F');shake=8; sfx('die');
+  if(a.gm.auraRevive&&!a.reviveUsed){a.reviveUsed=true;a.reviveT=AURA.topaz.reviveT;}  // 되살리는 맥박
+  layoutAllies();
+}
 function hurtAlly(a,dmg,from){
   if(Math.random()<dodgeOf(a)){ num(a.x,a.y-a.r-6,'회피','#D8E4EA'); return; }
-  const d=Math.max(1,Math.round(dmg-defOf(a)));
-  a.hp-=d; a.hit=.14; num(a.x,a.y-a.r-6,d,'#C4574F');
+  let d=Math.max(1,Math.round(dmg-defOf(a)));
+  if(!a.front){                                                           // 전선 사수 — 방패가 뒷줄 피해를 나눠 받는다
+    const g=allies.find(x=>x.front&&x.hp>0&&x.guard&&x!==a);
+    if(g){ const t=Math.min(d-1,Math.round(d*.25*g.guard));
+      if(t>0){ d-=t; g.hp-=t; g.hit=.14; g.noHitT=0;
+        num(g.x,g.y-g.r-6,t,'#C4574F');
+        if(g.hp<=0)allyDown(g); } }
+  }
+  a.hp-=d; a.hit=.14; a.noHitT=0; num(a.x,a.y-a.r-6,d,'#C4574F');
   if(a.thorns&&from) hurtMob(from,a.thorns,a);
   if(a.repel&&from&&from.hp>0){                                           // 밀치는 반격 (DESIGN 4.1.1)
     from.x=Math.min(W+20,from.x+60*a.repel); from.charge=0;               // 밀려나면 재충전도 처음부터
@@ -90,9 +109,5 @@ function hurtAlly(a,dmg,from){
     from.freezeCd=from.freezeT+STATUS.chill.immune;
     ring(from.x,from.y,from.r+10,'#9AD9E8',1.2);
   }
-  if(a.hp<=0){
-    burst(a.x,a.y,'#C4574F');shake=8; sfx('die');
-    if(a.gm.auraRevive&&!a.reviveUsed){a.reviveUsed=true;a.reviveT=AURA.topaz.reviveT;}  // 되살리는 맥박
-    layoutAllies();
-  }
+  if(a.hp<=0)allyDown(a);
 }

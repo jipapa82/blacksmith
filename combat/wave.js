@@ -39,6 +39,9 @@ function step(dt){
       a.ultWait+=dt;
       if((ultWorth(a)||a.ultWait>6)&&ultimate(a)){a.ultT=a.ultCd*.12*a.echo;a.ultWait=0;}   // 메아리 — 일부 보존
     }
+    a.noHitT+=dt;                                // 숨 고르기 — 4초간 안 맞으면 회복 (4.1.1)
+    if(a.breather&&a.noHitT>=4&&a.hp<maxHpOf(a))
+      a.hp=Math.min(maxHpOf(a),a.hp+maxHpOf(a)*.015*a.breather*dt);
     a.hit=Math.max(0,a.hit-dt); a.lung=Math.max(0,a.lung-dt); });
   mobs.forEach(m=>{ if(m.hp<=0)return;
     statusTick(m,dt);                        // 화상·중독 틱, 한기·빙결·공명 시간 경과

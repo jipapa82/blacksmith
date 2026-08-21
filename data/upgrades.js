@@ -9,6 +9,8 @@ const UP=[
    d:a=>`이 무기가 적을 잡을 때마다 체력 +1 (현재 +${a.leech}, 토파즈 흡혈과 합산)`, f:a=>a.leech+=1},
   {id:'repel', n:'밀치는 반격', max:3, r:0, when:'피격 시', ok:()=>1,
    d:a=>`이 무기가 맞으면 때린 적이 ${60*(a.repel+1)}만큼 튕겨나고 공격 충전도 처음부터 — 파고드는 적을 떼어낸다`, f:a=>a.repel++},
+  {id:'breath', n:'숨 고르기', max:3, r:0, when:'상시', ok:()=>1,
+   d:a=>`4초간 맞지 않으면 초당 최대 체력의 ${(1.5*(a.breather+1)).toFixed(1)}%씩 회복한다`, f:a=>a.breather++},
 
   /* ===== 일반 — 평타·필살 강화 (카드 = 행동 변주. DESIGN 4.1.1) ===== */
   {id:'dbl',   n:'이중 타격',   max:3, r:0, when:'기본 공격', ok:()=>1,
@@ -43,6 +45,8 @@ const UP=[
    d:()=>'이 무기가 적을 막아 세우는 범위 +15%', f:a=>a.blockR*=1.15},
   {id:'reach', n:'긴 자루',     max:4, r:1, when:'상시', ok:a=>a.trait==='wall',
    d:a=>`이 무기 기본 공격 사거리 +15% (현재 ${Math.round(a.range)})`, f:a=>a.range*=1.15},
+  {id:'guard', n:'전선 사수',   max:2, r:1, when:'피격 시', ok:a=>a.trait==='wall',
+   d:a=>`뒷줄이 받는 피해의 ${25*(a.guard+1)}%를 이 무기가 대신 받는다`, f:a=>a.guard++},
   {id:'ambush', n:'기습',       max:4, r:1, when:'기본 공격', ok:a=>a.trait==='assassin',
    d:a=>`침투자(전선을 넘어온 적)·대장 일격 피해 ×${(a.ambush+.25).toFixed(2)} (현재 ×${a.ambush.toFixed(2)})`, f:a=>a.ambush+=.25},
   {id:'ultwide', n:'퍼지는 오의', max:3, r:1, when:'필살기', ok:a=>a.trait!=='shoot',
@@ -78,6 +82,8 @@ const UP=[
    d:a=>`이 무기의 피해가 상태이상 2종 이상 걸린 적에게 +${Math.round(STATUS.syn.mixer*100*(a.syMixer+1))}% (파티가 건 것 전부 셈)`,
    f:a=>a.syMixer++},
 
+  {id:'laststand', n:'마지막 숨', max:2, r:2, when:'피격 시', ok:()=>1,
+   d:a=>`이 무기가 죽을 피해를 받으면 체력 ${30+20*a.lastStand}%로 버틴다 — 웨이브당 1회`, f:a=>a.lastStand++},
   {id:'dblult', n:'이중 오의', max:5, r:2, when:'필살기', ok:()=>1,
    d:a=>`필살기가 잇달아 두 번 터진다 — 대신 쿨타임 +${80-20*a.dblUlt}% (단계마다 -20%p, 5단계에 0%)`,
    f:a=>{a.dblUlt++; a.ultCd=EQUIP[a.key].ultCd*(1.8-.2*(a.dblUlt-1));}},
