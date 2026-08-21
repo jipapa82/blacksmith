@@ -15,7 +15,7 @@ const GEMS={
   /* 무색 2종은 원소 시너지 대신 이중 스탯 (2026-08-21) — 토파즈+다이아 = 치명 빌드 */
   topaz:   {name:'토파즈',    color:'#E0C050', stat:'crit',  kind:'add', desc:'치명타 확률',
             v:[.04,.07,.11,.17,.26], elem:null,                                 // 번개 추가 시 승격 후보
-            stat2:'leech', desc2:'처치 시 회복', v2:[1,2,3,5,8]},
+            stat2:'leech', desc2:'처치 시 회복', v2:[1,1,2,3,4]},
   amethyst:{name:'자수정',    color:'#9B6FD0', stat:'def',   kind:'add', desc:'방어',
             v:[1,2,4,6,10],          elem:'shock', syn:[.02,.04,.06,.08,.10]},  // 공명 증폭 +
   diamond: {name:'다이아몬드',color:'#D8E4EA', stat:'dodge', kind:'add', desc:'회피',
