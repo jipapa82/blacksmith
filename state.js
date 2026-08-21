@@ -1,6 +1,6 @@
 /* ===================== 전역 상태 =====================
    전역 공유 상태는 이 파일 한 곳에만 둔다. 런 단위 초기화는 main.js의 reset(). */
-let loadout=['shield','wand'];
+let loadout=['shield','bow'];   // 기본 편성: 용병 A 참나무 방패(앞줄) + 용병 B 사냥 활(뒷줄)
 let speed=1, running=false, phase='idle';
 let allies=[], mobs=[], fxs=[], nums=[];
 let waveIdx=0, waveT=0, spawnT=0, shake=0;
