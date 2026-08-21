@@ -73,11 +73,54 @@ function renderForgeRow(){
   };
 }
 
+/* ===== 스탯 비교 — 보석을 어떻게 끼우느냐에 따라 뭐가 달라지는지 한눈에 (DESIGN 7.3) ===== */
+function statSnap(a){
+  return {hp:maxHpOf(a),atk:atkOf(a),aspd:aspdOf(a),def:defOf(a),
+    crit:critOf(a),critD:a.critD+a.gm.critDmgAdd,dodge:dodgeOf(a),leech:a.leech+a.gm.leechAdd,
+    el:elemOf(a),elLv:a.elFire||a.elPois||a.elCold||a.elShock||0};
+}
+/* 홈 si에 gem을 끼웠다 치고 스탯을 재보고 원상 복구 */
+function previewWith(a,si,gem){
+  const old=a.sock[si];
+  a.sock[si]=gem; recalcGems(a);
+  const snap=statSnap(a);
+  a.sock[si]=old; recalcGems(a);
+  return snap;
+}
+function statLine(a){
+  const s=statSnap(a);
+  return `<div class="sock-stats">체 ${Math.max(0,Math.ceil(a.hp))}/${s.hp} · 공 ${s.atk} · 공속 ${s.aspd.toFixed(2)} · 방 ${s.def}`
+    +` · 치명 ${Math.round(s.crit*100)}% · 치피 ${Math.round(s.critD*100)}% · 회피 ${Math.round(s.dodge*100)}% · 흡혈 ${s.leech}`
+    +(s.el?` · <b style="color:${ELEM_INFO[s.el][1]}">${ELEM_INFO[s.el][0]} ${s.elLv}단계</b>`:' · <span style="opacity:.5">원소 없음</span>')
+    +`</div>`;
+}
+/* 고른 보석을 첫 빈 홈에 끼웠을 때의 변화 미리보기 */
+function gemPreview(a){
+  if(!selGem)return '';
+  const si=a.sock.findIndex(s=>!s);
+  if(si<0)return `<div class="sock-prev" style="opacity:.5">빈 홈 없음 — 찬 홈을 누르면 교체</div>`;
+  const [t,gr]=selGem.split(':');
+  const cur=statSnap(a), nx=previewWith(a,si,{type:t,grade:+gr});
+  const d=[];
+  if(nx.atk!==cur.atk)d.push('공 +'+(nx.atk-cur.atk));
+  if(nx.hp!==cur.hp)d.push('체 +'+(nx.hp-cur.hp));
+  if(Math.abs(nx.aspd-cur.aspd)>1e-9)d.push('공속 +'+(nx.aspd-cur.aspd).toFixed(2));
+  if(nx.def!==cur.def)d.push('방 +'+(nx.def-cur.def));
+  if(Math.abs(nx.crit-cur.crit)>1e-9)d.push('치명 +'+Math.round((nx.crit-cur.crit)*100)+'%p');
+  if(Math.abs(nx.critD-cur.critD)>1e-9)d.push('치피 +'+Math.round((nx.critD-cur.critD)*100)+'%p');
+  if(Math.abs(nx.dodge-cur.dodge)>1e-9)d.push('회피 +'+Math.round((nx.dodge-cur.dodge)*100)+'%p');
+  if(nx.leech!==cur.leech)d.push('흡혈 +'+(nx.leech-cur.leech));
+  let el='';
+  if(nx.el!==cur.el||nx.elLv!==cur.elLv)
+    el=(d.length?' · ':'')+(nx.el?`<b style="color:${ELEM_INFO[nx.el][1]}">원소 ${ELEM_INFO[nx.el][0]} ${nx.elLv}단계</b>`:'원소 없음');
+  return `<div class="sock-prev">${si===0?'◆ 원소 홈':'홈 '+(si+1)}에 끼우면: ${d.join(' · ')||(el?'':'변화 없음')}${el}</div>`;
+}
+
 /* 보석 장착/합성 화면 */
 function renderForgeBody(){
   const box=document.getElementById('forgeBody'); if(!box)return;
   let html=allies.map((a,ai)=>`<div class="sock-row">
-      <span class="sock-name">${weaponIcon(a.key)}${a.name} · ${a.eq}</span>
+      <div class="sock-top"><span class="sock-name">${weaponIcon(a.key)}${a.name} · ${a.eq}</span>
       ${a.sock.map((s,si)=>{
         const elHome=si===0;   // 1번 홈 = 원소 홈 (DESIGN 4.2)
         const elTitle=elHome?`[원소 홈 — 허용: ${EQUIP[a.key].elems.map(e=>ELEM_INFO[e][0]).join('·')}] `:'';
@@ -86,7 +129,8 @@ function renderForgeBody(){
             title="${elTitle}${g.name} ${GRADE_TXT[s.grade-1]} — ${gemStatText(g,s.grade,s.type)}"
             style="border-color:${g.color};color:${g.color}${s.grade>=FINAL_GRADE?`;box-shadow:0 0 7px ${g.color}`:''}">${GRADE_TXT[s.grade-1]}</button>`;}
         return `<button class="slotbtn${elHome?' elem':''}" data-ai="${ai}" data-si="${si}" title="${elTitle}빈 홈">${elHome?'◆':'+'}</button>`;
-      }).join('')}
+      }).join('')}</div>
+      ${statLine(a)}${gemPreview(a)}
     </div>`).join('');
   const inv=invEntries();
   const canMergeAll=inv.some(e=>e.count>=2&&e.grade<GEM_MAX_GRADE);
