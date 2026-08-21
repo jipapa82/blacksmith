@@ -28,8 +28,10 @@ function killMob(m,src){
       mobs.forEach(o=>{ if(o.hp>0&&o!==m&&Math.hypot(o.x-m.x,o.y-m.y)<R)
         o.burn={t:STATUS.burn.dur, dps:m.burn.dps, pt:o.burn?o.burn.pt:0, src}; });
     }
-    if(src.syReso&&m.shockT>0){                      // 공명 파열: 공명 중 처치 → 폭발·전파
+    if(src.syReso&&m.shockT>0&&_resoDepth<3){        // 공명 파열: 공명 중 처치 → 폭발·전파
       // 감쇠 없는 폭발 연쇄는 전멸기였다 (2026-08-21) — 연쇄마다 ×0.55, 전파는 4마리까지 (7.1)
+      // 하드캡 추가 (같은 날 2차): 최소 피해 1 때문에 감쇠만으론 빈사 무리에서 연쇄가 안 끝났다
+      // — 한 사슬에서 폭발은 최대 3회, 그 너머는 폭발·전파 없음
       const mul=Math.pow(.55,_resoDepth);
       ring(m.x,m.y,STATUS.syn.resoR,'#9B8ACB',1.6);
       _resoDepth++;
