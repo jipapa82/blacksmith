@@ -20,13 +20,13 @@ function takeGem(k){
   if(--G.gems[k]<=0) delete G.gems[k];
   gemTxt.textContent=gemTotal(); return true;
 }
-/* 같은 종류·단계 2개 → 한 단계 위 1개. 실패 없음. (DESIGN 4.4) */
+/* 같은 종류·등급 2개 → 한 등급 위 1개. 실패 없음. (DESIGN 4.4) */
 function mergeGems(k){
   const [t,g]=k.split(':'), gr=+g;
   if(gr>=GEM_MAX_GRADE||invCount(k)<2)return false;
   takeGem(k); takeGem(k); gainGem(t,gr+1); return true;
 }
-/* 일괄 합성 — 종류마다 낮은 단계부터 쌍을 전부 밀어 올린다. 오름차순이라 연쇄가 저절로 된다. */
+/* 일괄 합성 — 종류마다 낮은 등급부터 쌍을 전부 밀어 올린다. 오름차순이라 연쇄가 저절로 된다. */
 function mergeAllGems(){
   let n=0;
   for(const t of Object.keys(GEMS)){
@@ -41,7 +41,7 @@ function mergeAllGems(){
   if(n) gemTxt.textContent=gemTotal();
   return n;
 }
-/* 최종 합성 — 5단계 둘. 같은 종류=확정, 다른 종류=50/50 (DESIGN 4.4)
+/* 최종 합성 — Ⅴ 둘. 같은 종류=확정, 다른 종류=50/50 (DESIGN 4.4)
    성공 시 나온 종류를, 실패 시 false를 돌려준다. */
 function mergeFinal(k1,k2){
   const [t1,g1]=k1.split(':'), [t2,g2]=k2.split(':');

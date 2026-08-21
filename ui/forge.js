@@ -15,7 +15,7 @@ function restoreCrew(){
 }
 
 let selGem=null;            // 인벤토리에서 고른 보석 키 ("종류:단계")
-let altar=[], finalMsg='';  // 최종 합성대에 올린 5단계 키 2개 (DESIGN 4.4)
+let altar=[], finalMsg='';  // 최종 합성대에 올린 Ⅴ등급 키 2개 (DESIGN 4.4)
 
 /* 보석 스탯 표기 — 무색 2종은 이중 스탯, 최종 보석은 오라까지 (DESIGN 4.2, 4.4) */
 function gemStatText(g,gr,type){
@@ -130,7 +130,7 @@ function renderForgeBody(){
     </div>`;
   }
   html+=`<div class="forge-hint">보석을 고르고 홈(+)을 누르면 끼운다. 보석을 안 고른 채 찬 홈을 누르면 뺀다.<br>
-    합성: 같은 보석 2개 → 한 단계 위 1개. 일괄 합성은 합칠 수 있는 걸 전부 (연쇄까지) 밀어 올린다.<br>
+    합성: 같은 보석 2개 → 한 등급 위 1개. 일괄 합성은 합칠 수 있는 걸 전부 (연쇄까지) 밀어 올린다.<br>
     ↔ 표시 보석은 같은 원소의 무기에 끼우면 시너지가 발현된다.</div>`;
   box.innerHTML=html;
 

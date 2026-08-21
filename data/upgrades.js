@@ -86,7 +86,7 @@ const UP=[
    d:a=>`이 무기의 피해가 상태이상 2종 이상 걸린 적에게 +${Math.round(STATUS.syn.mixer*100*(a.syMixer+1))}% (파티가 건 것 전부 셈)`,
    f:a=>a.syMixer++},
 
-  /* ===== 회수: 농사 짓고 필살기로 거둔다 (원소 보유 시에만) — 기폭은 황금 등급 ===== */
+  /* ===== 회수: 농사 짓고 필살기로 거둔다 (원소 보유 시에만) — 기폭은 황금 희귀도 ===== */
   {id:'detona', n:'기폭', max:2, r:3, when:'필살기', ok:()=>allies.some(x=>x.elFire||x.elPois),
    d:a=>`이 무기의 필살기에 맞은 적의 화상·중독을 소모해 터뜨린다 — 남은 지속 피해 × ${Math.round((STATUS.syn.detBase+STATUS.syn.detPerLv*(a.syDeton+1))*100)}% × 걸린 상태이상 종류 수(최대 4)를 즉시 피해로`,
    f:a=>a.syDeton++},
