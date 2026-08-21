@@ -55,7 +55,7 @@ function beginWave(){
   curWave=waveSpec(waveIdx);
   waveT=0; spawnT=0; waveSpawned=0; waveKills=0; mobs=[]; G._boss=0;
   aliveTxt.textContent=curWave.count+(curWave.boss?1:0);
-  waveNum.textContent=waveIdx+1; waveNum.classList.add('live');
+  waveNum.textContent=fmtWave(waveIdx+1); waveNum.classList.add('live');
   waveTitle.textContent=curWave.title; statusTxt.textContent='교전 중';
   phase='fight'; running=true;
 }

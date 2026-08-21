@@ -75,9 +75,11 @@ const driver = `
 ;(function(){
   const out = [];
   out.push('waveCount 1/4/8/12/16: ' + [0,3,7,11,15].map(waveCount).join('/'));
-  out.push('무한 스펙: ' + (waveCount(16)===waveCount(15) && waveCount(40)===waveCount(15)
-    && waveSpec(16).title==='끝없는 물결 1' && waveSpec(19).boss && !waveSpec(16).boss
-    ? 'OK (마릿수 캡·이름·대장 주기)' : 'WRONG'));
+  out.push('무한 스테이지: ' + (waveCount(16)===waveCount(0) && waveCount(31)===waveCount(15)
+    && waveSpec(16).title===WAVE_TITLES[0] && waveSpec(19).boss && !waveSpec(16).boss
+    && waveSpec(17).mix.length===1 && waveSpec(20).mix.length===3
+    && fmtWave(16)==='16' && fmtWave(17)==='2-1' && fmtWave(32)==='2-16'
+    ? 'OK (패턴 반복·구성 리셋·표기·대장 주기)' : 'WRONG'));
 
   let ultFired = 0;
   function playRun(tag){

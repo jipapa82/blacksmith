@@ -21,10 +21,10 @@ function showEnd(win){
   META.pts+=pts; META.gold+=banked; saveMeta();
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='ov';
   ov.innerHTML=`<div class="big ${win?'win':'lose'}">${win?'귀환':'전멸'}</div>
-    <div class="ov-sub">${win?`웨이브 ${cleared}까지 밀어내고 ${G.kills}마리를 정리했다. 용병 ${surv}명이 돌아왔다.`
-      :`웨이브 ${waveIdx+1}, ${G.kills}마리째에서 무너졌다. 장비는 회수했다.`}</div>
+    <div class="ov-sub">${win?`웨이브 ${fmtWave(cleared)}까지 밀어내고 ${G.kills}마리를 정리했다. 용병 ${surv}명이 돌아왔다.`
+      :`웨이브 ${fmtWave(waveIdx+1)}, ${G.kills}마리째에서 무너졌다. 장비는 회수했다.`}</div>
     <div class="loot">스탯 포인트 +${pts} (보유 ${META.pts}) · 골드 +${banked} → 금고 ${META.gold}
-      · 최고 웨이브 ${META.best}${rec?' — <b style="color:var(--heat)">신기록</b>':''}</div>
+      · 최고 웨이브 ${fmtWave(META.best)}${rec?' — <b style="color:var(--heat)">신기록</b>':''}</div>
     <div class="ov-sub" style="color:#5C636D">포인트는 대장간에서 무기 노드에 영구히 새긴다. 남은 골드는 금고로 회수된다.<br>
       카드와 보석은 이 런과 함께 사라진다.</div>
     <div class="ov-row">
@@ -51,7 +51,7 @@ function reset(){
   goldTxt.textContent='0'; killTxt.textContent='0'; aliveTxt.textContent='0';
   lvTxt.textContent='1'; gemTxt.textContent='0';
   waveNum.textContent='0'; waveNum.classList.remove('live');
-  document.getElementById('waveMeta').textContent=META.best>0?'웨이브 · 최고 '+META.best:'웨이브';
+  document.getElementById('waveMeta').textContent=META.best>0?'웨이브 · 최고 '+fmtWave(META.best):'웨이브';
   waveTitle.textContent='출정 대기'; statusTxt.textContent='준비';
   timeFill.style.width='0%'; xpFill.style.width='0%';
   document.getElementById('crew').innerHTML=''; renderCrew();
