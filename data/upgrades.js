@@ -34,7 +34,7 @@ const UP=[
   {id:'pierce',n:'꿰뚫는 촉',   max:4, r:1, when:'기본 공격', ok:a=>a.trait==='shoot',
    d:a=>`화살 한 발이 ${a.pierce+2}명을 꿰뚫는다 — 한 명 뚫을 때마다 피해가 62%로 준다`, f:a=>a.pierce++},
   {id:'twin',  n:'쌍촉 화살',   max:3, r:1, when:'기본 공격', ok:a=>a.trait==='shoot',
-   d:a=>`화살을 ${a.arrows+1}줄로 쏜다 — 줄당 피해는 나뉘고 총합은 +20%씩 는다`, f:a=>a.arrows++},
+   d:a=>`부채꼴로 ${a.arrows+1}발을 쏜다 — 발당 피해는 나뉘고 총합은 +20%씩 는다`, f:a=>a.arrows++},
   {id:'broad', n:'넓은 화살촉', max:4, r:1, when:'상시', ok:a=>a.trait==='shoot',
    d:a=>`화살 판정 폭 +25% (현재 ${Math.round(a.pierceW)})`, f:a=>a.pierceW*=1.25},
   {id:'sweep', n:'긴 휘두름',   max:5, r:1, when:'상시', ok:a=>a.trait==='cleave',

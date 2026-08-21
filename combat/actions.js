@@ -102,34 +102,33 @@ function ultimate(a,isEcho){
   }
   return true;
 }
-/* 활 사격 한 발 — 기본 공격과 필살기 '질풍 연사'가 공유한다.
-   isUlt=true면 발마다 필살기 판정(기폭·추수 적용). */
+/* 활 사격 한 발 — 논타겟 부채꼴 (2026-08-21): 가장 붐비는 쪽을 조준해 쏘고,
+   각 화살의 경로에 있는 놈이 맞는다. 조준은 하되 유도는 없다 (유도 화살은 후일 카드 후보).
+   기본 공격과 필살기 '질풍 연사'가 공유 — isUlt=true면 발마다 필살기 판정(기폭·추수 적용). */
 function bowShot(a,isUlt){
-  const live=mobs.filter(m=>m.hp>0);
+  const live=mobs.filter(m=>m.hp>0&&m.x>a.x);
   if(!live.length)return;
-  const rows=[];
-  for(let i=0;i<a.arrows;i++){
-    let best=null,bn=-1;
-    live.forEach(m=>{ if(m.x<=a.x)return;
-      if(rows.some(y=>Math.abs(y-m.y)<a.pierceW))return;
-      const n=live.filter(o=>Math.abs(o.y-m.y)<a.pierceW&&o.x>a.x).length;
-      if(n>bn){bn=n;best=m;} });
-    if(!best)break;
-    rows.push(best.y);
-  }
-  if(!rows.length)return;
-  a.lung=.1;
-  // 줄이 늘면 줄당 피해를 나눈다(총합 +20%씩), 관통은 한 명 뚫을 때마다 62%로 (DESIGN 7.1)
+  let aim=null,bn=-1;                          // 조준점 — 가장 붐비는 곳
+  live.forEach(m=>{const n=live.filter(o=>Math.hypot(o.x-m.x,o.y-m.y)<70).length;
+    if(n>bn){bn=n;aim=m;}});
+  const base=Math.atan2(aim.y-a.y,aim.x-a.x);
+  // 발이 늘면 발당 피해를 나눈다(총합 +20%씩), 관통은 한 명 뚫을 때마다 62%로 (DESIGN 7.1)
   const rowMul = a.arrows>1 ? (1+.2*(a.arrows-1))/a.arrows : 1;
-  rows.forEach(y=>{
-    // 가까운 순으로 정렬해 관통 수만큼만 맞춘다
-    const line=live.filter(m=>Math.abs(m.y-y)<a.pierceW&&m.x>a.x)
-                   .sort((p,q)=>p.x-q.x);
-    const hits=line.slice(0, 1+a.pierce);
-    const endX = hits.length ? hits[hits.length-1].x+14 : W;
-    beam(a.x+12,a.y,endX,y,elemColor(a)||'#6FC9CE',isUlt?3.5:2.5);
-    hits.forEach((m,i)=>hurtMob(m,atkOf(a)*rowMul*Math.pow(.62,i),a,isUlt));
-  });
+  const SPREAD=.13;                            // 부채꼴 발 간격 (라디안, 약 7.5°)
+  a.lung=.1;
+  for(let i=0;i<a.arrows;i++){
+    const th=base+(i-(a.arrows-1)/2)*SPREAD;
+    const cs=Math.cos(th), sn=Math.sin(th);
+    const hits=live.map(m=>{
+        const dx=m.x-a.x, dy=m.y-a.y;
+        return {m, t:dx*cs+dy*sn, off:Math.abs(dy*cs-dx*sn)};   // 경로 진행거리 / 수직 거리
+      }).filter(h=>h.t>10&&h.off<a.pierceW&&h.m.hp>0)
+      .sort((p,q)=>p.t-q.t)
+      .slice(0,1+a.pierce);
+    const end=hits.length?hits[hits.length-1].t+14:W;           // 마지막 명중 지점까지 (표시=판정, 7.2)
+    beam(a.x+12*cs,a.y+12*sn,a.x+end*cs,a.y+end*sn,elemColor(a)||'#6FC9CE',isUlt?3.5:2.5);
+    hits.forEach((h,j)=>hurtMob(h.m,atkOf(a)*rowMul*Math.pow(.62,j),a,isUlt));
+  }
 }
 
 function allyAct(a){

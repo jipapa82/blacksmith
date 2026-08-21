@@ -16,7 +16,7 @@ const EQUIP={
           shape:'sq', color:'#8FBF6A', elems:['cold','shock'],
           enh:{atk:1,hp:10,def:1},
           ultName:'방패 밀치기', ultDesc:'적을 뒤로 밀어내고 잠시 굳힌다', ultCd:8},
-  bow:   {name:'사냥 활',    atk:13,def:1,hp:40, spd:1.30,trait:'shoot', desc:'가장 붐비는 줄로 화살을 쏜다',
+  bow:   {name:'사냥 활',    atk:13,def:1,hp:40, spd:1.30,trait:'shoot', desc:'가장 붐비는 쪽으로 부채꼴 화살을 쏜다 — 경로에 있는 놈이 맞는다',
           shape:'dia',color:'#6FC9CE', elems:['fire','pois'],
           enh:{atk:1,aspd:.03,critD:.03,hp:2},
           ultName:'질풍 연사', ultDesc:'숨을 몰아쉬며 시위를 폭풍처럼 당긴다', ultCd:8},
