@@ -1,6 +1,8 @@
 /* ===================== 행동: 필살기 / 기본 공격 / 적 이동 =====================
    규칙: 이펙트가 그려지는 그 좌표, 그 시점에만 판정한다. (DESIGN 7.2)
-   setTimeout으로 연출을 나눴다면 피해 계산도 그 안에 넣는다. */
+   연출 지연은 실제 시간이 아니라 게임 시간으로 — 레벨업 일시정지 중엔 멈췄다가 이어진다. */
+let delayed=[];                                  // 게임 시간 지연 실행 큐 — wave.js의 step이 돌린다
+function after(ms,fn){ delayed.push({t:ms/1000,fn}); }
 
 /* 대검의 타격 앵커 — 뒷줄이면 전선 기준. 공격·필살기·범위 표시가 모두 이걸 쓴다 (7.2: 표시=판정) */
 function cleaveAnchor(a){
@@ -45,8 +47,13 @@ function ultimate(a,isEcho){
   if(!live.length)return false;
   const P=a.ultPow;
   shake=6; sfx('ult');
-  /* 이중 오의 — 잇달아 한 번 더 (쿨타임 페널티는 카드가 ultCd에 반영, DESIGN 4.1.2) */
-  if(a.dblUlt&&!isEcho) setTimeout(()=>{ if(running&&a.hp>0) ultimate(a,true); },450);
+  /* 이중 오의 — 첫 발동의 연출이 끝난 뒤에 한 번 더 (활 연사는 볼리 종료 후 0.25초).
+     겹쳐 쏘면 "두 번"이 아니라 "길어진 한 번"으로 읽힌다 (DESIGN 4.1.2, 7.2) */
+  if(a.dblUlt&&!isEcho){
+    const gap=a.trait==='shoot'?(5+2*a.ultRank)*110+250
+             :a.trait==='blast'?550:450;
+    after(gap,()=>{ if(a.hp>0) ultimate(a,true); });
+  }
   if(a.gm.auraHaste)hasteT=AURA.emerald.hasteDur;   // 질풍의 오라 (최종 에메랄드)
 
   if(a.trait==='assassin'){                    // 급소 찌르기 — 침투자 중 최대 체력 대상 일격
@@ -62,12 +69,11 @@ function ultimate(a,isEcho){
     const an=cleaveAnchor(a), ax=an.ux, ay=an.uy;
     for(let i=0;i<3;i++){
       const cx=ax+i*70;
-      setTimeout(()=>{
-        if(!running)return;
+      after(i*90,()=>{
         ring(cx,ay,R,elemColor(a)||'#E8963C',2);
         mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-ay)<R)
             .forEach(m=>hurtMob(m,atkOf(a)*0.9*P,a,true));
-      },i*90);
+      });
     }
   }
   else if(a.trait==='wall'){                   // 방패 밀치기 — 근처만
@@ -81,18 +87,17 @@ function ultimate(a,isEcho){
   else if(a.trait==='shoot'){                  // 질풍 연사 — 순간적으로 공속을 몰아쓴다
     const n=5+2*a.ultRank;                     // 연마 랭크당 +2발: 5/7/9/11 (DESIGN 4.5)
     for(let i=0;i<n;i++)
-      setTimeout(()=>{ if(running) bowShot(a,true); }, i*110);
+      after(i*110,()=>bowShot(a,true));
   }
   else if(a.trait==='blast'){                  // 불바다 — 앞쪽 절반, 순차 폭발
     const x0=a.x+120, R=115*a.ultR;
     for(let i=0;i<4;i++){
       const cx=x0+i*135;
-      setTimeout(()=>{
-        if(!running)return;
+      after(i*100,()=>{
         ring(cx,MID_Y,R,elemColor(a)||'#9B8ACB',2.2);
         mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-MID_Y)<R)
             .forEach(m=>hurtMob(m,atkOf(a)*0.85*P,a,true));
-      },i*100);
+      });
     }
   }
   return true;
@@ -156,7 +161,7 @@ function allyAct(a){
     a.lung=.14;
     strike(1,elemColor(a)||'#E8963C');
     for(let c=1;c<=a.clones;c++)                                  // 그림자 분신 — 시차를 두고 따라 친다 (7.2)
-      setTimeout(()=>{ if(running&&a.hp>0) strike(.3,'#77808C'); },c*120);
+      after(c*120,()=>{ if(a.hp>0) strike(.3,'#77808C'); });
   }else if(a.trait==='cleave'){
     // 뒷줄이면 전선 너머로 내려친다 — 방패가 세우고 대검이 부순다 (DESIGN 3.3)
     const an=cleaveAnchor(a);

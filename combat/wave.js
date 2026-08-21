@@ -4,6 +4,12 @@
 function step(dt){
   const w=curWave;
   waveT+=dt;
+  if(delayed.length){                            // 게임 시간 지연 실행 — 일시정지 중엔 멈춰 있다 (7.2)
+    delayed.forEach(d=>d.t-=dt);
+    const due=delayed.filter(d=>d.t<=0);
+    delayed=delayed.filter(d=>d.t>0);
+    due.forEach(d=>d.fn());
+  }
   const total=w.count+(w.boss?1:0);
   timeFill.style.width=Math.min(100,waveKills/total*100)+'%';
   if(waveSpawned<w.count){
@@ -59,6 +65,7 @@ function step(dt){
 function beginWave(){
   curWave=waveSpec(waveIdx);
   waveT=0; spawnT=0; waveSpawned=0; waveKills=0; mobs=[]; G._boss=0;
+  delayed=[];                                    // 지난 웨이브의 연출 지연은 버린다
   aliveTxt.textContent=curWave.count+(curWave.boss?1:0);
   waveNum.textContent=fmtWave(waveIdx+1); waveNum.classList.add('live');
   waveTitle.textContent=curWave.title; statusTxt.textContent='교전 중';
