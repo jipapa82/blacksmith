@@ -162,18 +162,23 @@ function allyAct(a){
     a.lung=.14; slashFx(t.x,t.y,elemColor(a)||'#E8963C'); hurtMob(t,atkOf(a),a);
   }else if(a.trait==='assassin'){
     // 침투자·대장에겐 암살 일격, 아니면 무리를 질주하며 독을 바르고 온다 (DESIGN 3.3)
-    // mult<1이면 그림자 분신의 공격 — 피해만 줄고 독은 온전히 발린다
-    const strike=(mult,C)=>{
+    // shadow=true면 그림자 분신 — 피해만 줄고(30%) 독은 온전히, 그리고 서로 다른 길로 간다
+    const strike=(mult,C,shadow)=>{
       const live2=mobs.filter(m=>m.hp>0);
       if(!live2.length)return;
       const infil=live2.filter(behindLine).sort((p,q)=>p.x-q.x);
       const mark=infil[0]||live2.find(m=>m.type==='boss');
+      const sx=a.x+(shadow?(Math.random()*2-1)*26:0),             // 분신은 다른 자리에서 튀어나온다
+            sy=a.y+(shadow?(Math.random()*2-1)*30:0);
       if(mark){
-        beam(a.x,a.y,mark.x,mark.y,C,1.5); slashFx(mark.x,mark.y,C);
-        hurtMob(mark,atkOf(a)*a.ambush*mult,a);   // 암살 일격 ('기습' 카드로 강화)
+        beam(sx,sy,mark.x,mark.y,C,1.5); slashFx(mark.x,mark.y,C);
+        hurtMob(mark,atkOf(a)*a.ambush*mult,a);   // 암살 일격 ('기습' 카드로 강화) — 표적은 같다
       }else{
-        const path=live2.slice().sort((p,q)=>p.x-q.x).slice(0,a.dashN);   // 가까운 쪽부터 질주 — 기본 3, '이어지는 질주'로 +2씩
-        let px=a.x, py=a.y;
+        let path=live2.slice();
+        if(shadow) path.sort(()=>Math.random()-.5);               // 분신은 서로 다른 길로 질주 — 도포가 넓어진다
+        else path.sort((p,q)=>p.x-q.x);                           // 본체는 가까운 쪽부터
+        path=path.slice(0,a.dashN);
+        let px=sx, py=sy;
         path.forEach(m=>{ beam(px,py,m.x,m.y,C,1.2); slashFx(m.x,m.y,C);
           hurtMob(m,atkOf(a)*.5*mult,a); px=m.x; py=m.y; });      // 얕게 베어 독만 바른다
       }
@@ -181,7 +186,7 @@ function allyAct(a){
     a.lung=.14;
     strike(1,elemColor(a)||'#E8963C');
     for(let c=1;c<=a.clones;c++)                                  // 그림자 분신 — 시차를 두고 따라 친다 (7.2)
-      after(c*120,()=>{ if(a.hp>0) strike(.3,'#77808C'); });
+      after(c*120,()=>{ if(a.hp>0) strike(.3,'#77808C',true); });
   }else if(a.trait==='cleave'){
     // 뒷줄이면 전선 너머로 내려친다 — 방패가 세우고 대검이 부순다 (DESIGN 3.3)
     const an=cleaveAnchor(a);
