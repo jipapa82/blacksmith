@@ -9,7 +9,7 @@ const EQUIP={
           shape:'tri',color:'#6FC9CE', elems:['pois'],
           enh:{atk:1,aspd:.04,crit:.005,hp:3},
           ultName:'급소 찌르기', ultDesc:'가장 단단한 침투자의 약점을 노린다', ultCd:8},
-  great: {name:'무딘 대검',  atk:30,def:3,hp:64, spd:0.50,trait:'cleave',desc:'뒷줄에서는 전선 너머로 내려쳐 무리를 부순다',
+  great: {name:'무딘 대검',  atk:30,def:3,hp:64, spd:0.50,trait:'cleave',desc:'광역 — 타격 지대(주황 점선 원, 반경 56) 안의 모든 적을 친다. 뒷줄이면 전선 너머를 내려친다',
           shape:'tri',color:'#6FC9CE', elems:['shock'],
           enh:{atk:2,hp:6,def:1},
           ultName:'내려찍기', ultDesc:'땅을 갈라 앞을 쓸어버린다', ultCd:9},

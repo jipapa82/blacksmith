@@ -26,7 +26,9 @@ function draw(dt){
     ctx.setLineDash([4,7]);ctx.lineWidth=1.5;
     if(a.trait==='cleave'){
       const an=cleaveAnchor(a);
-      ctx.strokeStyle='rgba(232,150,60,.15)';
+      ctx.fillStyle='rgba(232,150,60,.05)';                 // 타격 지대 — 옅은 채움 + 점선 (0.15는 안 보였다)
+      ctx.beginPath();ctx.arc(an.x,an.y,a.cleaveR,0,6.283);ctx.fill();
+      ctx.strokeStyle='rgba(232,150,60,.35)';
       ctx.beginPath();ctx.arc(an.x,an.y,a.cleaveR,0,6.283);ctx.stroke();
       if(a.ultT>=a.ultCd){
         ctx.strokeStyle='rgba(232,150,60,.3)';
