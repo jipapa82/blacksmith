@@ -3,9 +3,11 @@
    행동이 다르므로 "탱커만 단단하면 끝"이 되지 않는다. (DESIGN 3.4) */
 /* 공격력 약 -40% (2026-08-21) — 뒷줄이 한 번에 삭제되면 대처가 아니라 복권이다.
    피는 천천히 빠져야 손이 나간다 (DESIGN 8.2 압박의 분업). 대신 웨이브 성장 +4%→+6%. */
+/* 골드 인하 (2026-08-21): 2·3·3·40 → 1·2·2·25 — 강화 경제 도입 후 한 판 수입이 과했다.
+   고용이냐 저축(강화)이냐가 다시 아까운 선택이 되게. */
 const FOE={
-  rush:   {name:'돌격병',hp:26, atk:5, def:1,mv:34,aspd:1.0, r:9, color:'#C4574F',behav:'wall', gold:2, xp:2},
-  breaker:{name:'돌파병',hp:20, atk:7, def:0,mv:62,aspd:1.1, r:8, color:'#E8963C',behav:'leak', gold:3, xp:3},
-  archer: {name:'궁수',  hp:18, atk:5, def:0,mv:30,aspd:0.7, r:8, color:'#9B8ACB',behav:'range',gold:3, xp:3},
-  boss:   {name:'대장',  hp:230,atk:15,def:5,mv:20,aspd:0.55,r:17,color:'#8B4A44',behav:'wall', gold:40,xp:30},
+  rush:   {name:'돌격병',hp:26, atk:5, def:1,mv:34,aspd:1.0, r:9, color:'#C4574F',behav:'wall', gold:1, xp:2},
+  breaker:{name:'돌파병',hp:20, atk:7, def:0,mv:62,aspd:1.1, r:8, color:'#E8963C',behav:'leak', gold:2, xp:3},
+  archer: {name:'궁수',  hp:18, atk:5, def:0,mv:30,aspd:0.7, r:8, color:'#9B8ACB',behav:'range',gold:2, xp:3},
+  boss:   {name:'대장',  hp:230,atk:15,def:5,mv:20,aspd:0.55,r:17,color:'#8B4A44',behav:'wall', gold:25,xp:30},
 };

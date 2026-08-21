@@ -73,7 +73,7 @@ const UP=[
    d:a=>`이 무기가 새로 거는 화상·중독의 초당 피해 +${Math.round(STATUS.syn.dotAmp*100*(a.syDotamp+1))}%`,
    f:a=>a.syDotamp++},
   {id:'reso', n:'공명 파열', max:2, r:2, when:'처치 시', ok:()=>allies.some(x=>x.elShock),
-   d:a=>`이 무기로 공명 중인 적을 처치하면 폭발 — 주위 70 안에 이 무기 공격력의 ${Math.round(STATUS.syn.resoPct*100*(a.syReso+1))}% 피해 + 공명 전파 (누가 걸었든)`,
+   d:a=>`이 무기로 공명 중인 적을 처치하면 폭발 — 주위 70 안에 이 무기 공격력의 ${Math.round(STATUS.syn.resoPct*100*(a.syReso+1))}% 피해 + 공명 전파 4마리 (누가 걸었든, 연쇄마다 폭발 55%로 감쇠)`,
    f:a=>a.syReso++},
   {id:'mixer', n:'원소 공진', max:2, r:2, when:'상시',
    ok:()=>{const s=new Set();

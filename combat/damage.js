@@ -1,4 +1,5 @@
 /* ===================== 피해 처리 ===================== */
+let _resoDepth=0;   // 공명 파열 연쇄 깊이 — 연쇄마다 폭발 피해 ×0.55 (7.1 연쇄 폭발 규칙)
 function killMob(m,src){
   burst(m.x,m.y,m.color); sfx('kill');
   G.kills++; waveKills++; killTxt.textContent=G.kills;
@@ -23,11 +24,17 @@ function killMob(m,src){
         o.burn={t:STATUS.burn.dur, dps:m.burn.dps, pt:o.burn?o.burn.pt:0, src}; });
     }
     if(src.syReso&&m.shockT>0){                      // 공명 파열: 공명 중 처치 → 폭발·전파
+      // 감쇠 없는 폭발 연쇄는 전멸기였다 (2026-08-21) — 연쇄마다 ×0.55, 전파는 4마리까지 (7.1)
+      const mul=Math.pow(.55,_resoDepth);
       ring(m.x,m.y,STATUS.syn.resoR,'#9B8ACB',1.6);
+      _resoDepth++;
+      let spread=0;
       mobs.forEach(o=>{ if(o.hp>0&&o!==m&&Math.hypot(o.x-m.x,o.y-m.y)<STATUS.syn.resoR){
-        hurtMob(o,atkOf(src)*STATUS.syn.resoPct*src.syReso,src);
-        if(o.hp>0){o.shockT=STATUS.shock.dur[0];o.shockLv=Math.max(o.shockLv,1);
+        hurtMob(o,atkOf(src)*STATUS.syn.resoPct*src.syReso*mul,src);
+        if(o.hp>0&&spread<4){spread++;
+          o.shockT=STATUS.shock.dur[0];o.shockLv=Math.max(o.shockLv,1);
           o.shockAmp=Math.max(o.shockAmp,STATUS.shock.amp[0]);} } });
+      _resoDepth--;
     }
   }
 }
