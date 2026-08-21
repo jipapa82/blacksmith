@@ -37,7 +37,7 @@ function drawCards(cards,onPick){
     const el=document.createElement('div');
     el.className='card '+cls;
     el.innerHTML=`<div class="target">${weaponIcon(c.a.key)}${c.a.eq}</div>
-      <div class="cname">${c.u.n} <span class="lvtag">${next}단계</span></div>
+      <div class="cname">${c.u.n} <span class="lvtag">${next}단계</span>${c.u.when?`<span class="when-tag">${c.u.when}</span>`:''}</div>
       <div class="pips">${pips}</div>
       <div class="cdesc">${c.u.d(c.a,cur)}</div>
       <div class="crar">${RAR[c.u.r]} · 최대 ${max}단계</div>`;
