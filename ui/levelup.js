@@ -9,8 +9,10 @@ function pickCards(){
     while(tries++<120){
       /* 황금은 5웨이브부터 웨이브당 +0.3%p, 최대 3% — 빌드 정의 카드는 벌어서 만난다 (DESIGN 4.1.1) */
       const goldP=Math.min(.03,Math.max(0,waveIdx-3)*.003);
+      /* 희귀 드로우트 천장 — 희귀 없는 드래프트마다 다음 희귀 확률 +15%p, 등장하면 초기화 (DESIGN 4.1) */
+      const rareP=Math.min(.75,.30+.15*(G.rareDry||0));
       const r=Math.random();
-      const rar=r<goldP?3:r<goldP+.09?2:r<goldP+.39?1:0;   // 황금 / 전설 9% / 희귀 30% / 나머지 일반
+      const rar=r<goldP?3:r<goldP+.09?2:r<goldP+.09+rareP?1:0;   // 황금 / 전설 9% / 희귀(천장) / 나머지 일반
       const cands=UP.filter(u=>u.r===rar&&!used.has(u.id));
       if(!cands.length)continue;
       const u=cands[Math.floor(Math.random()*cands.length)];
@@ -20,19 +22,9 @@ function pickCards(){
     }
     if(c){used.add(c.id); out.push({u:c,a:tgt});}
   }
-  /* 희귀 이상 1장 보장 (DESIGN 4.1) — 원소가 보석으로 간 뒤 일반은 조용한 카드뿐이라,
-     일반만 4장이면 화면이 달라지는 선택지가 없다. 황금은 램프 규칙 유지를 위해 제외 */
-  if(out.length&&!out.some(c=>c.u.r>=1)){
-    for(let tries=0;tries<60;tries++){
-      const rar=Math.random()<.8?1:2;
-      const cands=UP.filter(u=>u.r===rar&&!out.some(o=>o.u.id===u.id));
-      if(!cands.length)continue;
-      const u=cands[Math.floor(Math.random()*cands.length)];
-      const valid=live.filter(a=>u.ok(a)&&lvOf(a,u.id)<u.max);
-      if(!valid.length)continue;
-      out[out.length-1]={u,a:valid[Math.floor(Math.random()*valid.length)]};
-      break;
-    }
+  if(out.length){                                  // 드로우트 천장 갱신
+    if(out.some(c=>c.u.r>=1)) G.rareDry=0;
+    else G.rareDry=(G.rareDry||0)+1;
   }
   return out;
 }
