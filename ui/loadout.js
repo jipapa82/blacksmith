@@ -22,6 +22,25 @@ function elemChoices(key){
     `<span style="color:${ELEM_INFO[e][1]}">● ${ELEM_INFO[e][0]}</span>`).join(' ');
 }
 
+/* 필살기 정확 설명 — 수치는 combat/actions.js ultimate()와 동기 (바꾸면 여기도, 7.2 표시=판정) */
+function ultHead(k){
+  const mm=metaMods(k);
+  return EQUIP[k].trait==='shoot'
+    ? `연사 ${5+2*mm.ultRank}발 · 쿨 ${EQUIP[k].ultCd}초`
+    : `위력 ${Math.round(mm.ultPow*100)}% · 쿨 ${EQUIP[k].ultCd}초`;
+}
+function ultDescOf(k){
+  const mm=metaMods(k), p=x=>Math.round(x*mm.ultPow*100);
+  switch(EQUIP[k].trait){
+    case 'assassin': return `침투자 중 최대 체력의 적을 일격 — 공격력의 ${p(6)}%. 침투자가 없으면 전장 최대 체력을 노린다`;
+    case 'cleave':   return `전선 앞으로 3연타 — 타당 공격력의 ${p(.9)}%, 반경 90`;
+    case 'wall':     return `주위 135 안의 적에게 공격력의 ${p(2)}% 피해 + 50 밀치기 + 1.3초 경직`;
+    case 'shoot':    return `기본 사격(부채꼴·카드 반영)을 연달아 — 발마다 필살 판정(기폭·추수 적용)`;
+    case 'blast':    return `앞쪽으로 4연폭 — 폭당 공격력의 ${p(.85)}%, 반경 115`;
+  }
+  return '';
+}
+
 const mercList=document.getElementById('mercList');
 function renderLoadout(){
   mercList.innerHTML='';
@@ -38,6 +57,8 @@ function renderLoadout(){
       <div class="derived"><span>공 <b>${e.atk}</b></span><span>방 <b>${e.def}</b></span>
         <span>체 <b>${e.hp}</b></span><span>속 <b>${e.spd.toFixed(2)}</b></span></div>
       <div class="trait-note">${e.desc}</div>
+      <div class="trait-note" style="color:var(--heat)">필살 · ${e.ultName} — ${ultHead(k)}</div>
+      <div class="trait-note">${ultDescOf(k)}</div>
       <div class="derived">원소 ${elemChoices(k)}</div>
       ${bad?`<div class="warn-note">${e.trait==='assassin'?'앞줄에 서면 지킬 후미가 없다':'앞줄에 세우면 둘러싸인다'}</div>`:''}
       ${bad2?'<div class="warn-note">뒷줄에서는 막을 것이 없다</div>':''}`;
