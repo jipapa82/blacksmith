@@ -75,7 +75,7 @@ function ultimate(a,isEcho){
     ring(a.x,a.y,R,elemColor(a)||'#8FBF6A',2.5);
     live.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<R).forEach(m=>{
       hurtMob(m,atkOf(a)*2.0*P,a,true);
-      m.x+=80; m.stun=1.3;
+      m.x+=50; m.stun=1.3;             // 밀치기 80→50 (2026-08-21) — 광역 밀침+경직이라 과했다
     });
   }
   else if(a.trait==='shoot'){                  // 질풍 연사 — 순간적으로 공속을 몰아쓴다
