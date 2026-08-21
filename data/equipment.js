@@ -4,7 +4,8 @@
 /* elems: 이 무기에 부여할 수 있는 원소 — 설정이 어색한 조합은 아예 못 붙는다 (DESIGN 4.1.1)
    enh: 강화 1강당 오르는 스탯 — 무기의 성격을 따른다. 키: atk/aspd/hp/def/crit/critD (DESIGN 4.5) */
 const EQUIP={
-  sword: {name:'낡은 단검',  atk:15,def:1,hp:46, spd:1.25,trait:'assassin', desc:'무리를 질주하며 독을 바르고, 침투자와 대장은 일격에 벤다',
+  sword: {name:'낡은 단검',  atk:15,def:1,hp:46, spd:0.8,trait:'assassin', desc:'무리를 질주하며 독을 바르고, 침투자와 대장은 일격에 벤다',
+          /* 공속 1.25→0.8 (2026-08-21): 다타+독 도포가 겹쳐 오버스펙 — 질주 순차화와 세트 인하 */
           shape:'tri',color:'#6FC9CE', elems:['pois'],
           enh:{atk:1,aspd:.04,crit:.005,hp:3},
           ultName:'급소 찌르기', ultDesc:'가장 단단한 침투자의 약점을 노린다', ultCd:8},

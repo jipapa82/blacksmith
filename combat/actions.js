@@ -178,9 +178,13 @@ function allyAct(a){
         if(shadow) path.sort(()=>Math.random()-.5);               // 분신은 서로 다른 길로 질주 — 도포가 넓어진다
         else path.sort((p,q)=>p.x-q.x);                           // 본체는 가까운 쪽부터
         path=path.slice(0,a.dashN);
-        let px=sx, py=sy;
-        path.forEach(m=>{ beam(px,py,m.x,m.y,C,1.2); slashFx(m.x,m.y,C);
-          hurtMob(m,atkOf(a)*.5*mult,a); px=m.x; py=m.y; });      // 얕게 베어 독만 바른다
+        path.forEach((m,i)=>{                                     // 한 명 벨 때마다 0.2초 뒤 다음으로 —
+          after(i*200,()=>{                                       // 한 번에 다 베면 전파가 안 보인다 (7.5)
+            const from=i===0?{x:sx,y:sy}:path[i-1];
+            beam(from.x,from.y,m.x,m.y,C,1.2); slashFx(m.x,m.y,C);
+            if(m.hp>0) hurtMob(m,atkOf(a)*.5*mult,a);             // 얕게 베어 독만 바른다
+          });
+        });
       }
     };
     a.lung=.14;
