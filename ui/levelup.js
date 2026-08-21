@@ -7,7 +7,10 @@ function pickCards(){
   for(let i=0;i<4;i++){      // 4택 고정 (DESIGN 4.1) — N+1 규칙은 비교 피로로 폐기
     let tries=0, c=null, tgt=null;
     while(tries++<120){
-      const r=Math.random(); const rar=r<.58?0:r<.88?1:r<.97?2:3;   // 일반/희귀/전설/황금
+      /* 황금은 5웨이브부터 웨이브당 +0.3%p, 최대 3% — 빌드 정의 카드는 벌어서 만난다 (DESIGN 4.1.1) */
+      const goldP=Math.min(.03,Math.max(0,waveIdx-3)*.003);
+      const r=Math.random();
+      const rar=r<goldP?3:r<goldP+.09?2:r<goldP+.39?1:0;   // 황금 / 전설 9% / 희귀 30% / 나머지 일반
       const cands=UP.filter(u=>u.r===rar&&!used.has(u.id));
       if(!cands.length)continue;
       const u=cands[Math.floor(Math.random()*cands.length)];
