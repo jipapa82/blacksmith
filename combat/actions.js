@@ -142,7 +142,7 @@ function allyAct(a){
       a.lung=.14; beam(a.x,a.y,mark.x,mark.y,C,1.5); slashFx(mark.x,mark.y,C);
       hurtMob(mark,atkOf(a)*a.ambush,a);       // 암살 일격 ('기습' 카드로 강화)
     }else{
-      const path=live.slice().sort((p,q)=>p.x-q.x).slice(0,4);   // 가까운 쪽부터 최대 4명 질주
+      const path=live.slice().sort((p,q)=>p.x-q.x).slice(0,a.dashN);   // 가까운 쪽부터 질주 — 기본 3, '이어지는 질주'로 +2씩
       a.lung=.14;
       let px=a.x, py=a.y;
       path.forEach(m=>{ beam(px,py,m.x,m.y,C,1.2); slashFx(m.x,m.y,C);

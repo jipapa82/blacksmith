@@ -21,7 +21,22 @@ const UP=[
   {id:'repel', n:'밀치는 반격', max:3, r:0, ok:()=>1,
    d:a=>`맞으면 공격자가 ${60*(a.repel+1)}만큼 튕겨나고 공격 충전도 처음부터 — 파고드는 적을 떼어낸다`, f:a=>a.repel++},
 
+  /* ===== 일반 — 스탯 (% 배율 층: 노드=정수 기반, 카드=합산 후 한 번 곱. DESIGN 4.1.1) ===== */
+  {id:'whet',  n:'숫돌질',    max:4, r:0, ok:()=>1,
+   d:a=>`공격력 +12% (카드 합 +${Math.round((a.cardAtkMul-1)*100)}%)`, f:a=>a.cardAtkMul+=.12},
+  {id:'oil',   n:'기름칠',    max:3, r:0, ok:()=>1,
+   d:a=>`공격 속도 +10% (카드 합 +${Math.round((a.cardAspdMul-1)*100)}%)`, f:a=>a.cardAspdMul+=.10},
+  {id:'hone',  n:'날 세우기', max:4, r:0, ok:()=>1,
+   d:a=>`치명타 확률 +5%p (현재 ${Math.round(critOf(a)*100)}%)`, f:a=>a.crit+=.05},
+  {id:'weight',n:'무게 중심', max:3, r:0, ok:()=>1,
+   d:a=>`치명타 피해 +25%p (현재 ${Math.round(a.critD*100)}%)`, f:a=>a.critD+=.25},
+  {id:'plate', n:'덧댄 철판', max:3, r:0, ok:()=>1,
+   d:()=>`최대 체력 +12% — 찍는 즉시 그만큼 회복된다`,
+   f:a=>{const b=maxHpOf(a);a.cardHpMul+=.12;a.hp+=maxHpOf(a)-b;}},
+
   /* ===== 희귀 — 무기 행동 ===== */
+  {id:'dash',  n:'이어지는 질주', max:3, r:1, ok:a=>a.trait==='assassin',
+   d:a=>`질주로 ${a.dashN+2}명을 벤다 — 대상 수가 곧 독 도포량이다`, f:a=>a.dashN+=2},
   {id:'wide',  n:'폭발 확대',   max:5, r:1, ok:a=>a.trait==='blast',
    d:()=>'폭발 반경 +12%', f:a=>a.blastR*=1.12},
   {id:'chain', n:'불티 번짐',   max:3, r:1, ok:a=>a.trait==='blast',

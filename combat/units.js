@@ -7,8 +7,9 @@ function mkAlly(k,i,front){
     maxhp:e.hp+mm.hpAdd, hp:0, aspd:e.spd+mm.aspdAdd, charge:0,
     front, x:front?FRONT_X:BACK_X, y:MID_Y, r:front?18:15, hit:0, lung:0,
     blastR:60, pierceW:14, arrows:1, pierce:0, chain:0, cleaveR:56, thorns:0, blockR:1, range:72,
-    ambush:1.8,                                                    // 암살: 침투자에게 주는 피해 배수
+    ambush:1.8, dashN:3,                                           // 암살: 일격 배수 / 질주 대상 수 ('이어지는 질주')
     leech:0, deathBlast:0, repel:0, crit:.05, critD:1.5,
+    cardAtkMul:1, cardAspdMul:1, cardHpMul:1,                      // 스탯 카드 % 배율 층 (DESIGN 4.1.1)
     elFire:0, elPois:0, elCold:0, elShock:0,                       // 원소 부여 단계
     syShatter:0, syColdcut:0, syFirespread:0, syDotamp:0, syReso:0, syMixer:0,   // 시너지 단계
     syDeton:0, syHarvest:0, syReap:0,                                            // 회수 시너지 (필살기)
@@ -77,12 +78,13 @@ function recalcAuras(){
       else if(s.type==='amethyst')AURA_DEF+=AURA.amethyst.defAdd; }); });
 }
 
-function atkOf(a){ return Math.round(a.atk*a.gm.atkMul*AURA_ATK); }
-function aspdOf(a){ return a.aspd*a.gm.aspdMul*(hasteT>0?1+AURA.emerald.haste:1); }
+/* 최종 스탯 = (기본+노드 정수) × (1+보석 합) × (1+카드 합) × 오라 (DESIGN 4.1.1) */
+function atkOf(a){ return Math.round(a.atk*a.gm.atkMul*a.cardAtkMul*AURA_ATK); }
+function aspdOf(a){ return a.aspd*a.gm.aspdMul*a.cardAspdMul*(hasteT>0?1+AURA.emerald.haste:1); }
 function defOf(a){ return a.def+a.gm.defAdd+AURA_DEF; }
 function critOf(a){ return a.crit+a.gm.critAdd; }
 function dodgeOf(a){ return Math.min(.6,a.gm.dodgeAdd); }
-function maxHpOf(a){ return Math.round(a.maxhp*a.gm.hpMul); }
+function maxHpOf(a){ return Math.round(a.maxhp*a.gm.hpMul*a.cardHpMul); }
 
 /* 자주 쓰는 선택자 */
 const liveAllies=()=>allies.filter(a=>a.hp>0);
