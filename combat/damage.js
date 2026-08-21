@@ -1,6 +1,6 @@
 /* ===================== 피해 처리 ===================== */
 function killMob(m,src){
-  burst(m.x,m.y,m.color);
+  burst(m.x,m.y,m.color); sfx('kill');
   G.kills++; waveKills++; killTxt.textContent=G.kills;
   const g=Math.round(m.gold*G.goldMul);
   G.gold+=g; goldTxt.textContent=G.gold; num(m.x,m.y-4,'+'+g,'#D9B45C');
@@ -84,7 +84,7 @@ function hurtAlly(a,dmg,from){
     ring(from.x,from.y,from.r+10,'#9AD9E8',1.2);
   }
   if(a.hp<=0){
-    burst(a.x,a.y,'#C4574F');shake=8;
+    burst(a.x,a.y,'#C4574F');shake=8; sfx('die');
     if(a.gm.auraRevive&&!a.reviveUsed){a.reviveUsed=true;a.reviveT=AURA.topaz.reviveT;}  // 되살리는 맥박
     layoutAllies();
   }

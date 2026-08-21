@@ -18,7 +18,7 @@ function step(dt){
         if(Math.random()<.7&&waveSpawned<w.count){mobs.push(mkMob(pick));waveSpawned++;}
     }
   }
-  if(w.boss&&!G._boss&&waveSpawned>=w.count*.4){G._boss=1;mobs.push(mkMob('boss'));}
+  if(w.boss&&!G._boss&&waveSpawned>=w.count*.4){G._boss=1;mobs.push(mkMob('boss'));sfx('boss');}
   recalcAuras();                                     // 파티 오라 (최종 루비·자수정)
   if(hasteT>0)hasteT=Math.max(0,hasteT-dt);          // 질풍의 오라
   allies.forEach(a=>{
@@ -57,7 +57,7 @@ function beginWave(){
   aliveTxt.textContent=curWave.count+(curWave.boss?1:0);
   waveNum.textContent=fmtWave(waveIdx+1); waveNum.classList.add('live');
   waveTitle.textContent=curWave.title; statusTxt.textContent='교전 중';
-  phase='fight'; running=true;
+  phase='fight'; running=true; sfx('wave');
 }
 function advance(){
   waveIdx++;             // 상한 없음 — 무한 웨이브. 런의 끝은 전멸 또는 정비 화면의 귀환 (DESIGN 3.7)

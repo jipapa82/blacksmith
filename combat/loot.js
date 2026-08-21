@@ -65,9 +65,9 @@ function dropLoot(m){
   if(m.type==='boss'){
     gainGem(rollGemType(), 1+Math.ceil(waveIdx/5));
     for(let i=1;i<GEM_DROP.bossGems;i++) gainGem(rollGemType(), 1+Math.floor(waveIdx/8));
-    num(m.x,m.y-18,'보석!','#6FC9CE',1);
+    num(m.x,m.y-18,'보석!','#6FC9CE',1); sfx('gem');
   }else if(Math.random()<GEM_DROP.rate){
     gainGem(rollGemType(), 1+(Math.random()<waveIdx*GEM_DROP.gradeUpPerWave?1:0));
-    num(m.x,m.y-18,'보석','#6FC9CE');
+    num(m.x,m.y-18,'보석','#6FC9CE'); sfx('gem');
   }
 }

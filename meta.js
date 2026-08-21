@@ -8,10 +8,11 @@ const META=(()=>{ try{
       if(j.autoUlt===undefined)j.autoUlt=true;   // 필살기 발동 방식 (4.1.2) — 기본 자동
       if(j.gold===undefined)j.gold=0;            // 대장간 금고 (6.3) — 런의 남은 골드가 누적
       if(j.best===undefined)j.best=0;            // 최고 웨이브 기록 (3.7)
+      if(j.sound===undefined)j.sound=true;       // 효과음 (7.4) — 기본 켬
       return j;
     }
   }catch(e){}
-  return {pts:0, gold:0, best:0, nodes:{}, autoUlt:true}; })();
+  return {pts:0, gold:0, best:0, nodes:{}, autoUlt:true, sound:true}; })();
 function saveMeta(){ try{localStorage.setItem(META_KEY,JSON.stringify(META));}catch(e){} }
 
 function metaRank(k,id){ return (META.nodes[k]||{})[id]||0; }
@@ -20,6 +21,7 @@ function metaBuy(k,id){
   if(!n||r>=n.max) return false;
   const c=n.costs[r]; if(META.pts<c) return false;
   META.pts-=c; (META.nodes[k]=META.nodes[k]||{})[id]=r+1; saveMeta();
+  sfx('hammer');                                 // 노드를 새기는 망치질 (7.4)
   return true;
 }
 /* 무기(또는 '_global') 노드 전체 초기화 — 쓴 포인트 전액 환급 (DESIGN 4.5) */

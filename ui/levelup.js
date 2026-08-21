@@ -39,6 +39,7 @@ function drawCards(cards,onPick){
       <div class="cdesc">${c.u.d(c.a,cur)}</div>
       <div class="crar">${RAR[c.u.r]} · 최대 ${max}단계</div>`;
     el.onclick=()=>{
+      sfx('pick');
       c.u.f(c.a);
       c.a.lv[c.u.id]=next;
       renderCrew(); renderLoadout();
@@ -51,7 +52,7 @@ function drawCards(cards,onPick){
 function openLevelUp(){
   const cards=pickCards();
   if(!cards.length){ pendingLv--; running=true; return; }  // 새길 곳이 없으면 그냥 지나간다
-  phase='levelup';
+  phase='levelup'; sfx('levelup');
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='ov';
   ov.innerHTML=`
     <div class="ov-eyebrow">레벨 ${lv}</div>

@@ -35,6 +35,7 @@ function showEnd(win){
   document.getElementById('againBtn').onclick=startRun;
   document.getElementById('metaOpenBtn').onclick=openMeta;
   statusTxt.textContent=win?'귀환':'전멸';
+  sfx('end');
 }
 
 function reset(){
@@ -72,6 +73,12 @@ ultSeg.onclick=e=>{
   META.autoUlt=e.target.dataset.um==='auto'; saveMeta(); syncUltSeg();
 };
 syncUltSeg();
+
+/* 효과음 토글 — 합성 사운드, 저장됨 (DESIGN 7.4) */
+const sndBtn=document.getElementById('sndBtn');
+function syncSnd(){ sndBtn.classList.toggle('on',!!META.sound); sndBtn.textContent=META.sound?'소리 켬':'소리 끔'; }
+sndBtn.onclick=()=>{ META.sound=!META.sound; saveMeta(); syncSnd(); sfx('pick'); };
+syncSnd();
 
 /* 수동 모드: 키 1~5로 발동 */
 document.addEventListener('keydown',e=>{

@@ -14,7 +14,7 @@ const FILES = [
   'state.js', 'meta.js',
   'combat/units.js', 'combat/loot.js', 'combat/status.js', 'combat/damage.js',
   'combat/actions.js', 'combat/wave.js',
-  'render/fx.js', 'render/draw.js',
+  'render/fx.js', 'render/sound.js', 'render/draw.js',
   'ui/loadout.js', 'ui/balance.js', 'ui/crew.js', 'ui/forge.js', 'ui/levelup.js', 'ui/meta.js',
   'main.js',
 ];

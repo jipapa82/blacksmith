@@ -29,7 +29,7 @@ function gemStatText(g,gr,type){
 }
 
 function openForge(){
-  phase='forge'; selGem=null; altar=[]; finalMsg='';
+  phase='forge'; selGem=null; altar=[]; finalMsg=''; sfx('clear');
   const fallen=restoreCrew();
   renderCrew();
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='ov';
@@ -115,14 +115,14 @@ function renderForgeBody(){
 
   const mab=document.getElementById('mergeAllBtn');
   if(mab) mab.onclick=()=>{
-    mergeAllGems();
+    mergeAllGems(); sfx('hammer');
     if(selGem&&!invCount(selGem)) selGem=null;
     renderForgeBody();
   };
 
   box.querySelectorAll('.gemchip').forEach(el=>el.onclick=ev=>{
     const mk=ev.target.dataset&&ev.target.dataset.merge;
-    if(mk){ mergeGems(mk); if(!invCount(selGem)) selGem=null; renderForgeBody(); return; }
+    if(mk){ mergeGems(mk); sfx('hammer'); if(!invCount(selGem)) selGem=null; renderForgeBody(); return; }
     selGem = selGem===el.dataset.key ? null : el.dataset.key;
     renderForgeBody();
   });
@@ -139,6 +139,7 @@ function renderForgeBody(){
   if(fmb)fmb.onclick=()=>{
     if(altar.length<2)return;
     const t=mergeFinal(altar[0],altar[1]);
+    if(t)sfx('gem'); else sfx('hammer');
     altar=[];
     finalMsg=t?`${GEMS[t].name} 최종 보석 완성 — ${AURA[t].n}!`:'합성 실패 — 재료가 부족하다';
     if(selGem&&!invCount(selGem))selGem=null;
@@ -181,7 +182,7 @@ function renderHirePicker(){
     G.gold-=G.hireCost;
     G.hireCost = allies.length>=3 ? 6000 : 2000;
     goldTxt.textContent=G.gold;
-    hireMerc(el.dataset.k); renderCrew();
+    hireMerc(el.dataset.k); renderCrew(); sfx('hire');
     G.rerolls++;                       // 일손이 늘면 다시 두드릴 여유가 생긴다 (DESIGN 4.1)
     document.getElementById('ov').remove(); advance();
   });
