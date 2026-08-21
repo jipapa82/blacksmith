@@ -1,18 +1,14 @@
 /* ===================== 상태이상 로직 =====================
-   원소는 카드로 무기에 부여되고(a.el*), 적중 시 여기서 적에게 상태가 걸린다.
-   수치는 data/status.js의 STATUS. (DESIGN 4.1.1) */
+   원소는 보석으로 무기에 부여되고(a.el* — units.js recalcGems가 계산),
+   적중 시 여기서 적에게 상태가 걸린다. 수치는 data/status.js의 STATUS. (DESIGN 4.1.1, 4.2) */
 
-/* 이 무기의 원소 — 1무기 1원소, 처음 고른 부여가 정한다 (DESIGN 4.1.1) */
+/* 이 무기의 원소 — 1무기 1원소, 처음 끼운 허용 원소 보석이 정한다 (DESIGN 4.2) */
 function elemOf(a){
   return a.elFire?'fire':a.elPois?'pois':a.elCold?'cold':a.elShock?'shock':null;
 }
 function elemColor(a){
   const e=elemOf(a);
   return e==='fire'?'#E8963C':e==='pois'?'#8FBF6A':e==='cold'?'#9AD9E8':e==='shock'?'#9B8ACB':null;
-}
-/* 이 무기가 원소 e를 (더) 부여받을 수 있는가 — 무기별 허용 목록 + 1무기 1원소 */
-function elemOk(a,e){
-  return EQUIP[a.key].elems.includes(e)&&(!elemOf(a)||elemOf(a)===e);
 }
 
 /* 아군 적중 시 원소 적용 — hurtMob 끝에서 호출 */

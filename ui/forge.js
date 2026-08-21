@@ -131,7 +131,8 @@ function renderForgeBody(){
   }
   html+=`<div class="forge-hint">보석을 고르고 홈(+)을 누르면 끼운다. 보석을 안 고른 채 찬 홈을 누르면 뺀다.<br>
     합성: 같은 보석 2개 → 한 등급 위 1개. 일괄 합성은 합칠 수 있는 걸 전부 (연쇄까지) 밀어 올린다.<br>
-    ↔ 표시 보석은 같은 원소의 무기에 끼우면 시너지가 발현된다.</div>`;
+    ↔ 표시 보석을 허용 무기의 홈에 끼우면 <b>그 원소가 부여된다</b> — 첫 원소 보석이 원소를 확정하고,
+    최고 등급이 단계를 정한다 (Ⅰ~Ⅱ=1 · Ⅲ~Ⅳ=2 · Ⅴ=3단계). 허용 밖 원소는 스탯만.</div>`;
   box.innerHTML=html;
 
   const mab=document.getElementById('mergeAllBtn');

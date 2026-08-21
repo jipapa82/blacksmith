@@ -1,22 +1,10 @@
 /* ===================== 강화 카드 =====================
-   원칙: 보석 = 수치, 카드 = 행동 변화 + 스탯 배율 5종 (DESIGN 4.1.1)
-   일반 = 원소 부여·스탯, 희귀 = 무기 행동, 전설 = 시너지, 황금 = 빌드 정의.
-   설명 문법 (2026-08-21): when(시점 태그) + 대상 명시("이 무기/이 용병/누가 걸었든") + 정확한 수치.
+   원칙: 카드는 행동만 판다 — 수치는 보석·대장간, 원소 부여도 보석의 일 (DESIGN 4.1.1, 2026-08-21).
+   일반 = 평타·필살·생존 행동, 희귀 = 무기 행동, 전설 = 시너지, 황금 = 빌드 정의.
+   설명 문법: when(시점 태그) + 대상 명시("이 무기/누가 걸었든") + 정확한 수치.
    ok: 이 카드가 뜰 조건 / when: 발동 시점 / d: 설명 / f: 적용 */
 const UP=[
-  /* ===== 일반 — 원소 부여 (1무기 1원소: 처음 고른 부여가 그 무기의 원소를 정한다) ===== */
-  {id:'efire', n:'화염 부여', max:3, r:0, when:'적중 시', ok:a=>elemOk(a,'fire'),
-   d:a=>`이 무기로 때린 적에게 ${STATUS.burn.dur[a.elFire]}초 화상 — 초당 이 무기 공격력의 ${Math.round(STATUS.burn.dpsPct[a.elFire]*100)}% 피해. 다시 때리면 갱신${elemOf(a)?'':'<br>이 무기의 원소가 화염으로 정해진다'}`,
-   f:a=>a.elFire++},
-  {id:'epois', n:'맹독 부여', max:3, r:0, when:'적중 시', ok:a=>elemOk(a,'pois'),
-   d:a=>`이 무기로 때릴 때마다 중독 +1중첩 (최대 ${STATUS.pois.maxStacks[a.elPois]}중첩, ${STATUS.pois.dur}초) — 중첩당 초당 이 무기 공격력의 ${Math.round(STATUS.pois.dpsPct[a.elPois]*100)}% 피해${elemOf(a)?'':'<br>이 무기의 원소가 독으로 정해진다'}`,
-   f:a=>a.elPois++},
-  {id:'ecold', n:'냉기 부여', max:3, r:0, when:'적중 시', ok:a=>elemOk(a,'cold'),
-   d:a=>`이 무기로 때린 적에게 ${STATUS.chill.dur}초 한기 (이동 -${Math.round(STATUS.chill.slow[a.elCold]*100)}%). 한기 중 ${STATUS.chill.hitsToFreeze}회 더 때리면 ${STATUS.chill.freezeDur[a.elCold].toFixed(1)}초 빙결 (풀린 뒤 4초 재빙결 면역)${elemOf(a)?'':'<br>이 무기의 원소가 냉기로 정해진다'}`,
-   f:a=>a.elCold++},
-  {id:'eshock',n:'진동 부여', max:3, r:0, when:'적중 시', ok:a=>elemOk(a,'shock'),
-   d:a=>`이 무기로 때린 적에게 ${STATUS.shock.dur[a.elShock]}초 공명 — 받는 모든 피해 +${Math.round(STATUS.shock.amp[a.elShock]*100)}%, 맞을 때 ${Math.round(STATUS.shock.stagger[a.elShock]*100)}% 확률로 0.3초 휘청${elemOf(a)?'':'<br>이 무기의 원소가 진동으로 정해진다'}`,
-   f:a=>a.elShock++},
+  /* ===== 일반 — 생존 행동 ===== */
   {id:'leech', n:'피 먹는 홈',  max:4, r:0, when:'처치 시', ok:()=>1,
    d:a=>`이 무기가 적을 잡을 때마다 체력 +1 (현재 +${a.leech}, 토파즈 흡혈과 합산)`, f:a=>a.leech+=1},
   {id:'repel', n:'밀치는 반격', max:3, r:0, when:'피격 시', ok:()=>1,
@@ -31,19 +19,6 @@ const UP=[
    d:a=>`기본 공격이 적을 ${10*(a.heavyHand+1)}만큼 밀어낸다 (대장 제외)`, f:a=>a.heavyHand++},
   {id:'uhaste',n:'빠른 오의',   max:3, r:0, when:'필살기', ok:()=>1,
    d:a=>`이 무기 필살기 게이지 충전 속도 +${15*(a.ultHaste+1)}%`, f:a=>a.ultHaste++},
-
-  /* ===== 일반 — 스탯 (% 배율 층: 노드=정수 기반, 카드=합산 후 한 번 곱. DESIGN 4.1.1) ===== */
-  {id:'whet',  n:'숫돌질',    max:4, r:0, when:'상시', ok:()=>1,
-   d:a=>`이 무기 공격력 +12% (현재 카드 합 +${Math.round((a.cardAtkMul-1)*100)}%)`, f:a=>a.cardAtkMul+=.12},
-  {id:'oil',   n:'기름칠',    max:3, r:0, when:'상시', ok:()=>1,
-   d:a=>`이 무기 공격 속도 +10% (현재 카드 합 +${Math.round((a.cardAspdMul-1)*100)}%)`, f:a=>a.cardAspdMul+=.10},
-  {id:'hone',  n:'날 세우기', max:4, r:0, when:'상시', ok:()=>1,
-   d:a=>`이 무기 치명타 확률 +5%p (현재 ${Math.round(critOf(a)*100)}%)`, f:a=>a.crit+=.05},
-  {id:'weight',n:'무게 중심', max:3, r:0, when:'상시', ok:()=>1,
-   d:a=>`이 무기 치명타 피해 +25%p (현재 ${Math.round((a.critD+(a.gm?a.gm.critDmgAdd:0))*100)}%)`, f:a=>a.critD+=.25},
-  {id:'plate', n:'덧댄 철판', max:3, r:0, when:'상시', ok:()=>1,
-   d:()=>`이 무기 최대 체력 +12% — 고르는 즉시 늘어난 만큼 회복된다`,
-   f:a=>{const b=maxHpOf(a);a.cardHpMul+=.12;a.hp+=maxHpOf(a)-b;}},
 
   /* ===== 희귀 — 무기 행동 ===== */
   {id:'dash',  n:'이어지는 질주', max:3, r:1, when:'기본 공격', ok:a=>a.trait==='assassin',

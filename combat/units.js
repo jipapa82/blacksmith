@@ -10,7 +10,6 @@ function mkAlly(k,i,front){
     ambush:1.8, dashN:3,                                           // 암살: 일격 배수 / 질주 대상 수 ('이어지는 질주')
     leech:0, deathBlast:0, repel:0,
     crit:.05+mm.critAdd, critD:1.5+mm.critDmgAdd,                  // 강화로 오르는 치명(무기 성격, 4.5)
-    cardAtkMul:1, cardAspdMul:1, cardHpMul:1,                      // 스탯 카드 % 배율 층 (DESIGN 4.1.1)
     elFire:0, elPois:0, elCold:0, elShock:0,                       // 원소 부여 단계
     syShatter:0, syColdcut:0, syFirespread:0, syDotamp:0, syReso:0, syMixer:0,   // 시너지 단계
     syDeton:0, syHarvest:0, syReap:0,                                            // 회수 시너지 (필살기)
@@ -70,6 +69,23 @@ function recalcGems(a){
       else if(s.type==='emerald')gm.auraHaste=true;
     } });
   a.gm=gm;
+  /* 원소는 보석에서 온다 (DESIGN 4.2) — 허용 원소 중 첫 원소 보석이 확정(1무기 1원소),
+     그 원소 보석의 최고 등급이 단계를 정한다: Ⅰ~Ⅱ=1, Ⅲ~Ⅳ=2, Ⅴ+=3 (합성이 곧 심화).
+     허용 밖 원소 보석은 스탯만 발현 — 꽝 없음. 빼고 다른 색을 끼우면 원소 교체 */
+  a.elFire=a.elPois=a.elCold=a.elShock=0;
+  const allow=EQUIP[a.key].elems;
+  let elem=null, best=0;
+  a.sock.forEach(s=>{ if(!s)return;
+    const ge=GEMS[s.type].elem;
+    if(!ge||allow.indexOf(ge)<0)return;
+    if(!elem)elem=ge;
+    if(ge===elem)best=Math.max(best,Math.min(s.grade,GEM_MAX_GRADE));
+  });
+  if(elem){
+    const lv=best>=5?3:best>=3?2:1;
+    if(elem==='fire')a.elFire=lv; else if(elem==='pois')a.elPois=lv;
+    else if(elem==='cold')a.elCold=lv; else a.elShock=lv;
+  }
 }
 /* 파티 오라 (최종 루비·자수정) — 살아 있는 착용자 기준, 매 스텝 갱신 */
 let AURA_ATK=1, AURA_DEF=0;
@@ -81,13 +97,13 @@ function recalcAuras(){
       else if(s.type==='amethyst')AURA_DEF+=AURA.amethyst.defAdd; }); });
 }
 
-/* 최종 스탯 = (기본+노드 정수) × (1+보석 합) × (1+카드 합) × 오라 (DESIGN 4.1.1) */
-function atkOf(a){ return Math.round(a.atk*a.gm.atkMul*a.cardAtkMul*AURA_ATK); }
-function aspdOf(a){ return a.aspd*a.gm.aspdMul*a.cardAspdMul*(hasteT>0?1+AURA.emerald.haste:1); }
+/* 최종 스탯 = (기본+강화 정수) × (1+보석 합) × 오라 — 카드는 수치를 팔지 않는다 (DESIGN 4.1.1) */
+function atkOf(a){ return Math.round(a.atk*a.gm.atkMul*AURA_ATK); }
+function aspdOf(a){ return a.aspd*a.gm.aspdMul*(hasteT>0?1+AURA.emerald.haste:1); }
 function defOf(a){ return a.def+a.gm.defAdd+AURA_DEF; }
 function critOf(a){ return a.crit+a.gm.critAdd; }
 function dodgeOf(a){ return Math.min(.6,a.gm.dodgeAdd); }
-function maxHpOf(a){ return Math.round(a.maxhp*a.gm.hpMul*a.cardHpMul); }
+function maxHpOf(a){ return Math.round(a.maxhp*a.gm.hpMul); }
 
 /* 자주 쓰는 선택자 */
 const liveAllies=()=>allies.filter(a=>a.hp>0);
