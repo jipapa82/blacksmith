@@ -26,8 +26,16 @@ function pickCards(){
     if(c){used.add(c.id); out.push({u:c,a:tgt});}
   }
   if(out.length){                                  // 드로우트 천장 갱신
-    if(out.some(c=>c.u.r>=1)) G.rareDry=0;
+    if(out.some(c=>c.u&&c.u.r>=1)) G.rareDry=0;
     else G.rareDry=(G.rareDry||0)+1;
+  }
+  /* 무기 카드 (DESIGN 4.1, 2026-08-22) — 고용 폐지: 무기는 드래프트에서 만난다.
+     파티에 없는 무기가 출정 풀(META.draftPool)에 있으면 드래프트당 최대 1장, 25% 확률.
+     보유가 늘수록 후보가 줄어 자연히 덜 나오고, 다 모으면 안 나온다 */
+  if(out.length&&Math.random()<.25){
+    const taken=new Set(allies.map(x=>x.key));
+    const wc=Object.keys(EQUIP).filter(k=>!taken.has(k)&&META.draftPool[k]!==false);
+    if(wc.length) out[out.length-1]={weapon:wc[Math.floor(Math.random()*wc.length)]};
   }
   return out;
 }
@@ -39,6 +47,22 @@ function drawCards(cards,onPick){
     return;
   }
   cards.forEach(c=>{
+    if(c.weapon){                                  // 무기 카드 — 고르면 새 용병이 들고 합류 (4.1)
+      const k=c.weapon, v=EQUIP[k], L=metaRank(k,'lvl');
+      const el=document.createElement('div');
+      el.className='card wpn';
+      el.innerHTML=`<div class="target">새 무기 — 용병이 합류한다</div>
+        <div class="cname">${weaponIcon(k)}${v.name}${L?` <span class="lvtag">+${L}강</span>`:''}</div>
+        <div class="cdesc">${v.desc}</div>
+        <div class="cdesc" style="color:var(--heat)">필살 · ${v.ultName} — ${ultHead(k)}</div>
+        <div class="cdesc">원소 ${elemChoices(k)}</div>
+        <div class="crar">무기 · 획득 시 리롤 +1</div>`;
+      el.onclick=()=>{
+        sfx('hire'); hireMerc(k); G.rerolls++;
+        renderCrew(); renderLoadout(); onPick();
+      };
+      box.appendChild(el); return;
+    }
     const cls=['','rare','epic','gold'][c.u.r];
     const cur=lvOf(c.a,c.u.id), next=cur+1, max=c.u.max;
     const pips=Array.from({length:max},(_,i)=>

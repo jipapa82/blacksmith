@@ -10,6 +10,7 @@ const META=(()=>{ try{
       if(j.best===undefined)j.best=0;            // 최고 웨이브 기록 (3.7)
       if(j.sound===undefined)j.sound=true;       // 효과음 (7.4) — 기본 켬
       if(j.pity===undefined)j.pity={};           // 강화 천장 — 무기별 실패 누적 (4.5)
+      if(j.draftPool===undefined)j.draftPool={}; // 드래프트 등장 무기 (4.1) — 없으면 전부 허용
       if(j.pts>0){ j.gold+=j.pts*200; j.pts=0; } // 스탯 포인트 폐지 — 1pt = 200골드 일괄 환전 (4.5)
       /* 구 노드 저장 마이그레이션 — 스탯 4종·홈·연마를 무기 레벨 하나로 (4.5).
          레벨은 스탯 4종 중 최고 강을 승계, 홈·연마 구매액은 골드로 환급 (해금이 자동이 됐으므로) */
@@ -29,7 +30,7 @@ const META=(()=>{ try{
       return j;
     }
   }catch(e){}
-  return {pts:0, gold:0, best:0, nodes:{}, pity:{}, autoUlt:true, sound:true}; })();
+  return {pts:0, gold:0, best:0, nodes:{}, pity:{}, draftPool:{}, autoUlt:true, sound:true}; })();
 function saveMeta(){ try{localStorage.setItem(META_KEY,JSON.stringify(META));}catch(e){} }
 
 function metaRank(k,id){ return (META.nodes[k]||{})[id]||0; }

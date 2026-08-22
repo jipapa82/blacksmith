@@ -203,6 +203,34 @@ const driver = `
   const badEl=allies.filter(a=>{const e=elemOf(a);return e&&!EQUIP[a.key].elems.includes(e);});
   out.push('무기별 원소 제한: ' + (badEl.length ? 'VIOLATION — 허용 밖 원소' : 'OK (허용 목록 준수)'));
 
+  out.push('--- 무기 카드 (드래프트 합류 — 고용 폐지, DESIGN 4.1) ---');
+  /* 난수 0.10 고정: 희귀 슬롯에 유효 카드가 뽑히고 + 주입 확률(<0.25) 통과 + 후보 첫 번째.
+     출정 풀에서 뺀 무기(활)는 나오면 안 된다 */
+  loadout=['shield','sword']; startRun();
+  const mrW=Math.random; Math.random=()=>0.10;
+  META.draftPool.bow=false;
+  const pcW=pickCards();
+  const wcard=pcW[pcW.length-1];
+  out.push('무기 카드 주입: ' + (wcard&&wcard.weapon==='great'
+    ? 'OK (무딘 대검 — 활은 출정 풀 제외 준수)'
+    : 'WRONG '+(wcard?JSON.stringify(wcard.weapon||wcard.u&&wcard.u.id):'빈 드래프트')));
+  const nA=allies.length, nR=G.rerolls;
+  drawCards(pcW,()=>{});
+  const cboxW=document.getElementById('cards');
+  const wEl=cboxW.children[cboxW.children.length-1];
+  if(wEl&&wEl.onclick)wEl.onclick();
+  out.push('무기 카드 획득: ' + (allies.length===nA+1&&G.rerolls===nR+1
+    &&allies[allies.length-1].key==='great'
+    ? 'OK (용병 '+allies.length+'명 합류, 리롤 +1)'
+    : 'WRONG allies='+allies.length+' rerolls='+G.rerolls));
+  META.draftPool={};
+  const takenW=new Set(allies.map(a=>a.key));
+  Object.keys(EQUIP).filter(k=>!takenW.has(k)).forEach(k=>hireMerc(k));
+  const pcW2=pickCards();
+  Math.random=mrW;
+  out.push('풀 소진: ' + (pcW2.length&&pcW2.every(c=>!c.weapon)
+    ? 'OK (5종 보유 시 무기 카드 없음)' : 'WRONG'));
+
   out.push('--- 4회차 (귀환 검증 — 첫 정비에서 런을 끝낸다) ---');
   loadout=['shield','wand'];
   const bestBefore=META.best;

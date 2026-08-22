@@ -47,8 +47,8 @@ function reset(){
   waveIdx=0; waveT=0; waveSpawned=0; waveKills=0; curWave=null; mobs=[]; fxs=[]; nums=[];
   projs=[]; hitstop=0; slowT=0;
   lv=1; xp=0; pendingLv=0; hasteT=0;
-  G.gold=0; G.kills=0; G.goldMul=1; G.hireCost=200; G._boss=0; G.gems={};
-  G.rerolls=metaRank('_global','nreroll');   // 시작 리롤은 노드만큼. 고용마다 +1 (DESIGN 4.1)
+  G.gold=0; G.kills=0; G.goldMul=1; G._boss=0; G.gems={};
+  G.rerolls=metaRank('_global','nreroll');   // 시작 리롤은 노드만큼. 무기 카드 획득마다 +1 (DESIGN 4.1)
   G.rareDry=0;                               // 희귀 드로우트 천장 (DESIGN 4.1)
   mercLetter=0;
   allies=loadout.map((k,i)=>mkAlly(k,i,i===0)); layoutAllies();

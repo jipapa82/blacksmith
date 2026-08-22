@@ -60,12 +60,9 @@ function openForge(){
 
 function renderForgeRow(){
   const row=document.getElementById('forgeRow'); if(!row)return;
-  row.innerHTML=`<button id="hireBtn">용병 고용 · ${G.hireCost}골드</button>
-    <button id="retreatBtn" title="런을 여기서 끝낸다. 정산은 전멸과 같다 — 아끼는 건 시간이다">귀환</button>
+  /* 고용 폐지 (2026-08-22) — 무기는 드래프트의 무기 카드로 만난다 (DESIGN 4.1) */
+  row.innerHTML=`<button id="retreatBtn" title="런을 여기서 끝낸다. 정산은 전멸과 같다 — 아끼는 건 시간이다">귀환</button>
     <button class="primary" id="nextBtn">다음 웨이브</button>`;
-  const hb=document.getElementById('hireBtn');
-  hb.disabled=G.gold<G.hireCost||allies.length>=Object.keys(EQUIP).length;
-  hb.onclick=()=>renderHirePicker();
   document.getElementById('retreatBtn').onclick=()=>{
     document.getElementById('ov').remove(); showEnd(true);   // 자발적 귀환 (DESIGN 3.7)
   };
@@ -252,30 +249,3 @@ function renderForgeBody(){
   });
 }
 
-/* 용병 고용 — 새 장비를 골라 들려 보낸다 */
-function renderHirePicker(){
-  const box=document.getElementById('forgeBody'), row=document.getElementById('forgeRow');
-  if(!box||!row)return;
-  const taken=new Set(allies.map(a=>a.key));
-  const avail=Object.entries(EQUIP).filter(([k])=>!taken.has(k));
-  box.innerHTML=`<div class="forge-hint">아직 주인이 없는 장비다. 하나를 골라 들려 보낸다.</div>
-    <div class="cards">`+avail.map(([k,v])=>`<div class="card" data-k="${k}">
-      <div class="target">새 용병</div>
-      <div class="cname">${weaponIcon(k)}${v.name}</div>
-      <div class="cdesc">${v.desc}</div>
-      <div class="cdesc" style="color:var(--heat)">필살 · ${v.ultName} — ${ultHead(k)}</div>
-      <div class="cdesc">${ultDescOf(k)}</div>
-      <div class="cdesc">원소 ${elemChoices(k)}</div>
-      <div class="crar">공 ${v.atk} · 방 ${v.def} · 체 ${v.hp} · 속 ${v.spd.toFixed(2)}</div>
-    </div>`).join('')+`</div>`;
-  box.querySelectorAll('.card').forEach(el=>el.onclick=()=>{
-    G.gold-=G.hireCost;
-    G.hireCost = allies.length>=3 ? 6000 : 2000;
-    goldTxt.textContent=G.gold;
-    hireMerc(el.dataset.k); renderCrew(); sfx('hire');
-    G.rerolls++;                       // 일손이 늘면 다시 두드릴 여유가 생긴다 (DESIGN 4.1)
-    document.getElementById('ov').remove(); advance();
-  });
-  row.innerHTML='<button id="cancelHire">그만두기</button>';
-  document.getElementById('cancelHire').onclick=()=>{ renderForgeBody(); renderForgeRow(); };
-}

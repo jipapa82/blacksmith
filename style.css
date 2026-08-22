@@ -42,6 +42,9 @@ select{width:100%;background:var(--slate);color:var(--steel);border:1px solid va
 .derived{display:flex;gap:9px;margin-top:7px;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;flex-wrap:wrap}
 .derived b{color:var(--steel);font-weight:500}
 .trait-note{font-size:11px;color:var(--quench);margin-top:5px;line-height:1.45}
+.pool-row{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:6px;cursor:pointer}
+.pool-row input{accent-color:var(--ok)}
+.pool-row b{color:var(--heat);font-family:'IBM Plex Mono',monospace;font-weight:600}
 .warn-note{font-size:11px;color:var(--heat);margin-top:5px;line-height:1.45}
 .note{font-size:11px;color:var(--dim);line-height:1.6;margin-top:11px;padding-top:11px;border-top:1px solid var(--edge)}
 .swap-btn{width:100%}
@@ -121,6 +124,11 @@ canvas{display:block;width:100%;height:auto}
   box-shadow:0 0 0 1px rgba(217,180,92,.35),0 0 18px rgba(217,180,92,.28)}
 .card.gold .cname{color:var(--gold)}
 .card.gold .pip.on{background:var(--gold)}
+/* 무기 카드 — 고르면 용병이 합류한다 (DESIGN 4.1). 초록 계열로 희귀도와 구분 */
+.card.wpn{border-color:var(--ok);
+  box-shadow:0 0 0 1px rgba(143,191,106,.28),0 0 14px rgba(143,191,106,.18)}
+.card.wpn .cname{color:var(--ok)}
+.card.wpn .target{color:var(--ok)}
 
 /* 무기 문양 아이콘 */
 .wicon{display:inline-flex;width:15px;height:15px;flex:none;vertical-align:-3px;margin-right:3px}

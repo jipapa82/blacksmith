@@ -64,6 +64,21 @@ function renderLoadout(){
       ${bad2?'<div class="warn-note">뒷줄에서는 막을 것이 없다</div>':''}`;
     mercList.appendChild(d);
   });
+  /* 드래프트 등장 무기 (DESIGN 4.1) — 체크한 무기만 전투 중 무기 카드로 나온다.
+     강화 안 된 무기를 빼두는 용도. 시작 편성 2종은 이미 데리고 나가므로 목록에서 제외 */
+  const rest=Object.keys(EQUIP).filter(k=>!loadout.includes(k));
+  if(rest.length){
+    const d2=document.createElement('div'); d2.className='merc-row';
+    d2.innerHTML=`<div class="merc-top"><span>드래프트 등장 무기</span></div>`
+      +rest.map(k=>{const L=metaRank(k,'lvl');
+        return `<label class="pool-row"><input type="checkbox" data-pool="${k}"${META.draftPool[k]!==false?' checked':''}>`
+          +`${weaponIcon(k)}${EQUIP[k].name}${L?` <b>+${L}강</b>`:' <span style="opacity:.5">무강화</span>'}</label>`;}).join('')
+      +`<div class="trait-note">체크한 무기만 전투 중 드래프트에 무기 카드로 나온다. 고르면 그 무기를 든 용병이 합류한다</div>`;
+    mercList.appendChild(d2);
+    d2.querySelectorAll('input[data-pool]').forEach(cb=>cb.onchange=()=>{
+      META.draftPool[cb.dataset.pool]=cb.checked; saveMeta();
+    });
+  }
   mercList.querySelectorAll('select').forEach(s=>s.onchange=ev=>{
     const slot=+ev.target.dataset.slot,pick=ev.target.value,o=1-slot;
     if(loadout[o]===pick) loadout[o]=loadout[slot];

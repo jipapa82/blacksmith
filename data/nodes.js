@@ -16,5 +16,5 @@ const WLEVEL={
 
 /* 무기와 무관한 공용 노드 — 대장장이 자신의 성장. 도박 없는 정액 구매 */
 const GLOBAL_NODES=[
-  {id:'nreroll', n:'다시 뽑기', max:2, costs:[800,2400], eff:r=>`시작 리롤 +${r} (고용마다 +1과 별개)`},
+  {id:'nreroll', n:'다시 뽑기', max:2, costs:[800,2400], eff:r=>`시작 리롤 +${r} (무기 획득 +1과 별개)`},
 ];

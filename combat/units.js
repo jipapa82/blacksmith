@@ -31,7 +31,7 @@ function layoutAllies(){
 }
 function hireMerc(k){
   const a=mkAlly(k,allies.length,false);
-  a.name=nextMercName(); a.mods.push('고용');
+  a.name=nextMercName(); a.mods.push('합류');
   allies.push(a); layoutAllies();
 }
 function mkMob(type){
