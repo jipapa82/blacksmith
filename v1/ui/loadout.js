@@ -42,35 +42,47 @@ function ultDescOf(k){
 }
 
 const mercList=document.getElementById('mercList');
-/* v2 편성 (DESIGN 0장): [0]=전사 무기(직접 조작, role:'tank') + 나머지=망루 딜러(role:'tower').
-   무기 카드·출정 풀(당일 처방 A)은 철회 — 배치는 운이 아니라 내 결정 */
 function renderLoadout(){
   mercList.innerHTML='';
   loadout.forEach((k,i)=>{
-    const e=EQUIP[k], isT=i===0;
-    const opts=Object.entries(EQUIP).filter(([,v])=>v.role===(isT?'tank':'tower'));
-    const L=metaRank(k,'lvl');
+    const e=EQUIP[k], front=i===0;
+    const bad=front&&(e.trait==='shoot'||e.trait==='blast'||e.trait==='assassin');
+    const bad2=!front&&e.trait==='wall';
     const d=document.createElement('div'); d.className='merc-row';
     d.innerHTML=`<div class="merc-top">
-        <span class="rowtag ${isT?'front':'back'}">${isT?'전사 — 직접 조작':'망루 '+i}</span>
-        ${L?`<span class="lvtag">+${L}강</span>`:''}</div>
-      <select data-slot="${i}">${opts.map(([kk,v])=>
+        <span class="rowtag ${front?'front':'back'}">${front?'앞줄':'뒷줄'}</span>
+        <span>용병 ${String.fromCharCode(65+i)}</span></div>
+      <select data-slot="${i}">${Object.entries(EQUIP).map(([kk,v])=>
         `<option value="${kk}" ${kk===k?'selected':''}>${v.name}</option>`).join('')}</select>
       <div class="derived"><span>공 <b>${e.atk}</b></span><span>방 <b>${e.def}</b></span>
         <span>체 <b>${e.hp}</b></span><span>속 <b>${e.spd.toFixed(2)}</b></span></div>
       <div class="trait-note">${e.desc}</div>
       <div class="trait-note" style="color:var(--heat)">필살 · ${e.ultName} — ${ultHead(k)}</div>
       <div class="trait-note">${ultDescOf(k)}</div>
-      <div class="derived">원소 ${elemChoices(k)}</div>`;
+      <div class="derived">원소 ${elemChoices(k)}</div>
+      ${bad?`<div class="warn-note">${e.trait==='assassin'?'앞줄에 서면 지킬 후미가 없다':'앞줄에 세우면 둘러싸인다'}</div>`:''}
+      ${bad2?'<div class="warn-note">뒷줄에서는 막을 것이 없다</div>':''}`;
     mercList.appendChild(d);
   });
-  const hint=document.createElement('p'); hint.className='note';
-  hint.innerHTML='전사 = WASD·방향키·터치로 직접 조작. 몸으로 막고, 딜러가 발라놓은<br>상태이상을 때려 <b style="color:var(--heat)">기폭</b>한다. 망루의 딜러는 안전하지만, 대장간이 부서지면 끝이다.';
-  mercList.appendChild(hint);
+  /* 드래프트 등장 무기 (DESIGN 4.1) — 체크한 무기만 전투 중 무기 카드로 나온다.
+     강화 안 된 무기를 빼두는 용도. 시작 편성 2종은 이미 데리고 나가므로 목록에서 제외 */
+  const rest=Object.keys(EQUIP).filter(k=>!loadout.includes(k));
+  if(rest.length){
+    const d2=document.createElement('div'); d2.className='merc-row';
+    d2.innerHTML=`<div class="merc-top"><span>드래프트 등장 무기</span></div>`
+      +rest.map(k=>{const L=metaRank(k,'lvl');
+        return `<label class="pool-row"><input type="checkbox" data-pool="${k}"${META.draftPool[k]!==false?' checked':''}>`
+          +`${weaponIcon(k)}${EQUIP[k].name}${L?` <b>+${L}강</b>`:' <span style="opacity:.5">무강화</span>'}</label>`;}).join('')
+      +`<div class="trait-note">체크한 무기만 전투 중 드래프트에 무기 카드로 나온다. 고르면 그 무기를 든 용병이 합류한다</div>`;
+    mercList.appendChild(d2);
+    d2.querySelectorAll('input[data-pool]').forEach(cb=>cb.onchange=()=>{
+      META.draftPool[cb.dataset.pool]=cb.checked; saveMeta();
+    });
+  }
   mercList.querySelectorAll('select').forEach(s=>s.onchange=ev=>{
-    const slot=+ev.target.dataset.slot, pick=ev.target.value;
-    const o=loadout.findIndex((kk,j)=>j!==slot&&kk===pick);   // 같은 무기 중복 → 자리 맞바꿈
-    if(o>=0) loadout[o]=loadout[slot];
+    const slot=+ev.target.dataset.slot,pick=ev.target.value,o=1-slot;
+    if(loadout[o]===pick) loadout[o]=loadout[slot];
     loadout[slot]=pick; renderLoadout(); reset();
   });
 }
+document.getElementById('swapBtn').onclick=()=>{loadout.reverse();renderLoadout();reset();};

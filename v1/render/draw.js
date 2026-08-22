@@ -15,34 +15,9 @@ function draw(dt){
   ctx.fillStyle='#0E0F13'; ctx.fillRect(-20,-20,W+40,H+40);
   ctx.strokeStyle='rgba(255,255,255,.028)';ctx.lineWidth=1;
   for(let y=40;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(W,y+.5);ctx.stroke();}
-  /* v2 (DESIGN 0장): 왼쪽에 지킬 것이 서 있다 — 망루와 대장간 */
-  TOWERS.forEach(t=>{
-    ctx.fillStyle='rgba(255,255,255,.03)'; ctx.fillRect(t.x-21,t.y-21,42,42);
-    ctx.strokeStyle='rgba(255,255,255,.14)'; ctx.lineWidth=1.5;
-    ctx.strokeRect(t.x-21,t.y-21,42,42);
-  });
-  ctx.fillStyle='#2A2521';
-  ctx.fillRect(FORGE.x-FORGE.r,FORGE.y-FORGE.r+8,FORGE.r*2,FORGE.r*2-8);
-  ctx.strokeStyle='#8B6B4A'; ctx.lineWidth=2;
-  ctx.strokeRect(FORGE.x-FORGE.r,FORGE.y-FORGE.r+8,FORGE.r*2,FORGE.r*2-8);
-  ctx.beginPath();                                       // 지붕
-  ctx.moveTo(FORGE.x-FORGE.r-7,FORGE.y-FORGE.r+8);
-  ctx.lineTo(FORGE.x,FORGE.y-FORGE.r-14);
-  ctx.lineTo(FORGE.x+FORGE.r+7,FORGE.y-FORGE.r+8);
-  ctx.closePath(); ctx.fillStyle='#3A2F26'; ctx.fill(); ctx.stroke();
-  ctx.fillStyle='#E8963C'; ctx.font='11px "IBM Plex Sans KR"'; ctx.textAlign='center';
-  ctx.fillText('대장간',FORGE.x,FORGE.y+FORGE.r+16);
-  { const w=FORGE.r*2.4, hpP=Math.max(0,FORGE.hp/FORGE.maxhp);   // 내구도 바
-    ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(FORGE.x-w/2,FORGE.y-FORGE.r-24,w,4);
-    ctx.fillStyle=hpP>.5?'#8FBF6A':hpP>.25?'#E8963C':'#C4574F';
-    ctx.fillRect(FORGE.x-w/2,FORGE.y-FORGE.r-24,w*hpP,4); }
-  if(moveTarget){                                        // 터치/클릭 이동 목표 표시
-    ctx.strokeStyle='rgba(216,228,234,.4)'; ctx.lineWidth=1.5;
-    ctx.beginPath();
-    ctx.moveTo(moveTarget.x-6,moveTarget.y-6); ctx.lineTo(moveTarget.x+6,moveTarget.y+6);
-    ctx.moveTo(moveTarget.x+6,moveTarget.y-6); ctx.lineTo(moveTarget.x-6,moveTarget.y+6);
-    ctx.stroke();
-  }
+  const F=frontAlly();
+  if(F){ctx.strokeStyle='rgba(232,150,60,.15)';ctx.setLineDash([5,7]);
+    ctx.beginPath();ctx.moveTo(F.x+26,0);ctx.lineTo(F.x+26,H);ctx.stroke();ctx.setLineDash([]);}
 
   /* 범위 표시 — 대검 타격 지대는 상시, 범위 필살기는 게이지가 차면 예고 (DESIGN 7.3)
      좌표는 판정과 같은 cleaveAnchor()에서 나온다 (7.2: 표시=판정) */
@@ -57,7 +32,7 @@ function draw(dt){
       ctx.beginPath();ctx.arc(an.x,an.y,a.cleaveR,0,6.283);ctx.stroke();
       if(a.ultT>=a.ultCd){
         ctx.strokeStyle='rgba(232,150,60,.3)';
-        for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(an.ux+i*70*an.dx,an.uy+i*70*an.dy,90*a.ultR,0,6.283);ctx.stroke();}
+        for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(an.ux+i*70,an.uy,90*a.ultR,0,6.283);ctx.stroke();}
       }
     }else if(a.trait==='wall'&&a.ultT>=a.ultCd){
       ctx.strokeStyle='rgba(143,191,106,.32)';
@@ -113,14 +88,6 @@ function draw(dt){
     shapePath(a.x+ox,a.y,a.r+2,a.shape);
     ctx.fillStyle=a.hit>0?'#FFF':a.color; ctx.fill();
     ctx.globalAlpha=1;
-    if(a.isTank&&a.hp>0){                        // 전사 — 조작 중인 유닛 표시 (v2)
-      ctx.strokeStyle='rgba(216,228,234,.5)'; ctx.lineWidth=1.5; ctx.setLineDash([3,5]);
-      ctx.beginPath(); ctx.arc(a.x+ox,a.y,a.r+22,0,6.283); ctx.stroke(); ctx.setLineDash([]);
-    }
-    if(a.isTank&&a.hp<=0&&a.respawnT>0){         // 복귀 카운트
-      ctx.globalAlpha=1; ctx.fillStyle='#C4574F'; ctx.font='600 12px "IBM Plex Mono"'; ctx.textAlign='center';
-      ctx.fillText('복귀 '+Math.ceil(a.respawnT),FORGE.x,FORGE.y-FORGE.r-32);
-    }
     if(a.hp>0){
       ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=2;
       ctx.beginPath();ctx.arc(a.x+ox,a.y,a.r+9,-1.57,-1.57+6.283*Math.min(1,a.charge));ctx.stroke();

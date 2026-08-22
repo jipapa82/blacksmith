@@ -14,7 +14,7 @@ function renderCrew(){
   const c=document.getElementById('crew');
   if(c.children.length!==allies.length){
     c.innerHTML=allies.map((a,i)=>`<div class="cw">
-      <div class="cw-top"><span class="cw-tag ${a.isTank?'front':'back'}">${a.isTank?'전사':'망루'}</span>
+      <div class="cw-top"><span class="cw-tag ${a.front?'front':'back'}">${a.front?'앞줄':'뒷줄'}</span>
         <span>${a.name}</span><span class="cw-eq">${weaponIcon(a.key)}${a.eq}${metaRank(a.key,'lvl')?' +'+metaRank(a.key,'lvl')+'강':''}</span></div>
       <div class="cw-hp"><i></i></div>
       <div class="cw-stats">

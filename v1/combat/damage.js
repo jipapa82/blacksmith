@@ -2,11 +2,9 @@
 let _resoDepth=0;   // 공명 파열 연쇄 깊이 — 연쇄마다 폭발 피해 ×0.55 (7.1 연쇄 폭발 규칙)
 let _critStopT=-9;  // 치명타 히트스톱 스로틀 — 잦으면 멈칫이 아니라 렉이다 (7.5)
 function killMob(m,src){
-  if(m._dead)return; m._dead=true;               // 기폭 재귀 등 이중 사망 방지 (v2)
   if(m.type==='boss'){                           // 대장 처치 — 세상이 잠깐 멎는다 (7.5)
     hitstop=Math.max(hitstop,.12); slowT=.6; shake=12;
     flash('#FFD86B',.15,.35); burst(m.x,m.y,m.color,24,1.8);
-    G.rerolls++;                                 // 리롤 +1 — 무기 카드 보상의 승계 (v2, DESIGN 0장)
   }else burst(m.x,m.y,m.color);
   sfx('kill');
   G.kills++; waveKills++; killTxt.textContent=G.kills;
@@ -47,30 +45,6 @@ function killMob(m,src){
     }
   }
 }
-/* ===== v2 기폭 (DESIGN 0장) — 전사의 타격이 상태이상을 소모해 터뜨린다.
-   딜러가 농사(도포), 전사가 수확(기폭). 소모가 곧 쿨다운 — 다시 발라져야 다시 터진다.
-   피해 = 남은 화상·중독 지속 피해 ×1.2 + 공격력 ×0.5 × 상태 종류 수 (+빙결이면 최대 체력 6%),
-   반경 detR 안에 60% 파급. 파급은 상태를 소모하지 않는다 */
-let _detonating=false;
-function detonate(m,src){
-  if(_detonating)return;
-  const types=statusCount(m); if(!types)return;
-  _detonating=true;
-  let rem=0;
-  if(m.burn){rem+=m.burn.dps*Math.max(0,m.burn.t); m.burn=null;}
-  if(m.pois){rem+=m.pois.dps*m.pois.n*Math.max(0,m.pois.t); m.pois=null;}
-  let d=(rem*1.2+atkOf(src)*.5*types)*(src.detPow||1);
-  if(m.freezeT>0){ d+=m.maxhp*.06; m.freezeT=0; m.chillHits=0; }
-  m.chillT=0; m.chillLv=0; m.shockT=0; m.shockLv=0; m.shockAmp=0;
-  const R=src.detR||60, mx=m.x, my=m.y;
-  ring(mx,my,R,'#E8963C',1.8); burst(mx,my,'#FFD86B',10,1.4); sfx('deton');
-  hitstop=Math.max(hitstop,.02);
-  num(mx,my-m.r-14,'기폭 '+Math.round(d),'#FFD86B',1);
-  hurtMob(m,d,null,false);                      // src 없이 — 치명·기폭 재발동 없음
-  mobs.forEach(o=>{ if(o.hp>0&&o!==m&&Math.hypot(o.x-mx,o.y-my)<R) hurtMob(o,d*.6,null); });
-  _detonating=false;
-}
-
 function hurtMob(m,dmg,src,isUlt){
   if(m.hp<=0)return;
   let crit=false;
@@ -108,7 +82,6 @@ function hurtMob(m,dmg,src,isUlt){
   m.hp-=d; m.hit=crit?.22:.14;
   if(crit&&waveT-_critStopT>.5){ hitstop=Math.max(hitstop,.03); _critStopT=waveT; }   // 치명 멈칫 (7.5)
   num(m.x,m.y-m.r-4, crit?d+'!':d, crit?'#FFD86B':'#E8963C', crit);
-  if(src&&src.isTank&&!_detonating&&statusCount(m)>0) detonate(m,src);   // v2 기폭 — 전사의 수확
   if(m.hp<=0){ killMob(m,src); return; }
   if(src&&src.heavyHand&&!isUlt&&m.type!=='boss')                     // 묵직한 손 — 평타가 밀어낸다
     m.x=Math.min(W+20,m.x+10*src.heavyHand);
@@ -128,15 +101,7 @@ function allyDown(a){
   }
   burst(a.x,a.y,'#C4574F');shake=8; sfx('die');
   if(a.gm.auraRevive&&!a.reviveUsed){a.reviveUsed=true;a.reviveT=AURA.topaz.reviveT;}  // 되살리는 맥박
-  if(a.isTank){ a.respawnT=6; num(a.x,a.y-24,'6초 뒤 복귀','#C4574F',1); }   // v2: 전사 사망 ≠ 상실 — 공백이 대가
   layoutAllies();
-}
-/* v2: 대장간 피격 — 내구도 0 = 런 종료 (wave.js step이 판정) */
-function hurtForge(dmg){
-  const d=Math.max(1,Math.round(dmg));
-  FORGE.hp=Math.max(0,FORGE.hp-d);
-  num(FORGE.x,FORGE.y-FORGE.r-10,d,'#C4574F');
-  shake=Math.max(shake,2);
 }
 function hurtAlly(a,dmg,from){
   if(Math.random()<dodgeOf(a)){ num(a.x,a.y-a.r-6,'회피','#D8E4EA'); return; }

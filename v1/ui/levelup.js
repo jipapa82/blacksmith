@@ -3,13 +3,8 @@
 function lvOf(a,id){ return a.lv[id]||0; }
 function pickCards(){
   const out=[], used=new Set();
-  /* v2 (DESIGN 0장): 4장 = 전사 2 + 망루 2 — "내 손맛이냐 팀 화력이냐"가 매번의 선택.
-     전사는 죽어 있어도 대상 유지 (복귀하므로). 무기 카드(당일 처방 A)는 철회 */
-  const tankPool=allies.filter(a=>a.isTank);
-  const backPool=allies.filter(a=>!a.isTank&&a.hp>0);
-  for(let i=0;i<4;i++){
-    const side=i<2?tankPool:backPool;
-    if(!side.length)continue;
+  const live=liveAllies();
+  for(let i=0;i<4;i++){      // 4택 고정 (DESIGN 4.1) — N+1 규칙은 비교 피로로 폐기
     let tries=0, c=null, tgt=null;
     while(tries++<120){
       /* 황금은 5웨이브부터 웨이브당 +0.3%p, 최대 3% — 빌드 정의 카드는 벌어서 만난다 (DESIGN 4.1.1) */
@@ -24,7 +19,7 @@ function pickCards(){
       const pool=[];
       cands.forEach(u=>{for(let k=0,w=u.vis?3:1;k<w;k++)pool.push(u);});
       const u=pool[Math.floor(Math.random()*pool.length)];
-      const valid=side.filter(a=>u.ok(a)&&lvOf(a,u.id)<u.max);
+      const valid=live.filter(a=>u.ok(a)&&lvOf(a,u.id)<u.max);
       if(!valid.length)continue;
       c=u; tgt=valid[Math.floor(Math.random()*valid.length)]; break;
     }
@@ -33,6 +28,14 @@ function pickCards(){
   if(out.length){                                  // 드로우트 천장 갱신
     if(out.some(c=>c.u&&c.u.r>=1)) G.rareDry=0;
     else G.rareDry=(G.rareDry||0)+1;
+  }
+  /* 무기 카드 (DESIGN 4.1, 2026-08-22) — 고용 폐지: 무기는 드래프트에서 만난다.
+     파티에 없는 무기가 출정 풀(META.draftPool)에 있으면 드래프트당 최대 1장, 25% 확률.
+     보유가 늘수록 후보가 줄어 자연히 덜 나오고, 다 모으면 안 나온다 */
+  if(out.length&&Math.random()<.25){
+    const taken=new Set(allies.map(x=>x.key));
+    const wc=Object.keys(EQUIP).filter(k=>!taken.has(k)&&META.draftPool[k]!==false);
+    if(wc.length) out[out.length-1]={weapon:wc[Math.floor(Math.random()*wc.length)]};
   }
   return out;
 }
@@ -44,13 +47,29 @@ function drawCards(cards,onPick){
     return;
   }
   cards.forEach(c=>{
+    if(c.weapon){                                  // 무기 카드 — 고르면 새 용병이 들고 합류 (4.1)
+      const k=c.weapon, v=EQUIP[k], L=metaRank(k,'lvl');
+      const el=document.createElement('div');
+      el.className='card wpn';
+      el.innerHTML=`<div class="target">새 무기 — 용병이 합류한다</div>
+        <div class="cname">${weaponIcon(k)}${v.name}${L?` <span class="lvtag">+${L}강</span>`:''}</div>
+        <div class="cdesc">${v.desc}</div>
+        <div class="cdesc" style="color:var(--heat)">필살 · ${v.ultName} — ${ultHead(k)}</div>
+        <div class="cdesc">원소 ${elemChoices(k)}</div>
+        <div class="crar">무기 · 획득 시 리롤 +1</div>`;
+      el.onclick=()=>{
+        sfx('hire'); hireMerc(k); G.rerolls++;
+        renderCrew(); renderLoadout(); onPick();
+      };
+      box.appendChild(el); return;
+    }
     const cls=['','rare','epic','gold'][c.u.r];
     const cur=lvOf(c.a,c.u.id), next=cur+1, max=c.u.max;
     const pips=Array.from({length:max},(_,i)=>
       `<i class="pip${i<cur?' on':''}${i===cur?' next':''}"></i>`).join('');
     const el=document.createElement('div');
     el.className='card '+cls;
-    el.innerHTML=`<div class="target">${c.a.isTank?'전사 · ':'망루 · '}${weaponIcon(c.a.key)}${c.a.eq}</div>
+    el.innerHTML=`<div class="target">${weaponIcon(c.a.key)}${c.a.eq}</div>
       <div class="cname">${c.u.n} <span class="lvtag">${next}단계</span>${c.u.when?`<span class="when-tag">${c.u.when}</span>`:''}</div>
       <div class="pips">${pips}</div>
       <div class="cdesc">${c.u.d(c.a,cur)}</div>

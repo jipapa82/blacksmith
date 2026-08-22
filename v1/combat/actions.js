@@ -14,10 +14,11 @@ function fireArrow(a,th,dmg,isUlt){
 function stepProjs(dt){
   for(const p of projs){
     p.x+=p.vx*dt; p.y+=p.vy*dt;
-    if(p.foe){                                   // 적 화살 → 전사 또는 대장간 (망루는 안전 지대)
-      const T=tankAlly();
-      if(T&&Math.hypot(T.x-p.x,T.y-p.y)<T.r+4){ hurtAlly(T,p.dmg,p.srcM); p.left=0; }
-      else if(Math.hypot(FORGE.x-p.x,FORGE.y-p.y)<FORGE.r+6){ hurtForge(p.dmg); p.left=0; }
+    if(p.foe){                                   // 적 화살 → 아군 명중
+      for(const al of allies){
+        if(al.hp<=0)continue;
+        if(Math.hypot(al.x-p.x,al.y-p.y)<al.r+4){ hurtAlly(al,p.dmg,p.srcM); p.left=0; break; }
+      }
     }else{                                       // 아군 화살 → 경로의 적, 관통마다 62%로
       for(const m of mobs){
         if(m.hp<=0||p.hit.has(m))continue;
@@ -33,21 +34,17 @@ function stepProjs(dt){
   projs=projs.filter(p=>p.left>0&&p.x>-30&&p.x<W+30&&p.y>-30&&p.y<H+30);
 }
 
-/* 대검의 타격 앵커 — v2: 전사가 바라보는(가장 가까운 적) 방향으로 30 앞.
-   공격·필살기·범위 표시가 모두 이걸 쓴다 (7.2: 표시=판정) */
+/* 대검의 타격 앵커 — 뒷줄이면 전선 기준. 공격·필살기·범위 표시가 모두 이걸 쓴다 (7.2: 표시=판정) */
 function cleaveAnchor(a){
-  let ux=1,uy=0;
-  const near=mobs.filter(m=>m.hp>0)
-    .sort((p,q)=>Math.hypot(p.x-a.x,p.y-a.y)-Math.hypot(q.x-a.x,q.y-a.y))[0];
-  if(near){const d=Math.hypot(near.x-a.x,near.y-a.y)||1; ux=(near.x-a.x)/d; uy=(near.y-a.y)/d;}
-  return {x:a.x+ux*30, y:a.y+uy*30,          // 기본 공격 중심
-          ux:a.x+ux*90, uy:a.y+uy*90,        // 내려찍기 시작점
-          dx:ux, dy:uy};                     // 진행 방향 (내려찍기 3연타가 따라간다)
+  const F=frontAlly(), anchored=!a.front&&F&&F!==a;
+  return {x:anchored?F.x+45:a.x+30, y:anchored?F.y:a.y,        // 기본 공격 중심
+          ux:anchored?F.x+60:a.x+90, uy:anchored?F.y:a.y};     // 내려찍기 시작점
 }
 
-/* 침투자 — v2: 대장간 앞마당(x<220)까지 들어온 적. 단검(암살)의 사냥감 (DESIGN 0장) */
+/* 침투자 — 전선(앞줄)을 넘어 들어온 적. 단검(암살)의 사냥감 (DESIGN 3.3) */
 function behindLine(m){
-  return m.x < FORGE.x+170;
+  const F=frontAlly();
+  return m.x < (F?F.x+30:FRONT_X+30);
 }
 
 /* 필살기 수동 발동 — 키 1~5와 부대 카드 버튼이 부른다 (DESIGN 4.1.2) */
@@ -67,7 +64,7 @@ function ultWorth(a){
     if(m.hp<=0)continue;
     if(a.trait==='shoot'){ if(m.x>a.x)s+=w(m); }
     else if(a.trait==='blast'){ if(m.x>a.x)s+=w(m); }
-    else if(a.trait==='cleave'){ if(Math.hypot(m.x-a.x,m.y-a.y)<300*a.ultR)s+=w(m); }   // v2: 전사가 움직이므로 방사형
+    else if(a.trait==='cleave'){ if(m.x>a.x&&m.x<a.x+320*a.ultR&&Math.abs(m.y-a.y)<90*a.ultR)s+=w(m); }
     else if(a.trait==='assassin'){ if(behindLine(m)||m.type==='boss')s+=4; }  // 침투자나 대장이 있으면 즉시
     else{ const R=135*a.ultR; if(Math.hypot(m.x-a.x,m.y-a.y)<R)s+=w(m); }
     if(s>=4)return true;
@@ -99,14 +96,14 @@ function ultimate(a,isEcho){
     beam(a.x,a.y,t.x,t.y,C,3); slashFx(t.x,t.y,C); ring(t.x,t.y,26,C,1.5);
     hurtMob(t,atkOf(a)*6.0*P,a,true);
   }
-  else if(a.trait==='cleave'){                 // 내려찍기 — 바라보는 방향으로 3연타 (v2)
+  else if(a.trait==='cleave'){                 // 내려찍기 — 전선에서 앞으로 3연타
     const R=90*a.ultR;
-    const an=cleaveAnchor(a);
+    const an=cleaveAnchor(a), ax=an.ux, ay=an.uy;
     for(let i=0;i<3;i++){
-      const cx=an.ux+i*70*an.dx, cy=an.uy+i*70*an.dy;
+      const cx=ax+i*70;
       after(i*90,()=>{
-        ring(cx,cy,R,elemColor(a)||'#E8963C',2);
-        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-cy)<R)
+        ring(cx,ay,R,elemColor(a)||'#E8963C',2);
+        mobs.filter(m=>m.hp>0&&Math.hypot(m.x-cx,m.y-ay)<R)
             .forEach(m=>hurtMob(m,atkOf(a)*0.9*P,a,true));
       });
     }
@@ -177,11 +174,9 @@ function allyAct(a){
         beam(sx,sy,mark.x,mark.y,C,1.5); slashFx(mark.x,mark.y,C);
         hurtMob(mark,atkOf(a)*a.ambush*mult,a);   // 암살 일격 ('기습' 카드로 강화) — 표적은 같다
       }else{
-        /* v2: 질주는 전사 주위 280 안에서만 — 위치 선정이 곧 실력 (DESIGN 0장) */
-        let path=live2.filter(m=>Math.hypot(m.x-a.x,m.y-a.y)<280);
-        if(!path.length)return;
+        let path=live2.slice();
         if(shadow) path.sort(()=>Math.random()-.5);               // 분신은 서로 다른 길로 질주 — 도포가 넓어진다
-        else path.sort((p,q)=>Math.hypot(p.x-a.x,p.y-a.y)-Math.hypot(q.x-a.x,q.y-a.y));  // 본체는 가까운 쪽부터
+        else path.sort((p,q)=>p.x-q.x);                           // 본체는 가까운 쪽부터
         path=path.slice(0,a.dashN);
         path.forEach((m,i)=>{                                     // 한 명 벨 때마다 0.2초 뒤 다음으로 —
           after(i*200,()=>{                                       // 한 번에 다 베면 전파가 안 보인다 (7.5)
@@ -197,7 +192,7 @@ function allyAct(a){
     for(let c=1;c<=a.clones;c++)                                  // 그림자 분신 — 시차를 두고 따라 친다 (7.2)
       after(c*120,()=>{ if(a.hp>0) strike(.3,'#77808C',true); });
   }else if(a.trait==='cleave'){
-    // v2: 바라보는 방향의 타격 지대를 내려친다 — 위치 선정이 곧 광역 (DESIGN 0장)
+    // 뒷줄이면 전선 너머로 내려친다 — 방패가 세우고 대검이 부순다 (DESIGN 3.3)
     const an=cleaveAnchor(a);
     const targets=live.filter(m=>Math.hypot(m.x-an.x,m.y-an.y)<a.cleaveR);
     if(!targets.length)return;
@@ -227,20 +222,20 @@ function allyAct(a){
     }
   }
 }
-/* v2 표적 규칙 (DESIGN 0장): 기본은 대장간 직행.
-   돌격병·대장은 어그로 반경 안의 전사를 문다 / 돌파병은 전사를 무시 / 궁수는 260 안의 전사 우선 */
 function mobStep(m,dt){
-  const T=tankAlly();
-  const dT=T?Math.hypot(T.x-m.x,T.y-m.y):1e9;
-  let tgt=FORGE, stopD=FORGE.r+m.r+2;
-  if(m.behav==='range'){ tgt=(T&&dT<260)?T:FORGE; stopD=185; }
-  else if(m.behav==='wall'&&T&&dT<(T.aggroR||110)){ tgt=T; stopD=T.r*(T.blockR||1)+m.r+3; }
+  const F=frontAlly(), B=anyBack();
+  let tgt=null, stopD=0;
+  if(m.behav==='wall'){ tgt=F||B; stopD=(tgt?tgt.r*(tgt.blockR||1):16)+m.r+3; }
+  else if(m.behav==='leak'){ tgt=B||F; stopD=(tgt?tgt.r:16)+m.r+3; }
+  else{ tgt=B||F; stopD=185; }
+  if(!tgt)return;
   if(m.freezeT>0) return;                                  // 빙결: 행동 불가
   if(m.stun>0){ m.stun-=dt; m.x=Math.min(W+20,m.x); return; }
   const dx=tgt.x-m.x, dy=tgt.y-m.y, dist=Math.hypot(dx,dy);
   if(dist>stopD){
     const slow=(m.chillT>0&&m.chillLv)?(1-STATUS.chill.slow[m.chillLv-1]):1;   // 한기: 단계별 감속
     const s=m.mv*slow*dt/dist; m.x+=dx*s; m.y+=dy*s;
+    if(m.behav==='wall'&&F&&m.x<F.x+8) m.x=F.x+8;
   }else{
     m.charge+=dt*m.aspd;
     if(m.charge>=1){ m.charge=0; m.lung=.12;
@@ -248,8 +243,7 @@ function mobStep(m,dt){
         const th=Math.atan2(tgt.y-m.y,tgt.x-m.x);
         projs.push({x:m.x,y:m.y,vx:Math.cos(th)*330,vy:Math.sin(th)*330,
           dmg:m.atk,left:1,w:14,foe:true,srcM:m,c:'#9B8ACB'});
-      }else if(tgt===FORGE){ slashFx(FORGE.x+FORGE.r-6,FORGE.y,'#C4574F'); hurtForge(m.atk); }
-      else{ slashFx(tgt.x,tgt.y,'#C4574F'); hurtAlly(tgt,m.atk,m); } }
+      }else{ slashFx(tgt.x,tgt.y,'#C4574F'); hurtAlly(tgt,m.atk,m); } }
   }
   for(const o of mobs){
     if(o===m||o.hp<=0)continue;

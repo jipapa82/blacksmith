@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>대장간 — 전투 프로토타입 v6</title>
+<title>대장간 — 전투 프로토타입 v5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 
 <header>
   <h1>대장간 <em>/</em> 전투 프로토타입</h1>
-  <span class="tagline">v6 — 대장간을 지켜라</span>
+  <span class="tagline">v5 — 남김없이 잡아야 끝난다</span>
   <div class="head-actions">
     <div class="seg" id="ultSeg" title="필살기 발동 방식">
       <button data-um="auto">필살 자동</button>
@@ -37,6 +37,7 @@
       <div class="panel-hd">편성</div>
       <div class="panel-bd">
         <div id="mercList"></div>
+        <button class="swap-btn" id="swapBtn">앞줄 · 뒷줄 바꾸기</button>
         <p class="note">용병 능력치는 0. 모든 수치는 장비에서 온다.<br>
           강화도 용병이 아니라 장비에 새겨진다.</p>
       </div>
@@ -85,13 +86,11 @@
     <div class="canvas-wrap"><canvas id="cv" width="880" height="400"></canvas></div>
     <div class="crew" id="crew"></div>
     <div class="legend">
-      <span class="lg"><b style="color:var(--quench)">이동</b> — WASD·방향키·터치</span>
-      <span class="lg"><b style="color:var(--heat)">기폭</b> — 상태이상 걸린 적을 전사가 치면 터진다</span>
-      <span class="lg"><i class="dot" style="background:#C4574F"></i>돌격병 — 전사를 문다</span>
-      <span class="lg"><i class="dot" style="background:#E8963C"></i>돌파병 — 대장간에 직행</span>
-      <span class="lg"><i class="dot" style="background:#9B8ACB"></i>궁수 — 멀리서 쏜다</span>
+      <span class="lg"><i class="dot" style="background:#C4574F"></i>돌격병 — 앞줄에 막힌다</span>
+      <span class="lg"><i class="dot" style="background:#E8963C"></i>돌파병 — 뒤로 파고든다</span>
+      <span class="lg"><i class="dot" style="background:#9B8ACB"></i>궁수 — 멀리서 뒷줄을 쏜다</span>
       <span class="lg"><i class="dot" style="background:#8B4A44"></i>대장 — 느리고 두껍다</span>
-      <span class="lg" style="margin-left:auto">수동 필살 — <b style="color:var(--heat)">1~3</b> 키 또는 부대 카드 버튼</span>
+      <span class="lg" style="margin-left:auto">필살기 — 상단에서 자동/수동 선택. 수동은 <b style="color:var(--heat)">1~5</b> 키 또는 버튼</span>
     </div>
   </div>
 </main>

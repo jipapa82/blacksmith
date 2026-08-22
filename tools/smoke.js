@@ -27,7 +27,7 @@ function stubEl() {
     textContent: '', disabled: false, onclick: null, oninput: null, onchange: null,
     width: 880, height: 400,
     appendChild(c) { this.children.push(c); return c; },
-    remove() {}, insertAdjacentHTML() {},
+    remove() {}, insertAdjacentHTML() {}, addEventListener() {},
     querySelector() { return stubEl(); },
     querySelectorAll() { return []; },
     getContext() { return ctxStub; },
@@ -64,6 +64,7 @@ const localStorageStub = {
 const sandbox = {
   document: documentStub,
   localStorage: localStorageStub,
+  window: { addEventListener() {} },   // v2 조작 리스너용
   console,
   requestAnimationFrame() {},
   setTimeout(fn) { fn(); },   // 연출 지연은 즉시 실행으로 대체
@@ -95,6 +96,15 @@ const driver = `
     while (rounds++ < 400) {
       let guard = 0;
       while (running && guard++ < 400000) {
+        if (guard % 30 === 0) {                    // v2: 전사 조작 흉내 — 가장 가까운 적을 쫓는다
+          const T = allies[0];
+          if (T && T.hp > 0) {
+            let best = null, bd = 1e9;
+            for (const m of mobs) { if (m.hp <= 0) continue;
+              const d = Math.hypot(m.x - T.x, m.y - T.y); if (d < bd) { bd = d; best = m; } }
+            moveTarget = best ? { x: best.x, y: best.y } : null;
+          }
+        }
         step(1/60);
         if (guard % 120 === 0) draw(1/60);
         if (guard % 180 === 0)                     // 키 1~5 입력 흉내
@@ -133,8 +143,8 @@ const driver = `
     return 'incomplete';
   }
 
-  out.push('--- 1회차 (노드 없음, 방패+대검 편성 — 전선 앵커 검증) ---');
-  loadout = ['shield','great'];
+  out.push('--- 1회차 (노드 없음, 대검 전사 — 광역·기폭 흐름 검증) ---');
+  loadout = ['great','bow','wand'];
   out.push('RUN1: ' + playRun('r1'));
   out.push('금고 누적: ' + META.gold + '골드' + (META.gold>0?' OK':' NONE_BANKED'));
 
@@ -170,9 +180,9 @@ const driver = `
     ? 'OK (실패 유지 → 15%+3%p → 성공 시 천장 초기화)' : 'WRONG '+f1+'/'+rateAfterFail+'/'+s1));
   out.push('저장 확인: ' + (localStorage.getItem('blacksmith-meta-v1') ? 'localStorage OK' : 'MISSING'));
 
-  out.push('--- 2회차 (수동 모드, 방패+활 편성 — 질풍 연사 검증) ---');
+  out.push('--- 2회차 (수동 모드, 방패 전사 — 질풍 연사 검증) ---');
   META.autoUlt = false;
-  loadout = ['shield','bow'];
+  loadout = ['shield','bow','wand'];
   startRun();
   const bowAlly = allies.find(a=>a.key==='bow');
   out.push('활 연사 수(2강 연마 Ⅰ → 7발): ' + (5+2*bowAlly.ultRank) + ((5+2*bowAlly.ultRank)===7?' OK':' WRONG'));
@@ -180,14 +190,14 @@ const driver = `
   out.push('RUN2: ' + playRun('r2'));
   out.push('필살기 수동 발동 횟수: ' + ultFired + (ultFired>0?' OK':' NONE_FIRED'));
 
-  out.push('--- 3회차 (자동 모드, 방패+단검 편성 — 암살 검증) ---');
+  out.push('--- 3회차 (자동 모드, 단검 전사 — 암살·질주 검증) ---');
   META.autoUlt = true;
-  loadout = ['shield','sword'];
+  loadout = ['sword','bow','wand'];
   const before = ultFired;
   out.push('RUN3: ' + playRun('r3'));
   out.push('자동 모드 중 수동 개입(갈무리 리필 틈으로 소수는 정상): ' + (ultFired - before));
-  out.push('검증: 방패 ultPow=' + allies.filter(a=>a.key==='shield').map(a=>a.ultPow)
-    + ' (2강=0.75), 홈=' + allies[0].sock.length);
+  out.push('검증: 활 ultPow=' + allies.filter(a=>a.key==='bow').map(a=>a.ultPow)
+    + ' (2강=0.75), 전사 홈=' + allies[0].sock.length + ' isTank=' + allies[0].isTank);
   gainGem('ruby',5); gainGem('ruby',5);
   const ft=mergeFinal('ruby:5','ruby:5');
   const a0=allies[0]; a0.hp=1; a0.sock[0]={type:'ruby',grade:FINAL_GRADE}; recalcGems(a0); recalcAuras();
@@ -203,36 +213,37 @@ const driver = `
   const badEl=allies.filter(a=>{const e=elemOf(a);return e&&!EQUIP[a.key].elems.includes(e);});
   out.push('무기별 원소 제한: ' + (badEl.length ? 'VIOLATION — 허용 밖 원소' : 'OK (허용 목록 준수)'));
 
-  out.push('--- 무기 카드 (드래프트 합류 — 고용 폐지, DESIGN 4.1) ---');
-  /* 난수 0.10 고정: 희귀 슬롯에 유효 카드가 뽑히고 + 주입 확률(<0.25) 통과 + 후보 첫 번째.
-     출정 풀에서 뺀 무기(활)는 나오면 안 된다 */
-  loadout=['shield','sword']; startRun();
-  const mrW=Math.random; Math.random=()=>0.10;
-  META.draftPool.bow=false;
-  const pcW=pickCards();
-  const wcard=pcW[pcW.length-1];
-  out.push('무기 카드 주입: ' + (wcard&&wcard.weapon==='great'
-    ? 'OK (무딘 대검 — 활은 출정 풀 제외 준수)'
-    : 'WRONG '+(wcard?JSON.stringify(wcard.weapon||wcard.u&&wcard.u.id):'빈 드래프트')));
-  const nA=allies.length, nR=G.rerolls;
-  drawCards(pcW,()=>{});
-  const cboxW=document.getElementById('cards');
-  const wEl=cboxW.children[cboxW.children.length-1];
-  if(wEl&&wEl.onclick)wEl.onclick();
-  out.push('무기 카드 획득: ' + (allies.length===nA+1&&G.rerolls===nR+1
-    &&allies[allies.length-1].key==='great'
-    ? 'OK (용병 '+allies.length+'명 합류, 리롤 +1)'
-    : 'WRONG allies='+allies.length+' rerolls='+G.rerolls));
-  META.draftPool={};
-  const takenW=new Set(allies.map(a=>a.key));
-  Object.keys(EQUIP).filter(k=>!takenW.has(k)).forEach(k=>hireMerc(k));
-  const pcW2=pickCards();
-  Math.random=mrW;
-  out.push('풀 소진: ' + (pcW2.length&&pcW2.every(c=>!c.weapon)
-    ? 'OK (5종 보유 시 무기 카드 없음)' : 'WRONG'));
+  out.push('--- v2 검증: 전사·망루·기폭·대장간 (DESIGN 0장) ---');
+  loadout=['shield','bow','wand']; startRun();
+  out.push('전사 지정: ' + (allies[0].isTank&&allies[0].hp>0
+    ? 'OK (allies[0]='+allies[0].eq+')' : 'WRONG'));
+  out.push('망루 배치: ' + (allies[1].x===TOWERS[0].x&&allies[1].y===TOWERS[0].y
+    &&allies[2].x===TOWERS[1].x&&allies[2].y===TOWERS[1].y
+    ? 'OK (딜러 2명 망루 위)' : 'WRONG'));
+  out.push('카드 2+2: ' + (function(){
+    const pc=pickCards();
+    const tk=pc.filter(c=>c.a.isTank).length, tw=pc.length-tk;
+    return pc.length===4&&tk===2&&tw===2 ? 'OK (전사 2 + 망루 2)' : 'WRONG '+tk+'+'+tw+'/'+pc.length;
+  })());
+  /* 기폭 — 난수 고정(치명 없음): 화상 걸린 적을 전사가 치면 상태를 소모하고 터진다 */
+  { const mrD=Math.random; Math.random=()=>0.99;
+    const T2=allies[0];
+    const md=mkMob('rush'); md.hp=md.maxhp=800; md.def=0; md.x=T2.x+20; md.y=T2.y;
+    mobs=[md]; md.burn={t:2,dps:10,pt:0,src:null};
+    const hp0=md.hp, atk=atkOf(T2);
+    hurtMob(md,atk,T2,false);
+    const expDet=Math.max(1,Math.round(20*1.2+atk*.5*1));
+    const expected=hp0-Math.max(1,Math.round(atk))-expDet;
+    out.push('기폭: ' + (md.burn===null&&md.hp===expected
+      ? 'OK (화상 소모 → 폭발 +'+expDet+', '+hp0+'→'+md.hp+')'
+      : 'WRONG hp='+md.hp+' 기대='+expected+' burn='+JSON.stringify(md.burn)));
+    Math.random=mrD; mobs=[]; }
+  FORGE.hp=0; step(1/60);
+  out.push('대장간 파괴 종료: ' + (phase==='end'&&statusTxt.textContent==='파괴'
+    ? 'OK (내구 0 → 런 종료)' : 'WRONG phase='+phase+' status='+statusTxt.textContent));
 
   out.push('--- 4회차 (귀환 검증 — 첫 정비에서 런을 끝낸다) ---');
-  loadout=['shield','wand'];
+  loadout=['shield','bow','wand'];
   const bestBefore=META.best;
   startRun();
   let r4='';

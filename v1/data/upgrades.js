@@ -4,16 +4,6 @@
    설명 문법: when(시점 태그) + 대상 명시("이 무기/누가 걸었든") + 정확한 수치.
    ok: 이 카드가 뜰 조건 / when: 발동 시점 / d: 설명 / f: 적용 */
 const UP=[
-  /* ===== 전사 (v2, DESIGN 0장) — 조작·기폭의 손맛을 키운다. ok: isTank */
-  {id:'legs', n:'단련된 다리', max:3, r:0, when:'상시', ok:a=>a.isTank,
-   d:a=>`전사 이동 속도 +15% (현재 ${Math.round(a.moveSpd)})`, f:a=>a.moveSpd*=1.15},
-  {id:'taunt', n:'도발', max:2, r:0, when:'상시', ok:a=>a.isTank,
-   d:a=>`돌격병·대장이 전사를 무는 거리 +30% (현재 ${Math.round(a.aggroR)}) — 돌파병은 여전히 무시한다`, f:a=>a.aggroR*=1.3},
-  {id:'detr', vis:1, n:'넓은 기폭', max:3, r:1, when:'기폭', ok:a=>a.isTank,
-   d:a=>`기폭 파급 반경 +30% (현재 ${Math.round(a.detR)})`, f:a=>a.detR*=1.3},
-  {id:'detp', vis:1, n:'큰 기폭', max:3, r:1, when:'기폭', ok:a=>a.isTank,
-   d:a=>`기폭 피해 +40%p (현재 ${Math.round(a.detPow*100)}%)`, f:a=>a.detPow+=.4},
-
   /* ===== 일반 — 생존 행동 ===== */
   {id:'leech', n:'피 먹는 홈',  max:4, r:0, when:'처치 시', ok:()=>1,
    d:a=>`이 무기가 적을 잡을 때마다 체력 +1 (현재 +${a.leech}, 토파즈 흡혈과 합산)`, f:a=>a.leech+=1},
@@ -55,7 +45,7 @@ const UP=[
    d:()=>'이 무기가 적을 막아 세우는 범위 +15%', f:a=>a.blockR*=1.15},
   {id:'reach', n:'긴 자루',     max:4, r:1, when:'상시', ok:a=>a.trait==='wall',
    d:a=>`이 무기 기본 공격 사거리 +15% (현재 ${Math.round(a.range)})`, f:a=>a.range*=1.15},
-  {id:'guard', n:'전선 사수',   max:2, r:1, when:'피격 시', ok:()=>0,   // v2 봉인 — 망루는 피해를 안 받는다 (DESIGN 0장)
+  {id:'guard', n:'전선 사수',   max:2, r:1, when:'피격 시', ok:a=>a.trait==='wall',
    d:a=>`뒷줄이 받는 피해의 ${25*(a.guard+1)}%를 이 무기가 대신 받는다`, f:a=>a.guard++},
   {id:'ambush', n:'기습',       max:4, r:1, when:'기본 공격', ok:a=>a.trait==='assassin',
    d:a=>`침투자(전선을 넘어온 적)·대장 일격 피해 ×${(a.ambush+.25).toFixed(2)} (현재 ×${a.ambush.toFixed(2)})`, f:a=>a.ambush+=.25},

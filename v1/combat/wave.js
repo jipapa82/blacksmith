@@ -31,41 +31,13 @@ function step(dt){
   }
   recalcAuras();                                     // 파티 오라 (최종 루비·자수정)
   if(hasteT>0)hasteT=Math.max(0,hasteT-dt);          // 질풍의 오라
-
-  /* v2 전사 조작 (DESIGN 0장) — 키보드가 우선, 없으면 터치/클릭 목표로 이동 */
-  const T=allies[0];
-  if(T&&T.isTank&&T.hp>0){
-    let vx=0,vy=0;
-    if(keys.ArrowLeft||keys.a||keys.A)vx-=1;
-    if(keys.ArrowRight||keys.d||keys.D)vx+=1;
-    if(keys.ArrowUp||keys.w||keys.W)vy-=1;
-    if(keys.ArrowDown||keys.s||keys.S)vy+=1;
-    if(vx||vy){
-      moveTarget=null;
-      const l=Math.hypot(vx,vy);
-      T.x+=vx/l*T.moveSpd*dt; T.y+=vy/l*T.moveSpd*dt;
-    }else if(moveTarget){
-      const dx=moveTarget.x-T.x, dy=moveTarget.y-T.y, d=Math.hypot(dx,dy);
-      if(d<6) moveTarget=null;
-      else { T.x+=dx/d*T.moveSpd*dt; T.y+=dy/d*T.moveSpd*dt; }
-    }
-    T.x=Math.max(FORGE.x+FORGE.r+T.r,Math.min(W-T.r-4,T.x));
-    T.y=Math.max(26,Math.min(H-26,T.y));
-  }else if(T&&T.isTank&&T.hp<=0&&T.respawnT>0){      // 사망 → 6초 뒤 대장간 앞 복귀
-    T.respawnT-=dt;
-    if(T.respawnT<=0){
-      T.hp=maxHpOf(T); T.x=FORGE.x+FORGE.r+40; T.y=MID_Y; moveTarget=null;
-      T.lastStandUsed=false;
-      ring(T.x,T.y,T.r+16,'#D8E4EA',2); num(T.x,T.y-24,'복귀','#D8E4EA',1); sfx('wave');
-    }
-  }
-
   allies.forEach(a=>{
     if(a.hp<=0){
       if(a.reviveT>0){ a.reviveT-=dt;                // 되살리는 맥박 (최종 토파즈)
         if(a.reviveT<=0){
           a.hp=Math.round(maxHpOf(a)*AURA.topaz.reviveHp);
           ring(a.x,a.y,a.r+16,'#E0C050',2); num(a.x,a.y-20,'부활','#E0C050',1);
+          layoutAllies();
         } }
       return;
     }
@@ -89,7 +61,7 @@ function step(dt){
   lvTxt.textContent=lv; xpFill.style.width=Math.min(100,xp/xpNeed(lv)*100)+'%';
   renderCrew();
   if(waveSpawned>=w.count&&mobs.length) statusTxt.textContent='잔당 정리';
-  if(FORGE.hp<=0){running=false;showEnd(false);return;}  // v2 패배 = 대장간 파괴 (딜러는 안전 지대)
+  if(!liveAllies().length){running=false;showEnd(false);return;}
   if(pendingLv>0){running=false;openLevelUp();return;}   // 레벨업: 잠깐 멈추고 3택 (DESIGN 4.1)
   if(waveSpawned>=w.count&&!mobs.length){running=false;openForge();}
 }
@@ -98,7 +70,6 @@ function beginWave(){
   curWave=waveSpec(waveIdx);
   waveT=0; spawnT=0; waveSpawned=0; waveKills=0; mobs=[]; G._boss=0;
   delayed=[]; projs=[];                          // 지난 웨이브의 연출 지연·투사체는 버린다
-  FORGE.hp=FORGE.maxhp;                          // v2: 웨이브 시작마다 완전 수리 (다이얼 후보, DESIGN 0장)
   aliveTxt.textContent=curWave.count+(curWave.boss?1:0);
   waveNum.textContent=fmtWave(waveIdx+1); waveNum.classList.add('live');
   waveTitle.textContent=curWave.title; statusTxt.textContent='교전 중';

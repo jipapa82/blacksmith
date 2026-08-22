@@ -23,9 +23,9 @@ function showEnd(win){
   if(rec)META.best=cleared;
   META.gold+=banked; saveMeta();
   const ov=document.createElement('div'); ov.className='overlay'; ov.id='ov';
-  ov.innerHTML=`<div class="big ${win?'win':'lose'}">${win?'귀환':'대장간 파괴'}</div>
+  ov.innerHTML=`<div class="big ${win?'win':'lose'}">${win?'귀환':'전멸'}</div>
     <div class="ov-sub">${win?`웨이브 ${fmtWave(cleared)}까지 밀어내고 ${G.kills}마리를 정리했다. 용병 ${surv}명이 돌아왔다.`
-      :`웨이브 ${fmtWave(waveIdx+1)}, ${G.kills}마리째에서 대장간이 무너졌다. 장비는 잿더미에서 회수했다.`}</div>
+      :`웨이브 ${fmtWave(waveIdx+1)}, ${G.kills}마리째에서 무너졌다. 장비는 회수했다.`}</div>
     <div class="loot">골드 +${G.gold} · 도달 보너스 +${bonus} → 금고 ${META.gold}
       · 최고 웨이브 ${fmtWave(META.best)}${rec?' — <b style="color:var(--heat)">신기록</b>':''}</div>
     <div class="ov-sub" style="color:#5C636D">금고의 골드로 대장간에서 무기를 두드린다 (강화).<br>
@@ -37,7 +37,7 @@ function showEnd(win){
   document.getElementById('arena').appendChild(ov);
   document.getElementById('againBtn').onclick=startRun;
   document.getElementById('metaOpenBtn').onclick=openMeta;
-  statusTxt.textContent=win?'귀환':'파괴';
+  statusTxt.textContent=win?'귀환':'전멸';
   sfx('end');
 }
 
@@ -51,12 +51,8 @@ function reset(){
   G.rerolls=metaRank('_global','nreroll');   // 시작 리롤은 노드만큼. 무기 카드 획득마다 +1 (DESIGN 4.1)
   G.rareDry=0;                               // 희귀 드로우트 천장 (DESIGN 4.1)
   mercLetter=0;
-  allies=loadout.map((k,i)=>mkAlly(k,i,i===0));
-  allies[0].isTank=true;                     // v2: [0] = 전사 (플레이어 조작, DESIGN 0장)
-  allies[0].x=FRONT_X; allies[0].y=MID_Y;
-  layoutAllies();
+  allies=loadout.map((k,i)=>mkAlly(k,i,i===0)); layoutAllies();
   allies.forEach(a=>a.name=nextMercName());
-  keys={}; moveTarget=null; FORGE.hp=FORGE.maxhp;
   recalcAuras();
   goldTxt.textContent='0'; killTxt.textContent='0'; aliveTxt.textContent='0';
   lvTxt.textContent='1'; gemTxt.textContent='0';
@@ -89,25 +85,11 @@ function syncSnd(){ sndBtn.classList.toggle('on',!!META.sound); sndBtn.textConte
 sndBtn.onclick=()=>{ META.sound=!META.sound; saveMeta(); syncSnd(); sfx('pick'); };
 syncSnd();
 
-/* 키보드 — 이동(WASD·방향키)은 keys에 담고 wave.js step이 읽는다. 숫자 1~5 = 수동 필살 (v2) */
-const MOVE_KEYS=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','w','a','s','d','W','A','S','D'];
+/* 수동 모드: 키 1~5로 발동 */
 document.addEventListener('keydown',e=>{
-  if(MOVE_KEYS.includes(e.key)){ keys[e.key]=true; e.preventDefault(); return; }
   const n=+e.key;
   if(n>=1&&n<=allies.length) fireUlt(n-1);
 });
-document.addEventListener('keyup',e=>{ if(MOVE_KEYS.includes(e.key)) delete keys[e.key]; });
-window.addEventListener('blur',()=>{ keys={}; });
-
-/* 터치/클릭 이동 — 캔버스의 그 지점으로 전사가 걸어간다 (모바일 조작, DESIGN 0장) */
-function cvPoint(e){
-  const r=cv.getBoundingClientRect();
-  return {x:(e.clientX-r.left)*(W/r.width), y:(e.clientY-r.top)*(H/r.height)};
-}
-let _ptrDown=false;
-cv.addEventListener('pointerdown',e=>{ _ptrDown=true; moveTarget=cvPoint(e); e.preventDefault(); });
-cv.addEventListener('pointermove',e=>{ if(_ptrDown) moveTarget=cvPoint(e); });
-window.addEventListener('pointerup',()=>{ _ptrDown=false; });
 document.getElementById('speedSeg').onclick=e=>{
   if(e.target.tagName!=='BUTTON')return; speed=+e.target.dataset.sp;
   [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===e.target));

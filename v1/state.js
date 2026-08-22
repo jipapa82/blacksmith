@@ -1,7 +1,6 @@
 /* ===================== 전역 상태 =====================
    전역 공유 상태는 이 파일 한 곳에만 둔다. 런 단위 초기화는 main.js의 reset(). */
-/* v2: [0]=전사 무기(플레이어 조작, 단검/대검/방패) + 나머지=망루 딜러 (DESIGN 0장) */
-let loadout=['shield','bow','wand'];
+let loadout=['shield','bow'];   // 기본 편성: 용병 A 참나무 방패(앞줄) + 용병 B 사냥 활(뒷줄)
 let speed=1, running=false, phase='idle';
 let allies=[], mobs=[], fxs=[], nums=[];
 let projs=[];                                   // 투사체 (아군 화살·적 화살) — combat/actions.js가 굴린다
@@ -18,13 +17,6 @@ const G={gold:0, kills:0, goldMul:1, rerolls:0, gems:{}};
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const W=cv.width, H=cv.height;
 const BACK_X=112, FRONT_X=228, MID_Y=H/2;
-
-/* ===== v2 (DESIGN 0장) — 대장간 기지·망루·조작 입력 ===== */
-/* 내구 400→900 (2026-08-22): 물량이 대장간 한 점으로 수렴해 400은 풀강화 봇도 w7~9에서 끝났다 */
-const FORGE={x:52, y:MID_Y, r:30, hp:900, maxhp:900};   // 내구도 0 = 런 종료. 웨이브마다 완전 수리
-const TOWERS=[{x:120,y:64},{x:120,y:H-64}];             // 망루 — 딜러가 올라가는 안전 지대
-let keys={};                                            // 키보드 입력 (main.js가 채운다)
-let moveTarget=null;                                    // 터치/클릭 이동 목표 {x,y}
 
 /* HUD DOM 참조 */
 const goldTxt=document.getElementById('goldTxt'),

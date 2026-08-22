@@ -17,19 +17,17 @@ function mkAlly(k,i,front){
     dblHit:0, finisher:0, heavyHand:0, momentum:0, _cmT:null, _cmN:0,   // 평타 강화 (4.1.1)
     ultHaste:0, echo:0,                                                 // 필살 강화 (4.1.2)
     breather:0, guard:0, lastStand:0, lastStandUsed:false, noHitT:0,    // 생존 행동 (4.1.1)
-    /* v2 전사 필드 (DESIGN 0장) — isTank는 reset()이 allies[0]에만 켠다 (테스트 오염 방지) */
-    isTank:false, moveSpd:170, aggroR:130, detR:60, detPow:1, respawnT:0,
     sock:Array(mm.slots).fill(null), gm:null,
     reviveUsed:false, reviveT:0,                                   // 되살리는 맥박 (최종 토파즈)
     lv:{}, mods:[]};
   recalcGems(a); a.hp=maxHpOf(a);
   return a;
 }
-/* v2: 딜러만 망루에 앉힌다. 전사(allies[0]) 위치는 조작의 영역 — 여기서 건드리지 않는다 */
 function layoutAllies(){
-  allies.filter(a=>!a.isTank).forEach((a,i)=>{
-    const t=TOWERS[i%TOWERS.length]; a.x=t.x; a.y=t.y;
-  });
+  const backs=allies.filter(a=>!a.front);
+  const gap=Math.min(64, (H-90)/Math.max(1,backs.length));
+  backs.forEach((a,i)=>{ a.x=BACK_X; a.y=MID_Y+(i-(backs.length-1)/2)*gap; });
+  const f=allies.find(a=>a.front); if(f){f.x=FRONT_X;f.y=MID_Y;}
 }
 function hireMerc(k){
   const a=mkAlly(k,allies.length,false);
@@ -106,9 +104,8 @@ function critOf(a){ return a.crit+a.gm.critAdd; }
 function dodgeOf(a){ return Math.min(.6,a.gm.dodgeAdd); }
 function maxHpOf(a){ return Math.round(a.maxhp*a.gm.hpMul); }
 
-/* 자주 쓰는 선택자 — v2: 앞줄=전사(조작), 뒷줄=망루 딜러 */
+/* 자주 쓰는 선택자 */
 const liveAllies=()=>allies.filter(a=>a.hp>0);
-const tankAlly=()=>{const t=allies[0];return t&&t.isTank&&t.hp>0?t:null;};
-const frontAlly=tankAlly;                             // 구 호출부 호환 — 전선 = 전사
-const backAllies=()=>allies.filter(a=>!a.isTank&&a.hp>0);
+const frontAlly=()=>allies.find(a=>a.front&&a.hp>0);
+const backAllies=()=>allies.filter(a=>!a.front&&a.hp>0);
 const anyBack=()=>{const b=backAllies();return b.length?b[Math.floor(Math.random()*b.length)]:null;};
